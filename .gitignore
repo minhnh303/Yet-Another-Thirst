@@ -1,0 +1,44 @@
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Gradle
+.gradle/
+build/
+**/build/
+.gradletasknamecache
+gradle-app.setting
+local.properties
+
+# IntelliJ IDEA
+.idea/*
+!.idea/scopes/
+*.iml
+*.ipr
+*.iws
+out/
+**/out/
+
+# Eclipse
+.metadata/
+.settings/
+.classpath
+.project
+*.launch
+bin/
+**/bin/
+eclipse/
+
+# VS Code
+.vscode/
+
+# Minecraft / Modding specific
+run/
+**/run/
+runs/
+**/runs/
+logs/
+**/logs/
+*.log
+*.lock
+
