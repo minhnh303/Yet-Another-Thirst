@@ -1,5 +1,10 @@
 package dev.minhnh.yetanotherthirst.platform.services;
 
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+
 public interface IPlatformHelper {
 
     /**
@@ -23,6 +28,17 @@ public interface IPlatformHelper {
      * @return True if in a development environment, false otherwise.
      */
     boolean isDevelopmentEnvironment();
+
+    CompoundTag loadThirstData(Player player);
+
+    void saveThirstData(Player player, CompoundTag tag);
+
+    void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled);
+
+    default void sendThirstSync(ServerPlayer player, ThirstState state) {
+
+        sendThirstSync(player, state.getThirst(), state.getQuenched(), state.getExhaustion(), state.isEnabled());
+    }
 
     /**
      * Gets the name of the environment type as a string.

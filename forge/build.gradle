@@ -3,13 +3,6 @@ plugins {
     id 'net.neoforged.moddev.legacyforge'
 }
 
-mixin {
-    add(sourceSets.main, "${mod_id}.refmap.json")
-
-    config("${mod_id}.mixins.json")
-    config("${mod_id}.forge.mixins.json")
-}
-
 legacyForge {
     version = "${minecraft_version}-${forge_version}"
 
@@ -41,18 +34,24 @@ legacyForge {
             sourceSet sourceSets.main
         }
     }
+
+    mixin {
+        add(sourceSets.main, "yet_another_thirst.mixins.json")
+    }
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly project(":common")
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(layout.buildDirectory.dir("mixin")) {
+        include "yet_another_thirst.mixins.json"
+        rename "yet_another_thirst.mixins.json", "yet_another_thirst.refmap.json"
+    }
     finalizedBy('reobfJar')
-    manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
-    ])
 }

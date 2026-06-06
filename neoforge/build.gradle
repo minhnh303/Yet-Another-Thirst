@@ -3,21 +3,16 @@ plugins {
     id 'net.neoforged.moddev.legacyforge'
 }
 
-mixin {
-    add(sourceSets.main, "${mod_id}.refmap.json")
-
-    config("${mod_id}.mixins.json")
-    config("${mod_id}.neoforge.mixins.json")
-}
-
 legacyForge {
-    version = "${minecraft_version}-${neoforge_version}"
+    enable {
+        neoForgeVersion = "${minecraft_version}-${neoforge_version}"
+    }
 
     validateAccessTransformers = true
 
     def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
-        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
+        accessTransformers = [at]
     }
     parchment {
         minecraftVersion = parchment_minecraft
@@ -47,12 +42,8 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
     compileOnly project(":common")
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
 
 jar {
     finalizedBy('reobfJar')
-    manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.neoforge.mixins.json"
-    ])
 }

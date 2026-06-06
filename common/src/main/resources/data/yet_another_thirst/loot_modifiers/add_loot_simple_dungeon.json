@@ -1,0 +1,10 @@
+{
+  "type": "yet_another_thirst:add_loot_table",
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/simple_dungeon"
+    }
+  ],
+  "lootTable": "yet_another_thirst:chests/simple_dungeon"
+}

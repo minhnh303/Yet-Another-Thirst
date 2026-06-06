@@ -1,0 +1,189 @@
+package dev.minhnh.yetanotherthirst.core.purity;
+
+import dev.minhnh.yetanotherthirst.core.item.ModItems;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+
+public final class WaterPurity {
+
+    public static final int MIN_PURITY = 0;
+    public static final int MAX_PURITY = 3;
+
+    /**
+     * Block-state purity stored on cauldrons. Value 0 = unset (use DEFAULT_PURITY);
+     * values 1–4 map to purity levels 0–3 (offset by 1 because 0 is the mixin-safe "null").
+     */
+    public static final IntegerProperty BLOCK_PURITY = IntegerProperty.create("purity", 0, 4);
+
+    private static final List<ContainerWithPurity> CONTAINERS = new ArrayList<>();
+    private static final Random RANDOM = new Random();
+
+    private WaterPurity() {}
+
+    /** Called after item registration is complete (ServerStartedEvent / FMLCommonSetupEvent). */
+    public static void init() {
+        CONTAINERS.clear();
+        CONTAINERS.add(new ContainerWithPurity(
+                new ItemStack(Items.GLASS_BOTTLE),
+                PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER))
+                .setEqualsFilled(stack -> stack.is(Items.POTION) && PotionUtils.getPotion(stack) == Potions.WATER));
+        CONTAINERS.add(new ContainerWithPurity(
+                new ItemStack(ModItems.TERRACOTTA_BOWL.get()),
+                new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get())));
+        CONTAINERS.add(new ContainerWithPurity(
+                new ItemStack(Items.BUCKET),
+                new ItemStack(Items.WATER_BUCKET), false)
+                .canHarvestRunningWater(false));
+    }
+
+    public static boolean isWaterFilledContainer(ItemStack stack) {
+        for (ContainerWithPurity c : CONTAINERS)
+            if (c.equalsFilled(stack)) return true;
+        return false;
+    }
+
+    public static boolean isEmptyWaterContainer(ItemStack stack) {
+        for (ContainerWithPurity c : CONTAINERS)
+            if (c.equalsEmpty(stack)) return true;
+        return false;
+    }
+
+    public static boolean canHarvestRunningWater(ItemStack stack) {
+        for (ContainerWithPurity c : CONTAINERS)
+            if (c.equalsEmpty(stack) && c.canHarvestRunningWater()) return true;
+        return false;
+    }
+
+    public static ContainerWithPurity getContainerForEmpty(ItemStack stack) {
+        for (ContainerWithPurity c : CONTAINERS)
+            if (c.equalsEmpty(stack)) return c;
+        return null;
+    }
+
+    public static boolean hasPurity(ItemStack stack) {
+        return stack.hasTag() && Objects.requireNonNull(stack.getTag()).contains("Purity");
+    }
+
+    public static int getPurity(ItemStack stack) {
+        if (!hasPurity(stack))
+            return ThirstConfig.DEFAULT_PURITY;
+        return Objects.requireNonNull(stack.getTag()).getInt("Purity");
+    }
+
+    public static ItemStack addPurity(ItemStack stack, int purity) {
+        CompoundTag tag = stack.getOrCreateTag();
+        if (purity == ThirstConfig.DEFAULT_PURITY)
+            tag.remove("Purity");
+        else
+            tag.putInt("Purity", purity);
+        return stack;
+    }
+
+    public static ItemStack addPurity(ItemStack stack, Level level, BlockPos pos) {
+        return addPurity(stack, getBlockPurity(level, pos));
+    }
+
+    public static int getBlockPurity(Level level, BlockPos pos) {
+        // Cauldron: stored purity takes precedence over open-water derivation
+        BlockState blockState = level.getBlockState(pos);
+        if (blockState.is(Blocks.WATER_CAULDRON)) {
+            if (blockState.hasProperty(BLOCK_PURITY)) {
+                int val = blockState.getValue(BLOCK_PURITY);
+                return val == 0 ? ThirstConfig.DEFAULT_PURITY : val - 1;
+            }
+            return ThirstConfig.DEFAULT_PURITY;
+        }
+
+        // Open water: derive from Y-coordinate bands and flow
+        int purity = 0;
+        int y = pos.getY();
+        if (y > ThirstConfig.MOUNTAINS_Y || (y < ThirstConfig.CAVES_Y && y < ThirstConfig.MOUNTAINS_Y - 32)) {
+            purity = 1;
+        }
+        if (level.getFluidState(pos).is(FluidTags.WATER) && !level.getFluidState(pos).isSource()) {
+            purity = Math.min(purity + 1, MAX_PURITY);
+        }
+        return purity;
+    }
+
+    /**
+     * Applies purity-based effects to the entity and returns whether thirst should be restored.
+     * Returns true for non-purity-aware items (vanilla potions, food handled elsewhere).
+     */
+    public static boolean givePurityEffects(LivingEntity entity, ItemStack stack) {
+        if (!isWaterFilledContainer(stack)) return true;
+        if (!hasPurity(stack)) return true;
+        return givePurityEffects(entity, getPurity(stack));
+    }
+
+    public static boolean givePurityEffects(LivingEntity entity, int purity) {
+        boolean shouldDrink = true;
+        float chance = RANDOM.nextFloat();
+
+        float nauseaChance;
+        float poisonChance;
+        switch (purity) {
+            case 0 -> { nauseaChance = ThirstConfig.DIRTY_NAUSEA_CHANCE; poisonChance = ThirstConfig.DIRTY_POISON_CHANCE; }
+            case 1 -> { nauseaChance = ThirstConfig.SLIGHTLY_DIRTY_NAUSEA_CHANCE; poisonChance = ThirstConfig.SLIGHTLY_DIRTY_POISON_CHANCE; }
+            case 2 -> { nauseaChance = ThirstConfig.ACCEPTABLE_NAUSEA_CHANCE; poisonChance = ThirstConfig.ACCEPTABLE_POISON_CHANCE; }
+            default -> { nauseaChance = ThirstConfig.PURIFIED_NAUSEA_CHANCE; poisonChance = ThirstConfig.PURIFIED_POISON_CHANCE; }
+        }
+
+        if (entity instanceof ServerPlayer sp) {
+            if (chance < nauseaChance) {
+                sp.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 20 * 5, 0));
+                sp.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20 * 30, 0));
+            }
+            if (chance <= poisonChance) {
+                sp.addEffect(new MobEffectInstance(MobEffects.POISON, 20 * 10, 0));
+                shouldDrink = false;
+            }
+        }
+
+        return shouldDrink || ThirstConfig.QUENCH_WHEN_DEBUFFED;
+    }
+
+    /** Appends a purity tooltip line to the item tooltip if applicable. */
+    public static void appendTooltip(ItemStack stack, List<Component> tooltip) {
+        if (!isWaterFilledContainer(stack) || !hasPurity(stack)) return;
+        int purity = getPurity(stack);
+        if (purity < MIN_PURITY || purity > MAX_PURITY) return;
+        tooltip.add(purityComponent(purity));
+    }
+
+    private static Component purityComponent(int purity) {
+        String key = "yet_another_thirst.purity." + switch (purity) {
+            case 0 -> "dirty";
+            case 1 -> "slightly_dirty";
+            case 2 -> "acceptable";
+            default -> "purified";
+        };
+        int color = switch (purity) {
+            case 0 -> 0xA84C25;
+            case 1 -> 0x795231;
+            case 2 -> 0x5D8B5D;
+            default -> 0x21ABFF;
+        };
+        return Component.translatable(key).withStyle(s -> s.withColor(color));
+    }
+}

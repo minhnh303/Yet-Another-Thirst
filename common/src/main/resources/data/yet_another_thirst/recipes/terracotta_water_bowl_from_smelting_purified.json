@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "type": "forge:nbt",
+    "item": "yet_another_thirst:terracotta_water_bowl",
+    "nbt": "{Purity:2}"
+  },
+  "result": {
+    "item": "yet_another_thirst:terracotta_water_bowl",
+    "nbt": {
+      "Purity": 3
+    }
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

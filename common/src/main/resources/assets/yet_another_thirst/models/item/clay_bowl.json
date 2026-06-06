@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "yet_another_thirst:item/clay_bowl"
+  }
+}

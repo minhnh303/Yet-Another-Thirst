@@ -1,0 +1,10 @@
+{
+  "type": "yet_another_thirst:add_loot_table",
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+    }
+  ],
+  "lootTable": "yet_another_thirst:chests/abandoned_mineshaft"
+}
