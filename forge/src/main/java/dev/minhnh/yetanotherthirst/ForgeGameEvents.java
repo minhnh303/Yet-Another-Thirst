@@ -1,14 +1,12 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.compat.VampirismCompat;
-import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.purity.ContainerWithPurity;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.command.ThirstCommands;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstEvents;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
-import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,7 +18,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -40,8 +37,8 @@ public final class ForgeGameEvents {
     public static void onServerStarted(ServerStartedEvent event) {
         // Items are registered; initialise purity containers now
         WaterPurity.init();
-        // Register custom item thirst values after items exist
-        ThirstValues.registerDrink(ModItems.TERRACOTTA_WATER_BOWL.get(), 5, 7);
+        // Re-resolve config item values after registries and tags are available
+        ForgeConfig.reloadThirstValues();
     }
 
     // ── Tick / player state ───────────────────────────────────────────────────
@@ -87,16 +84,6 @@ public final class ForgeGameEvents {
         ThirstCommands.register(event.getDispatcher());
     }
 
-    @SubscribeEvent
-    public static void onLivingHeal(LivingHealEvent event) {
-
-        if (!ThirstConfig.DEHYDRATION_HALTS_HEALTH_REGEN) return;
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if (ThirstStorage.get(player).isEnabled() && ThirstStorage.get(player).getThirst() < ThirstConfig.MAX_THIRST) {
-            event.setCanceled(true);
-        }
-    }
-
     // ── Purity: running-water pickup ──────────────────────────────────────────
 
     /**
@@ -120,7 +107,6 @@ public final class ForgeGameEvents {
                 player)).getBlockPos();
 
         if (!level.getFluidState(pos).is(FluidTags.WATER)) return;
-        if (level.getFluidState(pos).isSource()) return; // source blocks handled by vanilla
 
         ContainerWithPurity container = WaterPurity.getContainerForEmpty(held);
         if (container == null) return;

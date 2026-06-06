@@ -5,6 +5,7 @@
   "command.yet_another_thirst.disable": "Disabled thirst ticking for %1$s",
   "death.attack.dehydrate": "%1$s died of thirst",
   "death.attack.dehydrate.player": "%1$s died of thirst while fighting %2$s",
+  "effect.yet_another_thirst.quenchness": "Quenchness",
   "item.yet_another_thirst.clay_bowl": "Clay Bowl",
   "item.yet_another_thirst.terracotta_bowl": "Terracotta Bowl",
   "item.yet_another_thirst.terracotta_water_bowl": "Terracotta Water Bowl",

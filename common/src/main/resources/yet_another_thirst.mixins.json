@@ -6,6 +6,9 @@
   "refmap": "yet_another_thirst.refmap.json",
   "mixins": [
     "MixinBootstrap",
+    "MixinFoodData",
+    "MixinInventory",
+    "MixinItem",
     "MixinItemStack",
     "MixinLayeredCauldronBlock"
   ],

@@ -36,14 +36,24 @@ legacyForge {
             sourceSet sourceSets.main
         }
     }
+
+    mixin {
+        add(sourceSets.main, "yet_another_thirst.mixins.json")
+    }
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly project(":common")
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(layout.buildDirectory.dir("mixin")) {
+        include "yet_another_thirst.mixins.json"
+        rename "yet_another_thirst.mixins.json", "yet_another_thirst.refmap.json"
+    }
     finalizedBy('reobfJar')
 }

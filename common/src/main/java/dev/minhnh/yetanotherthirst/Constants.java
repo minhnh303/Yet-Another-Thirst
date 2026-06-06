@@ -4,13 +4,16 @@ import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+
 public class Constants {
 
 	public static final String MOD_ID = "yet_another_thirst";
 	public static final String MOD_NAME = "Yet Another Thirst";
 	public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
 
-	public static ResourceLocation asResource(String path) {
+	@Nonnull
+	public static ResourceLocation asResource(@Nonnull String path) {
 
 		return new ResourceLocation(MOD_ID, path);
 	}

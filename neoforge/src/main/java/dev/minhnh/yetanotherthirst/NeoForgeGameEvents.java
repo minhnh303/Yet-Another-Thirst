@@ -1,12 +1,27 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.command.ThirstCommands;
+import dev.minhnh.yetanotherthirst.core.item.ModItems;
+import dev.minhnh.yetanotherthirst.core.purity.ContainerWithPurity;
+import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstEvents;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -15,6 +30,16 @@ public final class NeoForgeGameEvents {
 
     private NeoForgeGameEvents() {
     }
+
+    // ── Server lifecycle ──────────────────────────────────────────────────────
+
+    @SubscribeEvent
+    public static void onServerStarted(ServerStartedEvent event) {
+        WaterPurity.init();
+        ThirstValues.registerDrink(ModItems.TERRACOTTA_WATER_BOWL.get(), 5, 7);
+    }
+
+    // ── Tick / player state ───────────────────────────────────────────────────
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -54,5 +79,47 @@ public final class NeoForgeGameEvents {
     public static void onRegisterCommands(RegisterCommandsEvent event) {
 
         ThirstCommands.register(event.getDispatcher());
+    }
+
+    // ── Purity: running-water pickup ──────────────────────────────────────────
+
+    @SubscribeEvent
+    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+
+        ItemStack held = event.getItemStack();
+        if (!WaterPurity.canHarvestRunningWater(held)) return;
+
+        var player = event.getEntity();
+        var level = player.level();
+        var pos = level.clip(new net.minecraft.world.level.ClipContext(
+                player.getEyePosition(),
+                player.getEyePosition().add(player.getLookAngle().scale(player.getBlockReach())),
+                net.minecraft.world.level.ClipContext.Block.OUTLINE,
+                net.minecraft.world.level.ClipContext.Fluid.ANY,
+                player)).getBlockPos();
+
+        if (!level.getFluidState(pos).is(FluidTags.WATER)) return;
+
+        ContainerWithPurity container = WaterPurity.getContainerForEmpty(held);
+        if (container == null) return;
+
+        var sound = held.is(net.minecraft.world.item.Items.GLASS_BOTTLE)
+                ? SoundEvents.BOTTLE_FILL : SoundEvents.BUCKET_FILL;
+        level.playSound(player, player.getX(), player.getY(), player.getZ(),
+                sound, SoundSource.NEUTRAL, 1.0F, 1.0F);
+        level.gameEvent(player, GameEvent.FLUID_PICKUP, pos);
+
+        ItemStack filled = WaterPurity.addPurity(container.getFilledItem().copy(), level, pos);
+        ItemStack result = ItemUtils.createFilledResult(held, player, filled);
+        player.setItemInHand(event.getHand(), result);
+        event.setCanceled(true);
+    }
+
+    // ── Purity: tooltip ───────────────────────────────────────────────────────
+
+    @SubscribeEvent
+    public static void onItemTooltip(ItemTooltipEvent event) {
+
+        WaterPurity.appendTooltip(event.getItemStack(), event.getToolTip());
     }
 }

@@ -10,9 +10,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(Constants.MOD_ID)
-public class ExampleMod {
+public class YetAnotherThirstForge {
 
-    public ExampleMod() {
+    public YetAnotherThirstForge() {
 
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -20,14 +20,16 @@ public class ExampleMod {
         ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfig.SPEC, Constants.MOD_ID + "/common.toml");
         ctx.registerConfig(ModConfig.Type.CLIENT, ForgeClientConfig.SPEC, Constants.MOD_ID + "/client.toml");
 
-        modBus.addListener(ExampleMod::onConfigLoad);
-        modBus.addListener(ExampleMod::onCommonSetup);
+        modBus.addListener(YetAnotherThirstForge::onConfigLoading);
+        modBus.addListener(YetAnotherThirstForge::onConfigReloading);
+        modBus.addListener(YetAnotherThirstForge::onCommonSetup);
 
         // Bind Forge RegistryObjects into loader-agnostic ModItems before registration fires
         ForgeItems.bindToCommon();
 
         // Register DeferredRegisters onto the mod event bus
         ForgeItems.ITEMS.register(modBus);
+        ForgeEffects.EFFECTS.register(modBus);
         ForgeCreativeTab.TABS.register(modBus);
         ForgeLootModifier.SERIALIZERS.register(modBus);
 
@@ -43,12 +45,23 @@ public class ExampleMod {
         ThirstConfig.COMPAT_LETS_DO_BREWERY = ModList.get().isLoaded("brewery");
     }
 
-    private static void onConfigLoad(ModConfigEvent event) {
+    private static void onConfigLoading(ModConfigEvent.Loading event) {
+        onConfigEvent(event);
+    }
 
+    private static void onConfigReloading(ModConfigEvent.Reloading event) {
+        onConfigEvent(event);
+    }
+
+    private static void onConfigEvent(ModConfigEvent event) {
+        Constants.LOG.info("onConfigEvent called for config: {}", event.getConfig().getFileName());
         if (event.getConfig().getSpec() == ForgeConfig.SPEC) {
             ForgeConfig.sync();
+            ForgeConfig.reloadThirstValues();
+            Constants.LOG.info("ForgeConfig synced. extraHydrationConvertsToQuenched: {}", ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED);
         } else if (event.getConfig().getSpec() == ForgeClientConfig.SPEC) {
             ForgeClientConfig.sync();
+            Constants.LOG.info("ForgeClientConfig synced.");
         }
     }
 }

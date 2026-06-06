@@ -62,6 +62,10 @@ public final class WaterPurity {
         return false;
     }
 
+    public static boolean isWaterBottle(ItemStack stack) {
+        return stack.is(Items.POTION) && PotionUtils.getPotion(stack) == Potions.WATER;
+    }
+
     public static boolean isEmptyWaterContainer(ItemStack stack) {
         for (ContainerWithPurity c : CONTAINERS)
             if (c.equalsEmpty(stack)) return true;
@@ -81,27 +85,51 @@ public final class WaterPurity {
     }
 
     public static boolean hasPurity(ItemStack stack) {
-        return stack.hasTag() && Objects.requireNonNull(stack.getTag()).contains("Purity");
+        return isWaterFilledContainer(stack) && stack.hasTag() && Objects.requireNonNull(stack.getTag()).contains("Purity");
     }
 
     public static int getPurity(ItemStack stack) {
-        if (!hasPurity(stack))
+        if (!isWaterFilledContainer(stack) || !hasPurity(stack)) {
             return ThirstConfig.DEFAULT_PURITY;
+        }
         return Objects.requireNonNull(stack.getTag()).getInt("Purity");
     }
 
     public static ItemStack addPurity(ItemStack stack, int purity) {
+        if (!isWaterFilledContainer(stack)) {
+            return stack;
+        }
         CompoundTag tag = stack.getOrCreateTag();
-        if (purity == ThirstConfig.DEFAULT_PURITY)
-            tag.remove("Purity");
-        else
-            tag.putInt("Purity", purity);
+        tag.putInt("Purity", purity);
         return stack;
     }
 
     public static ItemStack addPurity(ItemStack stack, Level level, BlockPos pos) {
         return addPurity(stack, getBlockPurity(level, pos));
     }
+
+    public static void verifyItemStackPurity(ItemStack stack) {
+        if (!stack.isEmpty() && isWaterFilledContainer(stack) && !hasPurity(stack)) {
+            addPurity(stack, ThirstConfig.DEFAULT_PURITY);
+        }
+    }
+
+
+    public static boolean waterBottleTagsMatchForStacking(ItemStack first, ItemStack second) {
+        if (!isWaterBottle(first) || !isWaterBottle(second)) return false;
+        return getPurity(first) == getPurity(second)
+                && Objects.equals(waterBottleTagWithoutPurity(first), waterBottleTagWithoutPurity(second));
+    }
+
+    private static CompoundTag waterBottleTagWithoutPurity(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        if (tag == null) return null;
+
+        CompoundTag normalized = tag.copy();
+        normalized.remove("Purity");
+        return normalized.isEmpty() ? null : normalized;
+    }
+
 
     public static int getBlockPurity(Level level, BlockPos pos) {
         // Cauldron: stored purity takes precedence over open-water derivation
@@ -121,7 +149,7 @@ public final class WaterPurity {
             purity = 1;
         }
         if (level.getFluidState(pos).is(FluidTags.WATER) && !level.getFluidState(pos).isSource()) {
-            purity = Math.min(purity + 1, MAX_PURITY);
+            purity = Math.min(purity + ThirstConfig.RUNNING_WATER_PURIFICATION_AMOUNT, MAX_PURITY);
         }
         return purity;
     }
@@ -163,9 +191,10 @@ public final class WaterPurity {
         return shouldDrink || ThirstConfig.QUENCH_WHEN_DEBUFFED;
     }
 
-    /** Appends a purity tooltip line to the item tooltip if applicable. */
+    /** Appends a purity tooltip line only when the item carries an explicit Purity NBT tag. */
     public static void appendTooltip(ItemStack stack, List<Component> tooltip) {
-        if (!isWaterFilledContainer(stack) || !hasPurity(stack)) return;
+        if (!isWaterFilledContainer(stack)) return;
+        if (!hasPurity(stack)) return;
         int purity = getPurity(stack);
         if (purity < MIN_PURITY || purity > MAX_PURITY) return;
         tooltip.add(purityComponent(purity));
@@ -179,10 +208,10 @@ public final class WaterPurity {
             default -> "purified";
         };
         int color = switch (purity) {
-            case 0 -> 0xA84C25;
-            case 1 -> 0x795231;
-            case 2 -> 0x5D8B5D;
-            default -> 0x21ABFF;
+            case 0 -> 0xa84825;  // dirty   — dark brown
+            case 1 -> 0x796c71;  // slightly dirty — gray-brown
+            case 2 -> 0x5d829d;  // acceptable     — blue-gray
+            default -> 0x21b1ff; // purified        — bright blue
         };
         return Component.translatable(key).withStyle(s -> s.withColor(color));
     }

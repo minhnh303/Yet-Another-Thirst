@@ -13,6 +13,24 @@ public class ThirstState {
     private int syncTimer;
     private float previousFoodExhaustion;
     private boolean initialSync = true;
+    private boolean exhaustionRecalculate;
+    private boolean justHealed;
+
+    public boolean isExhaustionRecalculate() {
+        return exhaustionRecalculate;
+    }
+
+    public void setExhaustionRecalculate(boolean val) {
+        this.exhaustionRecalculate = val;
+    }
+
+    public boolean isJustHealed() {
+        return justHealed;
+    }
+
+    public void setJustHealed(boolean val) {
+        this.justHealed = val;
+    }
 
     public int getThirst() {
 
@@ -97,12 +115,16 @@ public class ThirstState {
     public void drink(int thirst, int quenched) {
 
         int overflow = Math.max(this.thirst + thirst - ThirstConfig.MAX_THIRST, 0);
+        int actualQuenched = quenched;
         if (!ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED) {
             overflow = 0;
+            if (this.thirst >= ThirstConfig.MAX_THIRST) {
+                actualQuenched = 0;
+            }
         }
 
         setThirst(this.thirst + thirst);
-        this.quenched = Math.min(this.quenched + quenched + overflow, this.thirst);
+        this.quenched = Math.min(this.quenched + actualQuenched + overflow, this.thirst);
     }
 
     public void addExhaustion(float amount) {
@@ -130,6 +152,8 @@ public class ThirstState {
         syncTimer = 0;
         previousFoodExhaustion = 0.0F;
         initialSync = true;
+        exhaustionRecalculate = false;
+        justHealed = false;
     }
 
     public void copyFrom(ThirstState other) {
@@ -139,6 +163,8 @@ public class ThirstState {
         exhaustion = other.exhaustion;
         enabled = other.enabled;
         initialSync = true;
+        exhaustionRecalculate = other.exhaustionRecalculate;
+        justHealed = other.justHealed;
     }
 
     public CompoundTag save() {

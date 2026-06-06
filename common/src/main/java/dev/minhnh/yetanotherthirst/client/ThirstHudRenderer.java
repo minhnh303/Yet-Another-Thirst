@@ -12,8 +12,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 
+import javax.annotation.Nonnull;
+
 public final class ThirstHudRenderer {
 
+    @Nonnull
     private static final ResourceLocation THIRST_ICONS = Constants.asResource("textures/gui/thirst_icons.png");
     private static final RandomSource RANDOM = RandomSource.create();
 

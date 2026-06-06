@@ -25,7 +25,11 @@ public final class ForgeCommonSetup {
 
     @SubscribeEvent
     public static void onCommonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(ForgeCommonSetup::registerDispenserBehaviors);
+        event.enqueueWork(() -> {
+            WaterPurity.init();
+            ForgeConfig.reloadThirstValues();
+            registerDispenserBehaviors();
+        });
     }
 
     /**

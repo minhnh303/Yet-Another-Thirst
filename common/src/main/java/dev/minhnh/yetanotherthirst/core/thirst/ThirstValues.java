@@ -5,8 +5,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public final class ThirstValues {
 
@@ -14,33 +16,7 @@ public final class ThirstValues {
     private static final Map<Item, ThirstValue> FOODS = new HashMap<>();
 
     static {
-        registerDrink(Items.POTION, 6, 8);
-        registerDrink(Items.HONEY_BOTTLE, 3, 4);
-        registerDrink(Items.MILK_BUCKET, 2, 4);
-
-        registerFood(Items.APPLE, 2, 3);
-        registerFood(Items.GOLDEN_APPLE, 2, 3);
-        registerFood(Items.ENCHANTED_GOLDEN_APPLE, 2, 3);
-        registerFood(Items.MELON_SLICE, 4, 5);
-        registerFood(Items.CARROT, 1, 2);
-        registerFood(Items.BEETROOT, 1, 2);
-        registerFood(Items.SWEET_BERRIES, 1, 2);
-        registerFood(Items.GLOW_BERRIES, 1, 2);
-        registerFood(Items.GOLDEN_CARROT, 1, 2);
-        registerFood(Items.CHORUS_FRUIT, 1, 2);
-        registerFood(Items.MUSHROOM_STEW, 2, 3);
-        registerFood(Items.RABBIT_STEW, 2, 3);
-        registerFood(Items.BEETROOT_SOUP, 5, 7);
-        registerFood(Items.SUSPICIOUS_STEW, 2, 3);
-        registerFood(Items.COD, 1, 1);
-        registerFood(Items.SALMON, 1, 1);
-        registerFood(Items.TROPICAL_FISH, 1, 2);
-        registerFood(Items.COOKED_COD, 1, 2);
-        registerFood(Items.COOKED_SALMON, 1, 2);
-        registerFood(Items.DRIED_KELP, 1, 1);
-        registerFood(Items.BREAD, 1, 1);
-        registerFood(Items.PUMPKIN_PIE, 1, 2);
-        registerFood(Items.COOKIE, 1, 1);
+        resetToDefaults();
     }
 
     private ThirstValues() {
@@ -64,5 +40,69 @@ public final class ThirstValues {
     public static void registerFood(Item item, int thirst, int quenched) {
 
         FOODS.putIfAbsent(item, new ThirstValue(thirst, quenched));
+    }
+
+    public static void replaceConfiguredValues(Map<Item, ThirstValue> drinks, Map<Item, ThirstValue> foods, Set<Item> blacklist) {
+
+        DRINKS.clear();
+        FOODS.clear();
+
+        drinks.forEach((item, value) -> {
+            if (!blacklist.contains(item)) {
+                DRINKS.put(item, value);
+            }
+        });
+        foods.forEach((item, value) -> {
+            if (!blacklist.contains(item)) {
+                FOODS.put(item, value);
+            }
+        });
+    }
+
+    public static void resetToDefaults() {
+
+        DRINKS.clear();
+        FOODS.clear();
+
+        defaultDrinks().forEach((item, value) -> DRINKS.put(item, value));
+        defaultFoods().forEach((item, value) -> FOODS.put(item, value));
+    }
+
+    public static Map<Item, ThirstValue> defaultDrinks() {
+
+        Map<Item, ThirstValue> values = new LinkedHashMap<>();
+        values.put(Items.POTION, new ThirstValue(6, 8));
+        values.put(Items.HONEY_BOTTLE, new ThirstValue(3, 4));
+        values.put(Items.MILK_BUCKET, new ThirstValue(2, 4));
+        return values;
+    }
+
+    public static Map<Item, ThirstValue> defaultFoods() {
+
+        Map<Item, ThirstValue> values = new LinkedHashMap<>();
+        values.put(Items.APPLE, new ThirstValue(2, 3));
+        values.put(Items.GOLDEN_APPLE, new ThirstValue(2, 3));
+        values.put(Items.ENCHANTED_GOLDEN_APPLE, new ThirstValue(2, 3));
+        values.put(Items.MELON_SLICE, new ThirstValue(4, 5));
+        values.put(Items.CARROT, new ThirstValue(1, 2));
+        values.put(Items.BEETROOT, new ThirstValue(1, 2));
+        values.put(Items.SWEET_BERRIES, new ThirstValue(1, 2));
+        values.put(Items.GLOW_BERRIES, new ThirstValue(1, 2));
+        values.put(Items.GOLDEN_CARROT, new ThirstValue(1, 2));
+        values.put(Items.CHORUS_FRUIT, new ThirstValue(1, 2));
+        values.put(Items.MUSHROOM_STEW, new ThirstValue(2, 3));
+        values.put(Items.RABBIT_STEW, new ThirstValue(2, 3));
+        values.put(Items.BEETROOT_SOUP, new ThirstValue(5, 7));
+        values.put(Items.SUSPICIOUS_STEW, new ThirstValue(2, 3));
+        values.put(Items.COD, new ThirstValue(1, 1));
+        values.put(Items.SALMON, new ThirstValue(1, 1));
+        values.put(Items.TROPICAL_FISH, new ThirstValue(1, 2));
+        values.put(Items.COOKED_COD, new ThirstValue(1, 2));
+        values.put(Items.COOKED_SALMON, new ThirstValue(1, 2));
+        values.put(Items.DRIED_KELP, new ThirstValue(1, 1));
+        values.put(Items.BREAD, new ThirstValue(1, 1));
+        values.put(Items.PUMPKIN_PIE, new ThirstValue(1, 2));
+        values.put(Items.COOKIE, new ThirstValue(1, 1));
+        return values;
     }
 }

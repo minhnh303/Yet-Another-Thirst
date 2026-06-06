@@ -20,6 +20,9 @@ public final class ThirstConfig {
     public static float THIRST_DEPLETION_MODIFIER = 1.2F;
     public static float NETHER_THIRST_DEPLETION_MODIFIER = 3.0F;
     public static float FIRE_RESISTANCE_DEHYDRATION_MODIFIER = 0.0F;
+    public static boolean BIOME_DEHYDRATION_MODIFIER = true;
+    public static boolean FIRE_PROTECTION_DEHYDRATION_MODIFIER = true;
+    public static float ENVIRONMENT_MODIFIER_HARSHNESS = 0.5F;
 
     // Purity system
     public static int DEFAULT_PURITY = 2;
@@ -36,6 +39,7 @@ public final class ThirstConfig {
     // World purity thresholds
     public static int MOUNTAINS_Y = 100;
     public static int CAVES_Y = 48;
+    public static int RUNNING_WATER_PURIFICATION_AMOUNT = 1;
 
     // Hand drinking
     public static boolean CAN_DRINK_BY_HAND = false;

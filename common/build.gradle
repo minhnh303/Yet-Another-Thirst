@@ -16,6 +16,7 @@ legacyForge {
 
 dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    compileOnly 'org.spongepowered:mixin:0.8.5'
 }
 
 configurations {

@@ -9,6 +9,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.biome.Biome;
 
 public final class ThirstTicker {
 
@@ -52,12 +54,11 @@ public final class ThirstTicker {
             updateFoodExhaustion(player, state);
         }
 
-        while (state.getExhaustion() > ThirstConfig.EXHAUSTION_LIMIT) {
+        if (state.getExhaustion() > ThirstConfig.EXHAUSTION_LIMIT) {
             if (state.getQuenched() > 0 || difficulty != Difficulty.PEACEFUL || ThirstConfig.THIRST_DEPLETES_IN_PEACEFUL) {
                 state.depleteOneLevel();
             } else {
                 state.setExhaustion(ThirstConfig.EXHAUSTION_LIMIT);
-                break;
             }
         }
 
@@ -97,11 +98,23 @@ public final class ThirstTicker {
 
         float hungerExhaustion = player.getFoodData().getExhaustionLevel();
         float previous = state.getPreviousFoodExhaustion();
-        float normalized = hungerExhaustion < previous ? hungerExhaustion + ThirstConfig.EXHAUSTION_LIMIT : hungerExhaustion;
+        float normalized = hungerExhaustion < previous
+                ? (state.isExhaustionRecalculate() ? hungerExhaustion + ThirstConfig.EXHAUSTION_LIMIT : hungerExhaustion)
+                : hungerExhaustion;
+
+        if (state.isExhaustionRecalculate()) {
+            state.setExhaustionRecalculate(false);
+        }
+
         float delta = normalized - previous;
         if (delta > 0.0F) {
             state.addExhaustion(delta * exhaustionModifier(player));
         }
+
+        if (state.isJustHealed()) {
+            state.setJustHealed(false);
+        }
+
         state.setPreviousFoodExhaustion(hungerExhaustion);
     }
 
@@ -148,13 +161,51 @@ public final class ThirstTicker {
 
     private static float exhaustionModifier(ServerPlayer player) {
 
-        float modifier = player.level().dimensionType().ultraWarm()
-                ? ThirstConfig.NETHER_THIRST_DEPLETION_MODIFIER
-                : ThirstConfig.THIRST_DEPLETION_MODIFIER;
+        float modifier = biomeModifier(player) * fireProtectionModifier(player);
 
         if (player.hasEffect(MobEffects.FIRE_RESISTANCE)) {
             modifier *= ThirstConfig.FIRE_RESISTANCE_DEHYDRATION_MODIFIER;
         }
         return modifier;
+    }
+
+    private static float biomeModifier(ServerPlayer player) {
+
+        if (player.level().dimensionType().ultraWarm()) {
+            return ThirstConfig.NETHER_THIRST_DEPLETION_MODIFIER;
+        }
+
+        if (!ThirstConfig.BIOME_DEHYDRATION_MODIFIER) {
+            return ThirstConfig.THIRST_DEPLETION_MODIFIER;
+        }
+
+        Biome biome = player.level().getBiome(player.getOnPos()).value();
+
+        float humidity = biome.getPrecipitationAt(player.getOnPos()) == Biome.Precipitation.NONE ? 1.1F : 1.2F;
+
+        float temperature = biome.getBaseTemperature() + 0.2F;
+        if (temperature <= 0.0F) {
+            temperature = (float) Math.exp(temperature);
+        } else if (temperature > 1.0F) {
+            temperature /= 2.0F;
+        }
+
+        float modifier = ThirstConfig.THIRST_DEPLETION_MODIFIER * (temperature / humidity);
+        if (modifier < 1.0F) {
+            float offset = (1.0F - modifier) * ThirstConfig.ENVIRONMENT_MODIFIER_HARSHNESS;
+            modifier = 1.0F - offset;
+        }
+        return modifier;
+    }
+
+    private static float fireProtectionModifier(ServerPlayer player) {
+
+        if (!ThirstConfig.FIRE_PROTECTION_DEHYDRATION_MODIFIER) {
+            return 1.0F;
+        }
+
+        int levels = EnchantmentHelper.getDamageProtection(player.getArmorSlots(), player.damageSources().onFire()) / 2;
+        levels = Math.min(levels, 12);
+        return 1.0F - levels * 0.0625F * 0.75F;
     }
 }

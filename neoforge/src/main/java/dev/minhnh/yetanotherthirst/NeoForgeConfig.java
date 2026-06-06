@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
@@ -10,17 +11,11 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITag;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-public final class ForgeConfig {
+public final class NeoForgeConfig {
 
-    static final ForgeConfigSpec SPEC;
+    public static final ForgeConfigSpec SPEC;
 
     // General
     private static final ForgeConfigSpec.BooleanValue EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
@@ -39,7 +34,7 @@ public final class ForgeConfig {
     private static final ForgeConfigSpec.BooleanValue FIRE_PROTECTION_DEHYDRATION_MODIFIER;
     private static final ForgeConfigSpec.DoubleValue ENVIRONMENT_MODIFIER_HARSHNESS;
 
-    // Purity effects
+    // Purity
     private static final ForgeConfigSpec.IntValue DEFAULT_PURITY;
     private static final ForgeConfigSpec.BooleanValue QUENCH_WHEN_DEBUFFED;
     private static final ForgeConfigSpec.DoubleValue DIRTY_NAUSEA_CHANCE;
@@ -51,7 +46,7 @@ public final class ForgeConfig {
     private static final ForgeConfigSpec.DoubleValue PURIFIED_NAUSEA_CHANCE;
     private static final ForgeConfigSpec.DoubleValue PURIFIED_POISON_CHANCE;
 
-    // World purity
+    // World
     private static final ForgeConfigSpec.IntValue MOUNTAINS_Y;
     private static final ForgeConfigSpec.IntValue CAVES_Y;
     private static final ForgeConfigSpec.IntValue RUNNING_WATER_PURIFICATION_AMOUNT;
@@ -167,10 +162,10 @@ public final class ForgeConfig {
                 .defineInRange("waterBottleStackSize", 64, 1, 64);
         DRINK_VALUES = builder
                 .comment("Items that restore thirst when drunk. Format: [[\"item-id\", thirst, quenched], [\"#item-tag\", thirst, quenched]]")
-                .defineList("drinks", defaultDrinkValues(), ForgeConfig::validItemValueEntry);
+                .defineList("drinks", defaultDrinkValues(), NeoForgeConfig::validItemValueEntry);
         FOOD_VALUES = builder
                 .comment("Items that restore thirst when eaten. Format: [[\"item-id\", thirst, quenched], [\"#item-tag\", thirst, quenched]]")
-                .defineList("foods", defaultFoodValues(), ForgeConfig::validItemValueEntry);
+                .defineList("foods", defaultFoodValues(), NeoForgeConfig::validItemValueEntry);
         ITEMS_BLACKLIST = builder
                 .comment("Items excluded from thirst restoration even if present in drink or food values")
                 .defineList("itemsBlacklist", List.of("yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2"), value -> value instanceof String);
@@ -438,5 +433,5 @@ public final class ForgeConfig {
         values.add(List.of(id, thirst, quenched));
     }
 
-    private ForgeConfig() {}
+    private NeoForgeConfig() {}
 }
