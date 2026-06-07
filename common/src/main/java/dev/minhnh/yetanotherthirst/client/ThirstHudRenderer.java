@@ -2,6 +2,7 @@ package dev.minhnh.yetanotherthirst.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.minhnh.yetanotherthirst.Constants;
+import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
@@ -28,6 +29,9 @@ public final class ThirstHudRenderer {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null || !player.isAlive() || minecraft.options.hideGui) {
+            return false;
+        }
+        if (ThirstCompat.hidesThirstHud(player)) {
             return false;
         }
 

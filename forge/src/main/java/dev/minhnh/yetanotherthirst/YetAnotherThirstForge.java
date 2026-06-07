@@ -43,6 +43,7 @@ public class YetAnotherThirstForge {
         ThirstConfig.COMPAT_FARMERS_DELIGHT = ModList.get().isLoaded("farmersdelight");
         ThirstConfig.COMPAT_LETS_DO_BAKERY = ModList.get().isLoaded("bakery");
         ThirstConfig.COMPAT_LETS_DO_BREWERY = ModList.get().isLoaded("brewery");
+        ThirstConfig.COMPAT_LETS_DO_FARM_AND_CHARM = ModList.get().isLoaded("farm_and_charm");
     }
 
     private static void onConfigLoading(ModConfigEvent.Loading event) {

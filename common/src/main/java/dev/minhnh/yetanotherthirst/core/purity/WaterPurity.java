@@ -85,7 +85,8 @@ public final class WaterPurity {
                 player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
-                LayeredCauldronBlock.lowerFillLevel(blockState, level, pos);
+                // Retrieve the updated block state (in case it was updated to the default purity) before lowering level
+                LayeredCauldronBlock.lowerFillLevel(level.getBlockState(pos), level, pos);
                 level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
             }
@@ -117,7 +118,8 @@ public final class WaterPurity {
                 player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
-                LayeredCauldronBlock.lowerFillLevel(blockState, level, pos);
+                // Retrieve the updated block state (in case it was updated to the default purity) before lowering level
+                LayeredCauldronBlock.lowerFillLevel(level.getBlockState(pos), level, pos);
                 level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
             }
@@ -132,7 +134,8 @@ public final class WaterPurity {
                 player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
-                LayeredCauldronBlock.lowerFillLevel(blockState, level, pos);
+                // Retrieve the updated block state (in case it was updated to the default purity) before lowering level
+                LayeredCauldronBlock.lowerFillLevel(level.getBlockState(pos), level, pos);
                 level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
             }
@@ -301,7 +304,13 @@ public final class WaterPurity {
         if (blockState.getBlock() instanceof AbstractCauldronBlock) {
             if (blockState.hasProperty(BLOCK_PURITY)) {
                 int val = blockState.getValue(BLOCK_PURITY);
-                return val == 0 ? ThirstConfig.DEFAULT_PURITY : val - 1;
+                if (val == 0) {
+                    int defaultPurity = ThirstConfig.DEFAULT_PURITY;
+                    // If cauldron does not have dirty water data yet, set it to the default
+                    level.setBlockAndUpdate(pos, blockState.setValue(BLOCK_PURITY, defaultPurity + 1));
+                    return defaultPurity;
+                }
+                return val - 1;
             }
             return ThirstConfig.DEFAULT_PURITY;
         }

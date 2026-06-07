@@ -64,6 +64,144 @@ public final class ThirstConfig {
     public static boolean COMPAT_FARMERS_DELIGHT = false;
     public static boolean COMPAT_LETS_DO_BAKERY = false;
     public static boolean COMPAT_LETS_DO_BREWERY = false;
+    public static boolean COMPAT_LETS_DO_FARM_AND_CHARM = false;
+
+    // Configured effects that suspend thirst
+    public static java.util.List<String> SUSPENDED_THIRST_EFFECTS_RAW = new java.util.ArrayList<>();
+    public static java.util.List<EffectCondition> SUSPENDED_THIRST_EFFECTS = new java.util.ArrayList<>();
+
+    // Configured effects that pause thirst depletion
+    public static java.util.List<String> PAUSE_DEPLETION_EFFECTS_RAW = new java.util.ArrayList<>();
+    public static java.util.List<EffectCondition> PAUSE_DEPLETION_EFFECTS = new java.util.ArrayList<>();
+
+    public static void setPauseDepletionEffects(java.util.List<? extends String> rawList) {
+        java.util.List<String> list = new java.util.ArrayList<>();
+        java.util.List<EffectCondition> conditions = new java.util.ArrayList<>();
+        for (String entry : rawList) {
+            list.add(entry);
+            EffectCondition cond = EffectCondition.parse(entry);
+            if (cond != null) {
+                conditions.add(cond);
+            }
+        }
+        PAUSE_DEPLETION_EFFECTS_RAW = list;
+        PAUSE_DEPLETION_EFFECTS = conditions;
+    }
+
+    // Configured effects that regenerate thirst
+    public static java.util.List<String> REGEN_THIRST_EFFECTS_RAW = new java.util.ArrayList<>();
+    public static java.util.List<EffectCondition> REGEN_THIRST_EFFECTS = new java.util.ArrayList<>();
+    public static int REGEN_THIRST_INTERVAL = 40;
+    public static int REGEN_THIRST_AMOUNT = 1;
+
+    public static void setRegenThirstEffects(java.util.List<? extends String> rawList) {
+        java.util.List<String> list = new java.util.ArrayList<>();
+        java.util.List<EffectCondition> conditions = new java.util.ArrayList<>();
+        for (String entry : rawList) {
+            list.add(entry);
+            EffectCondition cond = EffectCondition.parse(entry);
+            if (cond != null) {
+                conditions.add(cond);
+            }
+        }
+        REGEN_THIRST_EFFECTS_RAW = list;
+        REGEN_THIRST_EFFECTS = conditions;
+    }
+
+    public static void setSuspendThirstEffects(java.util.List<? extends String> rawList) {
+        java.util.List<String> list = new java.util.ArrayList<>();
+        java.util.List<EffectCondition> conditions = new java.util.ArrayList<>();
+        for (String entry : rawList) {
+            list.add(entry);
+            EffectCondition cond = EffectCondition.parse(entry);
+            if (cond != null) {
+                conditions.add(cond);
+            }
+        }
+        SUSPENDED_THIRST_EFFECTS_RAW = list;
+        SUSPENDED_THIRST_EFFECTS = conditions;
+    }
+
+    public static class EffectCondition {
+        public final net.minecraft.resources.ResourceLocation effectId;
+        public final String operator;
+        public final int amplifier;
+
+        public EffectCondition(net.minecraft.resources.ResourceLocation effectId, String operator, int amplifier) {
+            this.effectId = effectId;
+            this.operator = operator;
+            this.amplifier = amplifier;
+        }
+
+        public static EffectCondition parse(String input) {
+            if (input == null || input.isBlank()) {
+                return null;
+            }
+            input = input.trim();
+            String operator = null;
+            int opIndex = -1;
+            String[] operators = {">=", "<=", "==", ">", "<", "="};
+            for (String op : operators) {
+                int idx = input.indexOf(op);
+                if (idx != -1) {
+                    operator = op;
+                    opIndex = idx;
+                    break;
+                }
+            }
+
+            net.minecraft.resources.ResourceLocation effectId;
+            int amplifier = 0;
+            if (operator != null) {
+                String idPart = input.substring(0, opIndex).trim();
+                String valPart = input.substring(opIndex + operator.length()).trim();
+                try {
+                    effectId = new net.minecraft.resources.ResourceLocation(idPart);
+                } catch (Exception e) {
+                    effectId = null;
+                }
+                try {
+                    amplifier = Integer.parseInt(valPart);
+                } catch (NumberFormatException e) {
+                    amplifier = 0;
+                }
+            } else {
+                try {
+                    effectId = new net.minecraft.resources.ResourceLocation(input);
+                } catch (Exception e) {
+                    effectId = null;
+                }
+                operator = ">=";
+                amplifier = 0;
+            }
+
+            if (effectId == null) {
+                return null;
+            }
+            return new EffectCondition(effectId, operator, amplifier);
+        }
+
+        public boolean matches(int activeAmplifier) {
+            if (amplifier < 0) {
+                return true;
+            }
+            switch (operator) {
+                case ">=":
+                    return activeAmplifier >= amplifier;
+                case ">":
+                    return activeAmplifier > amplifier;
+                case "<=":
+                    return activeAmplifier <= amplifier;
+                case "<":
+                    return activeAmplifier < amplifier;
+                case "==":
+                case "=":
+                    return activeAmplifier == amplifier;
+                default:
+                    return activeAmplifier >= amplifier;
+            }
+        }
+    }
 
     private ThirstConfig() {
     }

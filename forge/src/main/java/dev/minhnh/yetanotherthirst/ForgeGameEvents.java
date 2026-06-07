@@ -1,6 +1,5 @@
 package dev.minhnh.yetanotherthirst;
 
-import dev.minhnh.yetanotherthirst.compat.VampirismCompat;
 import dev.minhnh.yetanotherthirst.core.purity.ContainerWithPurity;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.command.ThirstCommands;
@@ -47,7 +46,6 @@ public final class ForgeGameEvents {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
 
         if (event.phase == TickEvent.Phase.END && event.player instanceof ServerPlayer player) {
-            if (ThirstConfig.COMPAT_VAMPIRISM && VampirismCompat.isVampire(player)) return;
             ThirstEvents.onPlayerTick(player);
         }
     }

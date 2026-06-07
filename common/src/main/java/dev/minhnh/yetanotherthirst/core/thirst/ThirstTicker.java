@@ -1,6 +1,7 @@
 package dev.minhnh.yetanotherthirst.core.thirst;
 
 import dev.minhnh.yetanotherthirst.Constants;
+import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,12 +27,6 @@ public final class ThirstTicker {
             return;
         }
 
-        // Tombstone: skip tick entirely while player has the ghostly shape (death chest ghost form)
-        if (ThirstConfig.COMPAT_TOMBSTONE && player.getActiveEffects().stream()
-                .anyMatch(e -> e.getEffect().getDescriptionId().contains("ghostly_shape"))) {
-            return;
-        }
-
         ThirstState state = ThirstStorage.get(player);
         if (!state.isEnabled()) {
             if (state.consumeInitialSync()) {
@@ -40,22 +35,31 @@ public final class ThirstTicker {
             return;
         }
 
+        if (ThirstCompat.suspendsThirst(player)) {
+            state.resetDamageTimer();
+            return;
+        }
+
         Difficulty difficulty = player.level().getDifficulty();
-        if (ThirstConfig.DEPLETES_WHEN_NAUSEA && player.hasEffect(MobEffects.CONFUSION)) {
+        boolean depletionPaused = ThirstCompat.pausesDepletion(player);
+
+        if (!depletionPaused && ThirstConfig.DEPLETES_WHEN_NAUSEA && player.hasEffect(MobEffects.CONFUSION)) {
             state.addExhaustion(0.06F * exhaustionModifier(player));
         }
 
-        if (player.hasEffect(MobEffects.HUNGER)) {
+        if (!depletionPaused && player.hasEffect(MobEffects.HUNGER)) {
             int amplifier = player.getEffect(MobEffects.HUNGER).getAmplifier() + 1;
             state.addExhaustion(-0.005F * amplifier * exhaustionModifier(player));
         }
 
-        if (!player.isPassenger() && !isExhaustionExempt(player)) {
+        if (!depletionPaused && !player.isPassenger()) {
             updateFoodExhaustion(player, state);
         }
 
         if (state.getExhaustion() > ThirstConfig.EXHAUSTION_LIMIT) {
-            if (state.getQuenched() > 0 || difficulty != Difficulty.PEACEFUL || ThirstConfig.THIRST_DEPLETES_IN_PEACEFUL) {
+            if (!depletionPaused
+                    && (state.getQuenched() > 0 || difficulty != Difficulty.PEACEFUL
+                    || ThirstConfig.THIRST_DEPLETES_IN_PEACEFUL)) {
                 state.depleteOneLevel();
             } else {
                 state.setExhaustion(ThirstConfig.EXHAUSTION_LIMIT);
@@ -75,23 +79,25 @@ public final class ThirstTicker {
             player.setSprinting(false);
         }
 
-        damageIfDehydrated(player, state, difficulty);
-    }
+        if (!ThirstConfig.REGEN_THIRST_EFFECTS.isEmpty() && player.tickCount % ThirstConfig.REGEN_THIRST_INTERVAL == 0) {
+            net.minecraft.core.Registry<net.minecraft.world.effect.MobEffect> effectsRegistry = player.level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.MOB_EFFECT);
+            for (var effectInstance : player.getActiveEffects()) {
+                net.minecraft.resources.ResourceLocation effectId = ThirstCompat.effectId(effectsRegistry, effectInstance.getEffect());
+                if (effectId != null) {
+                    for (var condition : ThirstConfig.REGEN_THIRST_EFFECTS) {
+                        if (condition.effectId.equals(effectId) && condition.matches(effectInstance.getAmplifier())) {
+                            if (state.getThirst() < ThirstConfig.MAX_THIRST) {
+                                state.setThirst(state.getThirst() + ThirstConfig.REGEN_THIRST_AMOUNT);
+                                ThirstStorage.sync(player);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
-    private static boolean isExhaustionExempt(ServerPlayer player) {
-        if (ThirstConfig.COMPAT_FARMERS_DELIGHT && player.getActiveEffects().stream()
-                .anyMatch(e -> "effect.farmersdelight.nourishment".equals(e.getEffect().getDescriptionId()))) {
-            return true;
-        }
-        if (ThirstConfig.COMPAT_LETS_DO_BAKERY && player.getActiveEffects().stream()
-                .anyMatch(e -> e.getEffect().getDescriptionId().contains("stuffed"))) {
-            return true;
-        }
-        if (ThirstConfig.COMPAT_LETS_DO_BREWERY && player.getActiveEffects().stream()
-                .anyMatch(e -> e.getEffect().getDescriptionId().contains("saturated"))) {
-            return true;
-        }
-        return false;
+        damageIfDehydrated(player, state, difficulty);
     }
 
     private static void updateFoodExhaustion(ServerPlayer player, ThirstState state) {

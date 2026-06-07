@@ -25,6 +25,11 @@ public final class NeoForgeConfig {
     private static final ForgeConfigSpec.BooleanValue SPRINT_PREVENTION;
     private static final ForgeConfigSpec.IntValue SPRINT_THRESHOLD;
     private static final ForgeConfigSpec.BooleanValue DEHYDRATION_HALTS_HEALTH_REGEN;
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SUSPEND_THIRST_EFFECTS;
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> PAUSE_DEPLETION_EFFECTS;
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> REGEN_THIRST_EFFECTS;
+    private static final ForgeConfigSpec.IntValue REGEN_THIRST_INTERVAL;
+    private static final ForgeConfigSpec.IntValue REGEN_THIRST_AMOUNT;
 
     // Dehydration
     private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE;
@@ -95,6 +100,46 @@ public final class NeoForgeConfig {
         DEHYDRATION_HALTS_HEALTH_REGEN = builder
                 .comment("Prevent natural health regeneration while the thirst bar is not full")
                 .define("dehydrationHaltsHealthRegen", true);
+        SUSPEND_THIRST_EFFECTS = builder
+                .comment("List of effects that completely suspend all thirst mechanics.",
+                        "While active, the thirst level remains frozen, the player is immune to dehydration damage,",
+                        "and sprinting is not blocked by low thirst.",
+                        "Format: 'effect_id' or 'effect_id operator amplifier'",
+                        "  - 'effect_id': Matches the effect at any level (e.g. 'minecraft:invisibility')",
+                        "  - 'effect_id operator amplifier': Matches based on effect level (0-indexed, i.e., 0 = level I, 1 = level II, etc.)",
+                        "    Supported operators: >=, <=, ==, >, <, =",
+                        "    Example: 'minecraft:speed >= 1' (matches Speed II or higher)")
+                .defineList("suspendThirstEffects", List.of("tombstone:ghostly_shape"), value -> value instanceof String);
+        PAUSE_DEPLETION_EFFECTS = builder
+                .comment("List of effects that only pause thirst depletion (exhaustion from movement, etc.).",
+                        "Unlike suspend, the thirst system remains active: player can still drink, receive regeneration,",
+                        "sprint can still be blocked, and dehydration damage is still dealt if thirst is already at 0.",
+                        "Format: 'effect_id' or 'effect_id operator amplifier'",
+                        "  - 'effect_id': Matches the effect at any level (e.g. 'farmersdelight:nourishment')",
+                        "  - 'effect_id operator amplifier': Matches based on effect level (0-indexed, i.e., 0 = level I, 1 = level II, etc.)",
+                        "    Supported operators: >=, <=, ==, >, <, =",
+                        "    Example: 'farmersdelight:nourishment >= 0'")
+                .defineList("pauseDepletionEffects", List.of(
+                        "farmersdelight:nourishment",
+                        "bakery:stuffed",
+                        "farm_and_charm:satiation",
+                        "farm_and_charm:sustenance",
+                        "farm_and_charm:feast"
+                ), value -> value instanceof String);
+        REGEN_THIRST_EFFECTS = builder
+                .comment("List of effects that regenerate thirst.",
+                        "Format: 'effect_id' or 'effect_id operator amplifier'",
+                        "  - 'effect_id': Matches the effect at any level (e.g. 'farmersdelight:nourishment')",
+                        "  - 'effect_id operator amplifier': Matches based on effect level (0-indexed, i.e., 0 = level I, 1 = level II, etc.)",
+                        "    Supported operators: >=, <=, ==, >, <, =",
+                        "    Example: 'minecraft:regeneration >= 0'")
+                .defineList("regenThirstEffects", List.of("farmersdelight:nourishment", "farm_and_charm:sustenance"), value -> value instanceof String);
+        REGEN_THIRST_INTERVAL = builder
+                .comment("Interval in ticks between thirst regeneration ticks when a regen effect is active")
+                .defineInRange("regenThirstInterval", 40, 1, 72000);
+        REGEN_THIRST_AMOUNT = builder
+                .comment("Amount of thirst restored per regeneration tick")
+                .defineInRange("regenThirstAmount", 1, 1, 20);
         builder.pop();
 
         builder.push("dehydration");
@@ -223,6 +268,11 @@ public final class NeoForgeConfig {
         ThirstConfig.SPRINT_PREVENTION = SPRINT_PREVENTION.get();
         ThirstConfig.SPRINT_THRESHOLD = SPRINT_THRESHOLD.get();
         ThirstConfig.DEHYDRATION_HALTS_HEALTH_REGEN = DEHYDRATION_HALTS_HEALTH_REGEN.get();
+        ThirstConfig.setSuspendThirstEffects(SUSPEND_THIRST_EFFECTS.get());
+        ThirstConfig.setPauseDepletionEffects(PAUSE_DEPLETION_EFFECTS.get());
+        ThirstConfig.setRegenThirstEffects(REGEN_THIRST_EFFECTS.get());
+        ThirstConfig.REGEN_THIRST_INTERVAL = REGEN_THIRST_INTERVAL.get();
+        ThirstConfig.REGEN_THIRST_AMOUNT = REGEN_THIRST_AMOUNT.get();
         ThirstConfig.DAMAGE_INTERVAL_TICKS = DAMAGE_INTERVAL_TICKS.get();
         ThirstConfig.DEHYDRATION_DAMAGE = DEHYDRATION_DAMAGE.get().floatValue();
         ThirstConfig.DEHYDRATION_DAMAGE_EASY_LIMIT = DEHYDRATION_DAMAGE_EASY_LIMIT.get().floatValue();
