@@ -42,6 +42,12 @@ public class ForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public CompoundTag loadPersistentData(Player player, String key) {
+
+        return player.getPersistentData().getCompound(key);
+    }
+
+    @Override
     public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
 
         ForgeNetwork.sendToPlayer(player, thirst, quenched, exhaustion, enabled);

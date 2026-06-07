@@ -44,6 +44,14 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+    }
+    maven {
+        name = 'RyanLiptak'
+        url = 'https://maven.ryanliptak.com'
+    }
 }
 
 // Declare capabilities on the outgoing configurations.

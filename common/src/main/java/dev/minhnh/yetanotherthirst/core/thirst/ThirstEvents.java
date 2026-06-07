@@ -2,6 +2,7 @@ package dev.minhnh.yetanotherthirst.core.thirst;
 
 import dev.minhnh.yetanotherthirst.core.item.DrinkableItem;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
+import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -24,6 +25,9 @@ public final class ThirstEvents {
             return;
         }
         if (!(entity instanceof ServerPlayer player)) {
+            return;
+        }
+        if (ThirstCompat.usesExternalThirst(player)) {
             return;
         }
 

@@ -33,6 +33,11 @@ public interface IPlatformHelper {
 
     void saveThirstData(Player player, CompoundTag tag);
 
+    default CompoundTag loadPersistentData(Player player, String key) {
+
+        return new CompoundTag();
+    }
+
     void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled);
 
     default void sendThirstSync(ServerPlayer player, ThirstState state) {

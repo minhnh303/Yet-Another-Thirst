@@ -31,6 +31,18 @@ public final class NeoForgeConfig {
     private static final ForgeConfigSpec.IntValue REGEN_THIRST_INTERVAL;
     private static final ForgeConfigSpec.IntValue REGEN_THIRST_AMOUNT;
 
+    // Compatibility
+    private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
+    private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
+    private static final ForgeConfigSpec.EnumValue<ThirstConfig.ToughAsNailsMode> TOUGH_AS_NAILS_MODE;
+    private static final ForgeConfigSpec.BooleanValue COLD_SWEAT_DEHYDRATION_MODIFIER;
+    private static final ForgeConfigSpec.BooleanValue COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS;
+    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_HOT_BODY_TEMPERATURE;
+    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_BURNING_BODY_TEMPERATURE;
+    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_MAX_DEHYDRATION_MODIFIER;
+    private static final ForgeConfigSpec.BooleanValue SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST;
+    private static final ForgeConfigSpec.BooleanValue VAMPIRISM_VAMPIRE_SUSPENDS_THIRST;
+
     // Dehydration
     private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE;
     private static final ForgeConfigSpec.IntValue DAMAGE_INTERVAL_TICKS;
@@ -140,6 +152,43 @@ public final class NeoForgeConfig {
         REGEN_THIRST_AMOUNT = builder
                 .comment("Amount of thirst restored per regeneration tick")
                 .defineInRange("regenThirstAmount", 1, 1, 20);
+        builder.pop();
+
+        builder.push("compatibility");
+        APPLESKIN_THIRST_TOOLTIP = builder
+                .comment("When AppleSkin is loaded, add YAT thirst and quenched values to item tooltips")
+                .define("appleSkinThirstTooltip", true);
+        APPLESKIN_THIRST_HUD_PREVIEW = builder
+                .comment("When AppleSkin is loaded, preview held item thirst restoration on the thirst HUD")
+                .define("appleSkinThirstHudPreview", true);
+        TOUGH_AS_NAILS_MODE = builder
+                .comment("Tough As Nails handling mode",
+                        "OFF: ignore Tough As Nails",
+                        "AUTO_DISABLE_YAT: hide and stop YAT thirst while Tough As Nails is loaded",
+                        "ITEMS_ONLY: keep YAT thirst active and use configured TAN drink item values",
+                        "FORCE_YAT: keep YAT thirst active even when Tough As Nails is loaded")
+                .defineEnum("toughAsNailsMode", ThirstConfig.ToughAsNailsMode.AUTO_DISABLE_YAT);
+        COLD_SWEAT_DEHYDRATION_MODIFIER = builder
+                .comment("Use Cold Sweat body temperature to increase dehydration when the player is hot")
+                .define("coldSweatDehydrationModifier", true);
+        COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS = builder
+                .comment("When Cold Sweat is loaded, replace YAT biome/Nether temperature modifiers with Cold Sweat body temperature")
+                .define("coldSweatReplacesEnvironmentModifiers", true);
+        COLD_SWEAT_HOT_BODY_TEMPERATURE = builder
+                .comment("Cold Sweat body temperature where extra dehydration starts")
+                .defineInRange("coldSweatHotBodyTemperature", 50.0, -150.0, 150.0);
+        COLD_SWEAT_BURNING_BODY_TEMPERATURE = builder
+                .comment("Cold Sweat body temperature where extra dehydration reaches the configured maximum")
+                .defineInRange("coldSweatBurningBodyTemperature", 100.0, -150.0, 150.0);
+        COLD_SWEAT_MAX_DEHYDRATION_MODIFIER = builder
+                .comment("Maximum dehydration multiplier applied at or above coldSweatBurningBodyTemperature")
+                .defineInRange("coldSweatMaxDehydrationModifier", 1.75, 1.0, 10.0);
+        SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST = builder
+                .comment("Suspend YAT thirst and hide the thirst HUD for Supernatural vampires")
+                .define("supernaturalVampireSuspendsThirst", true);
+        VAMPIRISM_VAMPIRE_SUSPENDS_THIRST = builder
+                .comment("Suspend YAT thirst and hide the thirst HUD for Vampirism vampires")
+                .define("vampirismVampireSuspendsThirst", true);
         builder.pop();
 
         builder.push("dehydration");
@@ -273,6 +322,16 @@ public final class NeoForgeConfig {
         ThirstConfig.setRegenThirstEffects(REGEN_THIRST_EFFECTS.get());
         ThirstConfig.REGEN_THIRST_INTERVAL = REGEN_THIRST_INTERVAL.get();
         ThirstConfig.REGEN_THIRST_AMOUNT = REGEN_THIRST_AMOUNT.get();
+        ThirstConfig.APPLESKIN_THIRST_TOOLTIP = APPLESKIN_THIRST_TOOLTIP.get();
+        ThirstConfig.APPLESKIN_THIRST_HUD_PREVIEW = APPLESKIN_THIRST_HUD_PREVIEW.get();
+        ThirstConfig.TOUGH_AS_NAILS_MODE = TOUGH_AS_NAILS_MODE.get();
+        ThirstConfig.COLD_SWEAT_DEHYDRATION_MODIFIER = COLD_SWEAT_DEHYDRATION_MODIFIER.get();
+        ThirstConfig.COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS = COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS.get();
+        ThirstConfig.COLD_SWEAT_HOT_BODY_TEMPERATURE = COLD_SWEAT_HOT_BODY_TEMPERATURE.get().floatValue();
+        ThirstConfig.COLD_SWEAT_BURNING_BODY_TEMPERATURE = COLD_SWEAT_BURNING_BODY_TEMPERATURE.get().floatValue();
+        ThirstConfig.COLD_SWEAT_MAX_DEHYDRATION_MODIFIER = COLD_SWEAT_MAX_DEHYDRATION_MODIFIER.get().floatValue();
+        ThirstConfig.SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST = SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST.get();
+        ThirstConfig.VAMPIRISM_VAMPIRE_SUSPENDS_THIRST = VAMPIRISM_VAMPIRE_SUSPENDS_THIRST.get();
         ThirstConfig.DAMAGE_INTERVAL_TICKS = DAMAGE_INTERVAL_TICKS.get();
         ThirstConfig.DEHYDRATION_DAMAGE = DEHYDRATION_DAMAGE.get().floatValue();
         ThirstConfig.DEHYDRATION_DAMAGE_EASY_LIMIT = DEHYDRATION_DAMAGE_EASY_LIMIT.get().floatValue();
@@ -460,6 +519,33 @@ public final class NeoForgeConfig {
         addValue(values, "toughasnails:pumpkin_juice", 8, 13);
         addValue(values, "toughasnails:sweet_berry_juice", 8, 13);
         addValue(values, "toughasnails:ice_cream", 6, 12);
+        addValue(values, "supernatural:blood_bottle", 6, 8);
+        addValue(values, "farmersdelight:milk_bottle", 2, 4);
+        addValue(values, "brewery:beer_barley", 10, 14);
+        addValue(values, "brewery:beer_haley", 10, 14);
+        addValue(values, "brewery:beer_hops", 10, 14);
+        addValue(values, "brewery:beer_nettle", 10, 14);
+        addValue(values, "brewery:beer_oat", 10, 14);
+        addValue(values, "brewery:beer_wheat", 10, 14);
+        addValue(values, "brewery:dark_brew", 10, 14);
+        addValue(values, "brewery:whiskey_ak", 10, 14);
+        addValue(values, "brewery:whiskey_carrascon_label", 10, 14);
+        addValue(values, "brewery:whiskey_cristel_walker", 10, 14);
+        addValue(values, "brewery:whiskey_highland_hearth", 10, 14);
+        addValue(values, "brewery:whiskey_jamesons_malt", 10, 14);
+        addValue(values, "brewery:whiskey_jo_jannik", 10, 14);
+        addValue(values, "brewery:whiskey_lilitu_single_malt", 10, 14);
+        addValue(values, "brewery:whiskey_maggoallan", 10, 14);
+        addValue(values, "brewery:whiskey_smoky_reverie", 10, 14);
+        addValue(values, "farm_and_charm:nettle_tea", 10, 14);
+        addValue(values, "farm_and_charm:nettle_tea_cup", 10, 14);
+        addValue(values, "farm_and_charm:ribwort_tea", 10, 14);
+        addValue(values, "farm_and_charm:ribwort_tea_cup", 10, 14);
+        addValue(values, "farm_and_charm:strawberry_tea", 10, 14);
+        addValue(values, "farm_and_charm:strawberry_tea_cup", 10, 14);
+        addValue(values, "cold_sweat:filled_waterskin", 6, 8);
+        addValue(values, "cold_sweat:waterskin_cold", 7, 10);
+        addValue(values, "cold_sweat:waterskin_hot", 5, 6);
         return values;
     }
 
@@ -502,6 +588,35 @@ public final class NeoForgeConfig {
         addValue(values, "farmersdelight:pumpkin_soup", 4, 5);
         addValue(values, "farmersdelight:baked_cod_stew", 4, 5);
         addValue(values, "farmersdelight:noodle_soup", 4, 5);
+        addValue(values, "farmersdelight:bone_broth", 4, 5);
+        addValue(values, "farmersdelight:onion_soup", 4, 5);
+        addValue(values, "farmersdelight:gleaming_salad", 4, 5);
+        addValue(values, "farmersdelight:nether_salad", 2, 3);
+        addValue(values, "farmersdelight:glow_berry_custard", 3, 4);
+        addValue(values, "farmersdelight:apple_pie_slice", 1, 2);
+        addValue(values, "farmersdelight:sweet_berry_cheesecake_slice", 1, 2);
+        addValue(values, "farmersdelight:chocolate_pie_slice", 1, 1);
+        addValue(values, "brewery:potato_salad", 2, 3);
+        addValue(values, "bakery:strawberry_cake_slice", 1, 2);
+        addValue(values, "bakery:sweetberry_cake_slice", 1, 2);
+        addValue(values, "bakery:apple_pie_piece", 1, 2);
+        addValue(values, "bakery:glowberry_pie_slice", 1, 2);
+        addValue(values, "bakery:chocolate_tart_slice", 1, 1);
+        addValue(values, "bakery:linzer_tart_slice", 1, 2);
+        addValue(values, "bakery:pudding_slice", 2, 3);
+        addValue(values, "bakery:bread_with_jam", 1, 2);
+        addValue(values, "bakery:apple_cupcake", 1, 2);
+        addValue(values, "bakery:strawberry_cupcake", 1, 2);
+        addValue(values, "bakery:sweetberry_cupcake", 1, 2);
+        addValue(values, "farm_and_charm:barley_soup", 4, 5);
+        addValue(values, "farm_and_charm:onion_soup", 4, 5);
+        addValue(values, "farm_and_charm:potato_soup", 4, 5);
+        addValue(values, "farm_and_charm:simple_tomato_soup", 4, 5);
+        addValue(values, "farm_and_charm:goulash", 4, 5);
+        addValue(values, "farm_and_charm:oatmeal_with_strawberries", 3, 4);
+        addValue(values, "farm_and_charm:farmer_salad", 4, 5);
+        addValue(values, "farm_and_charm:strawberry", 1, 2);
+        addValue(values, "farm_and_charm:tomato", 2, 3);
         addValue(values, "collectorsreap:lime_slice", 1, 2);
         addValue(values, "collectorsreap:lime", 2, 3);
         addValue(values, "collectorsreap:portobello_rice_soup", 6, 8);

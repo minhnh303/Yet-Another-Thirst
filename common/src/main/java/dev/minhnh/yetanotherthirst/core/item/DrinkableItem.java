@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst.core.item;
 
+import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
@@ -34,7 +35,7 @@ public class DrinkableItem extends Item {
             CriteriaTriggers.CONSUME_ITEM.trigger(player, stack);
             player.awardStat(Stats.ITEM_USED.get(this));
 
-            boolean shouldDrink = WaterPurity.givePurityEffects(entity, stack);
+            boolean shouldDrink = !ThirstCompat.usesExternalThirst(player) && WaterPurity.givePurityEffects(entity, stack);
             if (shouldDrink) {
                 ThirstValues.get(stack).ifPresent(value -> {
                     ThirstStorage.get(player).drink(value.thirst(), value.quenched());

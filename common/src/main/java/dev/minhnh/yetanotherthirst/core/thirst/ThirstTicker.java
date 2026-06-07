@@ -28,6 +28,13 @@ public final class ThirstTicker {
         }
 
         ThirstState state = ThirstStorage.get(player);
+        if (ThirstCompat.usesExternalThirst(player)) {
+            state.resetDamageTimer();
+            if (state.consumeInitialSync()) {
+                ThirstStorage.sync(player);
+            }
+            return;
+        }
         if (!state.isEnabled()) {
             if (state.consumeInitialSync()) {
                 ThirstStorage.sync(player);
@@ -174,7 +181,7 @@ public final class ThirstTicker {
 
     private static float exhaustionModifier(ServerPlayer player) {
 
-        float modifier = biomeModifier(player) * fireProtectionModifier(player);
+        float modifier = biomeModifier(player) * fireProtectionModifier(player) * ThirstCompat.coldSweatDehydrationModifier(player);
 
         if (player.hasEffect(MobEffects.FIRE_RESISTANCE)) {
             modifier *= ThirstConfig.FIRE_RESISTANCE_DEHYDRATION_MODIFIER;
@@ -183,6 +190,10 @@ public final class ThirstTicker {
     }
 
     private static float biomeModifier(ServerPlayer player) {
+
+        if (ThirstCompat.coldSweatReplacesEnvironmentModifiers()) {
+            return ThirstConfig.THIRST_DEPLETION_MODIFIER;
+        }
 
         if (player.level().dimensionType().ultraWarm()) {
             return ThirstConfig.NETHER_THIRST_DEPLETION_MODIFIER;

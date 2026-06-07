@@ -17,6 +17,8 @@ legacyForge {
 dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly 'org.spongepowered:mixin:0.8.5'
+    compileOnly 'maven.modrinth:jade:11.13.2+forge'
+    compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
 }
 
 configurations {

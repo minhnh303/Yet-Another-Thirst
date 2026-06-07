@@ -19,5 +19,7 @@
   "yet_another_thirst.purity.dirty": "Bẩn",
   "yet_another_thirst.purity.slightly_dirty": "Hơi bẩn",
   "yet_another_thirst.purity.acceptable": "Chấp nhận được",
-  "yet_another_thirst.purity.purified": "Tinh khiết"
+  "yet_another_thirst.purity.purified": "Tinh khiết",
+  "yet_another_thirst.jade.water_purity": "Độ tinh khiết: %s",
+  "yet_another_thirst.tooltip.thirst_value": "+%1$s Độ khát, +%2$s Độ bão hòa nước"
 }

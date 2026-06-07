@@ -12,6 +12,7 @@
   "item.yet_another_thirst.terracotta_water_bowl": "Terracotta Water Bowl",
   "item.yet_another_thirst.wooden_water_bowl": "Wooden Water Bowl",
   "itemGroup.yet_another_thirst": "Yet Another Thirst",
+  "yet_another_thirst.jade.water_purity": "Purity: %s",
   "yet_another_thirst.ponder.sand_filter.header": "Purifying Water with a Sand Filter",
   "yet_another_thirst.ponder.sand_filter.text_1": "A Sand Filter purifies by one step water pumped through it",
   "yet_another_thirst.ponder.sand_filter.text_2": "Dirty Water needs to be pumped in from the top...",
@@ -19,5 +20,6 @@
   "yet_another_thirst.purity.dirty": "Dirty",
   "yet_another_thirst.purity.slightly_dirty": "Slightly Dirty",
   "yet_another_thirst.purity.acceptable": "Acceptable",
-  "yet_another_thirst.purity.purified": "Purified"
+  "yet_another_thirst.purity.purified": "Purified",
+  "yet_another_thirst.tooltip.thirst_value": "+%1$s Thirst, +%2$s Quenched"
 }

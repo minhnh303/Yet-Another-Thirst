@@ -45,6 +45,8 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly project(":common")
+    compileOnly 'maven.modrinth:jade:11.13.2+forge'
+    compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
 }
 
 jar {

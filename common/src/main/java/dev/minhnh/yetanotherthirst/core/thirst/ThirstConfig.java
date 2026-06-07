@@ -65,6 +65,23 @@ public final class ThirstConfig {
     public static boolean COMPAT_LETS_DO_BAKERY = false;
     public static boolean COMPAT_LETS_DO_BREWERY = false;
     public static boolean COMPAT_LETS_DO_FARM_AND_CHARM = false;
+    public static boolean COMPAT_APPLESKIN = false;
+    public static boolean COMPAT_JADE = false;
+    public static boolean COMPAT_TOUGH_AS_NAILS = false;
+    public static boolean COMPAT_COLD_SWEAT = false;
+    public static boolean COMPAT_SUPERNATURAL = false;
+
+    // Mod compatibility behavior
+    public static boolean APPLESKIN_THIRST_TOOLTIP = true;
+    public static boolean APPLESKIN_THIRST_HUD_PREVIEW = true;
+    public static ToughAsNailsMode TOUGH_AS_NAILS_MODE = ToughAsNailsMode.AUTO_DISABLE_YAT;
+    public static boolean COLD_SWEAT_DEHYDRATION_MODIFIER = true;
+    public static boolean COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS = true;
+    public static float COLD_SWEAT_HOT_BODY_TEMPERATURE = 50.0F;
+    public static float COLD_SWEAT_BURNING_BODY_TEMPERATURE = 100.0F;
+    public static float COLD_SWEAT_MAX_DEHYDRATION_MODIFIER = 1.75F;
+    public static boolean SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST = true;
+    public static boolean VAMPIRISM_VAMPIRE_SUSPENDS_THIRST = true;
 
     // Configured effects that suspend thirst
     public static java.util.List<String> SUSPENDED_THIRST_EFFECTS_RAW = new java.util.ArrayList<>();
@@ -201,6 +218,13 @@ public final class ThirstConfig {
                     return activeAmplifier >= amplifier;
             }
         }
+    }
+
+    public enum ToughAsNailsMode {
+        OFF,
+        AUTO_DISABLE_YAT,
+        ITEMS_ONLY,
+        FORCE_YAT
     }
 
     private ThirstConfig() {

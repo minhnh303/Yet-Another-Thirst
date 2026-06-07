@@ -44,6 +44,11 @@ public class YetAnotherThirstForge {
         ThirstConfig.COMPAT_LETS_DO_BAKERY = ModList.get().isLoaded("bakery");
         ThirstConfig.COMPAT_LETS_DO_BREWERY = ModList.get().isLoaded("brewery");
         ThirstConfig.COMPAT_LETS_DO_FARM_AND_CHARM = ModList.get().isLoaded("farm_and_charm");
+        ThirstConfig.COMPAT_APPLESKIN = ModList.get().isLoaded("appleskin");
+        ThirstConfig.COMPAT_JADE = ModList.get().isLoaded("jade");
+        ThirstConfig.COMPAT_TOUGH_AS_NAILS = ModList.get().isLoaded("toughasnails");
+        ThirstConfig.COMPAT_COLD_SWEAT = ModList.get().isLoaded("cold_sweat");
+        ThirstConfig.COMPAT_SUPERNATURAL = ModList.get().isLoaded("supernatural");
     }
 
     private static void onConfigLoading(ModConfigEvent.Loading event) {

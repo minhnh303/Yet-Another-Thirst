@@ -327,6 +327,35 @@ public final class WaterPurity {
         return purity;
     }
 
+    public static int getDisplayPurity(Level level, BlockPos pos) {
+        BlockState blockState = level.getBlockState(pos);
+        if (blockState.getBlock() instanceof AbstractCauldronBlock) {
+            if (blockState.hasProperty(BLOCK_PURITY)) {
+                int val = blockState.getValue(BLOCK_PURITY);
+                return val == 0 ? ThirstConfig.DEFAULT_PURITY : val - 1;
+            }
+            return ThirstConfig.DEFAULT_PURITY;
+        }
+        return getOpenWaterPurity(level, pos);
+    }
+
+    public static boolean isWaterDisplayTarget(Level level, BlockPos pos) {
+        BlockState blockState = level.getBlockState(pos);
+        return blockState.is(Blocks.WATER_CAULDRON) || level.getFluidState(pos).is(FluidTags.WATER);
+    }
+
+    private static int getOpenWaterPurity(Level level, BlockPos pos) {
+        int purity = 0;
+        int y = pos.getY();
+        if (y > ThirstConfig.MOUNTAINS_Y || (y < ThirstConfig.CAVES_Y && y < ThirstConfig.MOUNTAINS_Y - 32)) {
+            purity = 1;
+        }
+        if (level.getFluidState(pos).is(FluidTags.WATER) && !level.getFluidState(pos).isSource()) {
+            purity = Math.min(purity + ThirstConfig.RUNNING_WATER_PURIFICATION_AMOUNT, MAX_PURITY);
+        }
+        return purity;
+    }
+
     /**
      * Applies purity-based effects to the entity and returns whether thirst should be restored.
      * Returns true for non-purity-aware items (vanilla potions, food handled elsewhere).
@@ -373,7 +402,7 @@ public final class WaterPurity {
         tooltip.add(purityComponent(purity));
     }
 
-    private static Component purityComponent(int purity) {
+    public static Component purityComponent(int purity) {
         String key = "yet_another_thirst.purity." + switch (purity) {
             case 0 -> "dirty";
             case 1 -> "slightly_dirty";

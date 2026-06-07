@@ -2,6 +2,7 @@ package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.client.ThirstHudRenderer;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,5 +22,10 @@ public final class NeoForgeClientEvents {
                 gui.rightHeight += 10;
             }
         });
+    }
+
+    @SubscribeEvent
+    public static void onRegisterTooltipComponentFactories(RegisterClientTooltipComponentFactoriesEvent event) {
+        event.register(dev.minhnh.yetanotherthirst.client.ThirstTooltipComponent.class, dev.minhnh.yetanotherthirst.client.ClientThirstTooltipComponent::new);
     }
 }

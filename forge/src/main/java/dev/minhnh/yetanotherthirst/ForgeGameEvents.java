@@ -2,6 +2,7 @@ package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.purity.ContainerWithPurity;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
+import dev.minhnh.yetanotherthirst.client.ThirstTooltip;
 import dev.minhnh.yetanotherthirst.core.command.ThirstCommands;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstEvents;
@@ -145,5 +146,6 @@ public final class ForgeGameEvents {
     public static void onItemTooltip(ItemTooltipEvent event) {
 
         WaterPurity.appendTooltip(event.getItemStack(), event.getToolTip());
+        ThirstTooltip.append(event.getItemStack(), event.getToolTip());
     }
 }
