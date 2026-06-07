@@ -11,55 +11,46 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
-
-import java.util.Optional;
-import java.util.function.Supplier;
+import net.minecraftforge.network.SimpleChannel;
 
 public final class ForgeNetwork {
 
-    private static final String PROTOCOL_VERSION = "1";
-    private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            Constants.asResource("main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals);
+    private static final int PROTOCOL_VERSION = 1;
+    private static final SimpleChannel CHANNEL = ChannelBuilder
+            .named(Constants.asResource("main"))
+            .networkProtocolVersion(PROTOCOL_VERSION)
+            .simpleChannel();
     private static int packetId;
 
     private ForgeNetwork() {}
 
     public static void register() {
 
-        CHANNEL.registerMessage(
-                packetId++,
-                ThirstSyncPacket.class,
-                ThirstSyncPacket::encode,
-                ThirstSyncPacket::decode,
-                ThirstSyncPacket::handle,
-                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.messageBuilder(ThirstSyncPacket.class, packetId++)
+                .encoder(ThirstSyncPacket::encode)
+                .decoder(ThirstSyncPacket::decode)
+                .consumerMainThread(ThirstSyncPacket::handle)
+                .add();
 
-        CHANNEL.registerMessage(
-                packetId++,
-                DrinkByHandPacket.class,
-                DrinkByHandPacket::encode,
-                DrinkByHandPacket::decode,
-                DrinkByHandPacket::handle,
-                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        CHANNEL.messageBuilder(DrinkByHandPacket.class, packetId++)
+                .encoder(DrinkByHandPacket::encode)
+                .decoder(DrinkByHandPacket::decode)
+                .consumerMainThread(DrinkByHandPacket::handle)
+                .add();
     }
 
     public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
 
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ThirstSyncPacket(thirst, quenched, exhaustion, enabled));
+        CHANNEL.send(new ThirstSyncPacket(thirst, quenched, exhaustion, enabled), PacketDistributor.PLAYER.with(player));
     }
 
     public static void sendDrinkByHand(BlockPos pos) {
 
-        CHANNEL.sendToServer(new DrinkByHandPacket(pos));
+        CHANNEL.send(new DrinkByHandPacket(pos), PacketDistributor.SERVER.noArg());
     }
 
     // ── Server → Client: thirst state sync ───────────────────────────────────
@@ -77,12 +68,13 @@ public final class ForgeNetwork {
             return new ThirstSyncPacket(buf.readInt(), buf.readInt(), buf.readFloat(), buf.readBoolean());
         }
 
-        private static void handle(ThirstSyncPacket packet, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().enqueueWork(() ->
+        private static void handle(ThirstSyncPacket packet, CustomPayloadEvent.Context context) {
+            if (!context.isClientSide()) return;
+            context.enqueueWork(() ->
                     DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                             ForgeClientPacketHandler.handleThirstSync(
                                     packet.thirst, packet.quenched, packet.exhaustion, packet.enabled)));
-            ctx.get().setPacketHandled(true);
+            context.setPacketHandled(true);
         }
     }
 
@@ -98,9 +90,10 @@ public final class ForgeNetwork {
             return new DrinkByHandPacket(buf.readBlockPos());
         }
 
-        private static void handle(DrinkByHandPacket packet, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().enqueueWork(() -> {
-                ServerPlayer player = ctx.get().getSender();
+        private static void handle(DrinkByHandPacket packet, CustomPayloadEvent.Context context) {
+            if (!context.isServerSide()) return;
+            context.enqueueWork(() -> {
+                ServerPlayer player = context.getSender();
                 if (player == null) return;
 
                 // 1. Distance check
@@ -139,7 +132,7 @@ public final class ForgeNetwork {
                 }
                 ThirstStorage.sync(player);
             });
-            ctx.get().setPacketHandled(true);
+            context.setPacketHandled(true);
         }
     }
 }

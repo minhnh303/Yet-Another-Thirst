@@ -1,17 +1,17 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class NeoForgeClientConfig {
 
-    static final ForgeConfigSpec SPEC;
+    static final ModConfigSpec SPEC;
 
-    private static final ForgeConfigSpec.IntValue HUD_X_OFFSET;
-    private static final ForgeConfigSpec.IntValue HUD_Y_OFFSET;
+    private static final ModConfigSpec.IntValue HUD_X_OFFSET;
+    private static final ModConfigSpec.IntValue HUD_Y_OFFSET;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         builder.push("hud");
         HUD_X_OFFSET = builder

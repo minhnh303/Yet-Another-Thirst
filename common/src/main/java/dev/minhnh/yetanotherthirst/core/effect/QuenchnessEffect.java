@@ -29,13 +29,14 @@ public class QuenchnessEffect extends MobEffect {
     }
 
     @Override
-    public void applyEffectTick(@Nullable LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(@Nullable LivingEntity entity, int amplifier) {
 
         drink(entity, amplifier);
+        return true;
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
 
         return duration >= 1;
     }

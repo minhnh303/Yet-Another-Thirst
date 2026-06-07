@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "yet_another_thirst:clay_bowl"
+  },
+  "result": {
+    "id": "yet_another_thirst:terracotta_bowl"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

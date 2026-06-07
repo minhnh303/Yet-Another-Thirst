@@ -1,18 +1,16 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.moddev.legacyforge'
+    id 'net.neoforged.moddev'
 }
 
-legacyForge {
-    enable {
-        neoForgeVersion = "${minecraft_version}-${neoforge_version}"
-    }
+neoForge {
+    version = neoforge_version
 
     validateAccessTransformers = true
 
     def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
-        accessTransformers = [at]
+        accessTransformers.from at
     }
     parchment {
         minecraftVersion = parchment_minecraft
@@ -36,26 +34,17 @@ legacyForge {
             sourceSet sourceSets.main
         }
     }
-
-    mixin {
-        add(sourceSets.main, "yet_another_thirst.mixins.json")
-    }
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly project(":common")
-    compileOnly 'maven.modrinth:jade:11.13.2+forge'
-    compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
+    compileOnly("maven.modrinth:jade:${jade_version}") {
+        transitive = false
+    }
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(layout.buildDirectory.dir("mixin")) {
-        include "yet_another_thirst.mixins.json"
-        rename "yet_another_thirst.mixins.json", "yet_another_thirst.refmap.json"
-    }
-    finalizedBy('reobfJar')
 }

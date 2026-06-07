@@ -27,7 +27,8 @@ public abstract class MixinFoodData {
 
     @Redirect(
             method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V", ordinal = 0)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V", ordinal = 0),
+            remap = false
     )
     private void yet_another_thirst$healWithSaturation(Player player, float amount) {
         ThirstState thirstData = ThirstStorage.get(player);
@@ -56,7 +57,8 @@ public abstract class MixinFoodData {
 
     @Redirect(
             method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V", ordinal = 1)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V", ordinal = 1),
+            remap = false
     )
     private void yet_another_thirst$healWithHunger(Player player, float amount) {
         ThirstState thirstData = ThirstStorage.get(player);
@@ -72,7 +74,8 @@ public abstract class MixinFoodData {
 
     @Inject(
             method = "tick",
-            at = @At(value = "HEAD")
+            at = @At(value = "HEAD"),
+            remap = false
     )
     private void yet_another_thirst$dealWithExhaustionBySaturation(Player player, CallbackInfo ci) {
         if (exhaustionLevel > 4.0F) {

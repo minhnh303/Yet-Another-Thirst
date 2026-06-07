@@ -173,7 +173,7 @@ public final class ThirstConfig {
                 String idPart = input.substring(0, opIndex).trim();
                 String valPart = input.substring(opIndex + operator.length()).trim();
                 try {
-                    effectId = new net.minecraft.resources.ResourceLocation(idPart);
+                    effectId = net.minecraft.resources.ResourceLocation.parse(idPart);
                 } catch (Exception e) {
                     effectId = null;
                 }
@@ -184,7 +184,7 @@ public final class ThirstConfig {
                 }
             } else {
                 try {
-                    effectId = new net.minecraft.resources.ResourceLocation(input);
+                    effectId = net.minecraft.resources.ResourceLocation.parse(input);
                 } catch (Exception e) {
                     effectId = null;
                 }

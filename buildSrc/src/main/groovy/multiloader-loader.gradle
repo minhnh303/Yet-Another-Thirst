@@ -2,6 +2,10 @@ plugins {
     id 'multiloader-common'
 }
 
+base {
+    archivesName = "${base.archivesName.get()}-${project.name}"
+}
+
 configurations {
     commonJava{
         canBeResolved = true

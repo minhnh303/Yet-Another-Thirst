@@ -26,7 +26,7 @@ This file provides guidance to AI Agents when working with code in this reposito
 
 ## Architecture
 
-Multi-loader Minecraft mod (Minecraft 1.20.1, Java 17) targeting **Forge** and **NeoForge** via a shared `common` subproject.
+Multi-loader Minecraft mod (Minecraft 1.21, Java 21) targeting **Forge** and **NeoForge** via a shared `common` subproject.
 
 ```
 common/   — Loader-agnostic game logic, events, mixins

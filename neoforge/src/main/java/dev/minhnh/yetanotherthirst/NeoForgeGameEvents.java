@@ -16,17 +16,15 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
-@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public final class NeoForgeGameEvents {
 
     private NeoForgeGameEvents() {
@@ -45,9 +43,9 @@ public final class NeoForgeGameEvents {
     // ── Tick / player state ───────────────────────────────────────────────────
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
 
-        if (event.phase == TickEvent.Phase.END && event.player instanceof ServerPlayer player) {
+        if (event.getEntity() instanceof ServerPlayer player) {
             ThirstEvents.onPlayerTick(player);
         }
     }
@@ -96,7 +94,7 @@ public final class NeoForgeGameEvents {
         var level = player.level();
         var pos = level.clip(new net.minecraft.world.level.ClipContext(
                 player.getEyePosition(),
-                player.getEyePosition().add(player.getLookAngle().scale(player.getBlockReach())),
+                player.getEyePosition().add(player.getLookAngle().scale(player.blockInteractionRange())),
                 net.minecraft.world.level.ClipContext.Block.OUTLINE,
                 net.minecraft.world.level.ClipContext.Fluid.ANY,
                 player)).getBlockPos();
@@ -124,7 +122,7 @@ public final class NeoForgeGameEvents {
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
         if (ThirstConfig.CAN_DRINK_BY_HAND && event.getEntity().level().isClientSide) {
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> NeoForgeHandDrinkClient.handleRightClickBlock(event));
+            NeoForgeHandDrinkClient.handleRightClickBlock(event);
         }
     }
 
@@ -132,7 +130,7 @@ public final class NeoForgeGameEvents {
     public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
         if (event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
         if (ThirstConfig.CAN_DRINK_BY_HAND && event.getEntity().level().isClientSide) {
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> NeoForgeHandDrinkClient::tryDrink);
+            NeoForgeHandDrinkClient.tryDrink();
         }
     }
 

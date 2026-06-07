@@ -46,7 +46,7 @@ public final class ForgeHandDrinkClient {
         var eyePos = player.getEyePosition();
         BlockHitResult hit = level.clip(new ClipContext(
                 eyePos,
-                eyePos.add(player.getLookAngle().scale(player.getBlockReach())),
+                eyePos.add(player.getLookAngle().scale(player.blockInteractionRange())),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.ANY,
                 player));

@@ -12,8 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public final class NeoForgeHandDrinkClient {
@@ -46,7 +46,7 @@ public final class NeoForgeHandDrinkClient {
         var eyePos = player.getEyePosition();
         BlockHitResult hit = level.clip(new ClipContext(
                 eyePos,
-                eyePos.add(player.getLookAngle().scale(player.getBlockReach())),
+                eyePos.add(player.getLookAngle().scale(player.blockInteractionRange())),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.ANY,
                 player));
@@ -63,7 +63,7 @@ public final class NeoForgeHandDrinkClient {
         return true;
     }
 
-    public static void handleRightClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+    public static void handleRightClickBlock(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
         if (tryDrink()) {
             event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
             event.setCanceled(true);

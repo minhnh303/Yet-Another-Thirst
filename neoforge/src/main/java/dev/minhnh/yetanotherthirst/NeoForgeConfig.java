@@ -4,91 +4,93 @@ import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.*;
 
 public final class NeoForgeConfig {
 
-    public static final ForgeConfigSpec SPEC;
+    public static final ModConfigSpec SPEC;
 
     // General
-    private static final ForgeConfigSpec.BooleanValue EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
-    private static final ForgeConfigSpec.BooleanValue THIRST_DEPLETES_IN_PEACEFUL;
-    private static final ForgeConfigSpec.BooleanValue DRINK_RAIN_WATER;
-    private static final ForgeConfigSpec.BooleanValue DEPLETES_WHEN_NAUSEA;
-    private static final ForgeConfigSpec.BooleanValue SPRINT_PREVENTION;
-    private static final ForgeConfigSpec.IntValue SPRINT_THRESHOLD;
-    private static final ForgeConfigSpec.BooleanValue DEHYDRATION_HALTS_HEALTH_REGEN;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SUSPEND_THIRST_EFFECTS;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> PAUSE_DEPLETION_EFFECTS;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> REGEN_THIRST_EFFECTS;
-    private static final ForgeConfigSpec.IntValue REGEN_THIRST_INTERVAL;
-    private static final ForgeConfigSpec.IntValue REGEN_THIRST_AMOUNT;
+    private static final ModConfigSpec.BooleanValue EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
+    private static final ModConfigSpec.BooleanValue THIRST_DEPLETES_IN_PEACEFUL;
+    private static final ModConfigSpec.BooleanValue DRINK_RAIN_WATER;
+    private static final ModConfigSpec.BooleanValue DEPLETES_WHEN_NAUSEA;
+    private static final ModConfigSpec.BooleanValue SPRINT_PREVENTION;
+    private static final ModConfigSpec.IntValue SPRINT_THRESHOLD;
+    private static final ModConfigSpec.BooleanValue DEHYDRATION_HALTS_HEALTH_REGEN;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> SUSPEND_THIRST_EFFECTS;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> PAUSE_DEPLETION_EFFECTS;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> REGEN_THIRST_EFFECTS;
+    private static final ModConfigSpec.IntValue REGEN_THIRST_INTERVAL;
+    private static final ModConfigSpec.IntValue REGEN_THIRST_AMOUNT;
 
     // Compatibility
-    private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
-    private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
-    private static final ForgeConfigSpec.EnumValue<ThirstConfig.ToughAsNailsMode> TOUGH_AS_NAILS_MODE;
-    private static final ForgeConfigSpec.BooleanValue COLD_SWEAT_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS;
-    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_HOT_BODY_TEMPERATURE;
-    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_BURNING_BODY_TEMPERATURE;
-    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_MAX_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST;
-    private static final ForgeConfigSpec.BooleanValue VAMPIRISM_VAMPIRE_SUSPENDS_THIRST;
+    private static final ModConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
+    private static final ModConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
+    private static final ModConfigSpec.EnumValue<ThirstConfig.ToughAsNailsMode> TOUGH_AS_NAILS_MODE;
+    private static final ModConfigSpec.BooleanValue COLD_SWEAT_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS;
+    private static final ModConfigSpec.DoubleValue COLD_SWEAT_HOT_BODY_TEMPERATURE;
+    private static final ModConfigSpec.DoubleValue COLD_SWEAT_BURNING_BODY_TEMPERATURE;
+    private static final ModConfigSpec.DoubleValue COLD_SWEAT_MAX_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST;
+    private static final ModConfigSpec.BooleanValue VAMPIRISM_VAMPIRE_SUSPENDS_THIRST;
 
     // Dehydration
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE;
-    private static final ForgeConfigSpec.IntValue DAMAGE_INTERVAL_TICKS;
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_EASY_LIMIT;
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_NORMAL_LIMIT;
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_HARD_LIMIT;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE;
+    private static final ModConfigSpec.IntValue DAMAGE_INTERVAL_TICKS;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE_EASY_LIMIT;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE_NORMAL_LIMIT;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE_HARD_LIMIT;
 
     // Depletion
-    private static final ForgeConfigSpec.DoubleValue THIRST_DEPLETION_MODIFIER;
-    private static final ForgeConfigSpec.DoubleValue NETHER_THIRST_DEPLETION_MODIFIER;
-    private static final ForgeConfigSpec.DoubleValue FIRE_RESISTANCE_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue BIOME_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue FIRE_PROTECTION_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.DoubleValue ENVIRONMENT_MODIFIER_HARSHNESS;
+    private static final ModConfigSpec.DoubleValue THIRST_DEPLETION_MODIFIER;
+    private static final ModConfigSpec.DoubleValue NETHER_THIRST_DEPLETION_MODIFIER;
+    private static final ModConfigSpec.DoubleValue FIRE_RESISTANCE_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue BIOME_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue FIRE_PROTECTION_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.DoubleValue ENVIRONMENT_MODIFIER_HARSHNESS;
 
     // Purity
-    private static final ForgeConfigSpec.IntValue DEFAULT_PURITY;
-    private static final ForgeConfigSpec.BooleanValue QUENCH_WHEN_DEBUFFED;
-    private static final ForgeConfigSpec.DoubleValue DIRTY_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue DIRTY_POISON_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue SLIGHTLY_DIRTY_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue SLIGHTLY_DIRTY_POISON_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue ACCEPTABLE_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue ACCEPTABLE_POISON_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue PURIFIED_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue PURIFIED_POISON_CHANCE;
+    private static final ModConfigSpec.IntValue DEFAULT_PURITY;
+    private static final ModConfigSpec.BooleanValue QUENCH_WHEN_DEBUFFED;
+    private static final ModConfigSpec.DoubleValue DIRTY_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue DIRTY_POISON_CHANCE;
+    private static final ModConfigSpec.DoubleValue SLIGHTLY_DIRTY_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue SLIGHTLY_DIRTY_POISON_CHANCE;
+    private static final ModConfigSpec.DoubleValue ACCEPTABLE_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue ACCEPTABLE_POISON_CHANCE;
+    private static final ModConfigSpec.DoubleValue PURIFIED_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue PURIFIED_POISON_CHANCE;
 
     // World
-    private static final ForgeConfigSpec.IntValue MOUNTAINS_Y;
-    private static final ForgeConfigSpec.IntValue CAVES_Y;
-    private static final ForgeConfigSpec.IntValue RUNNING_WATER_PURIFICATION_AMOUNT;
+    private static final ModConfigSpec.IntValue MOUNTAINS_Y;
+    private static final ModConfigSpec.IntValue CAVES_Y;
+    private static final ModConfigSpec.IntValue RUNNING_WATER_PURIFICATION_AMOUNT;
 
     // Items
-    private static final ForgeConfigSpec.IntValue WATER_BOTTLE_STACKSIZE;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> DRINK_VALUES;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> FOOD_VALUES;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEMS_BLACKLIST;
+    private static final ModConfigSpec.IntValue WATER_BOTTLE_STACKSIZE;
+    private static final ModConfigSpec.ConfigValue<List<? extends List<?>>> DRINK_VALUES;
+    private static final ModConfigSpec.ConfigValue<List<? extends List<?>>> FOOD_VALUES;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> ITEMS_BLACKLIST;
 
     // Hand drinking
-    private static final ForgeConfigSpec.BooleanValue CAN_DRINK_BY_HAND;
-    private static final ForgeConfigSpec.IntValue HAND_DRINKING_THIRST;
-    private static final ForgeConfigSpec.IntValue HAND_DRINKING_QUENCHED;
-    private static final ForgeConfigSpec.BooleanValue DRINK_BOTH_HANDS_NEEDED;
+    private static final ModConfigSpec.BooleanValue CAN_DRINK_BY_HAND;
+    private static final ModConfigSpec.IntValue HAND_DRINKING_THIRST;
+    private static final ModConfigSpec.IntValue HAND_DRINKING_QUENCHED;
+    private static final ModConfigSpec.BooleanValue DRINK_BOTH_HANDS_NEEDED;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         builder.push("general");
         EXTRA_HYDRATION_CONVERTS_TO_QUENCHED = builder
@@ -154,7 +156,8 @@ public final class NeoForgeConfig {
                 .defineInRange("regenThirstAmount", 1, 1, 20);
         builder.pop();
 
-        builder.push("compatibility");
+        builder.comment("Note: Except for Corail Tombstone, other mods do not support version 1.21 yet, so configurations related to those mods will not work.")
+                .push("compatibility");
         APPLESKIN_THIRST_TOOLTIP = builder
                 .comment("When AppleSkin is loaded, add YAT thirst and quenched values to item tooltips")
                 .define("appleSkinThirstTooltip", true);
@@ -390,7 +393,7 @@ public final class NeoForgeConfig {
             String id = (String) entry.get(0);
             ThirstValue value = new ThirstValue(((Number) entry.get(1)).intValue(), ((Number) entry.get(2)).intValue());
             if (id.startsWith("#")) {
-                resolveTag(id.substring(1)).ifPresent(tag -> tag.stream().forEach(item -> values.put(item, value)));
+                resolveTag(id.substring(1)).ifPresent(tag -> tag.forEach(item -> values.put(item, value)));
             } else {
                 resolveItem(id).ifPresent(item -> values.put(item, value));
             }
@@ -403,7 +406,7 @@ public final class NeoForgeConfig {
         Set<Item> items = new HashSet<>();
         for (String id : entries) {
             if (id.startsWith("#")) {
-                resolveTag(id.substring(1)).ifPresent(tag -> tag.stream().forEach(items::add));
+                resolveTag(id.substring(1)).ifPresent(tag -> tag.forEach(items::add));
             } else {
                 resolveItem(id).ifPresent(items::add);
             }
@@ -414,8 +417,8 @@ public final class NeoForgeConfig {
     private static Optional<Item> resolveItem(String id) {
 
         try {
-            ResourceLocation location = new ResourceLocation(id);
-            Item item = ForgeRegistries.ITEMS.getValue(location);
+            ResourceLocation location = ResourceLocation.parse(id);
+            Item item = BuiltInRegistries.ITEM.get(location);
             if (item != null && (item != Items.AIR || "minecraft:air".equals(id))) {
                 return Optional.of(item);
             }
@@ -424,12 +427,12 @@ public final class NeoForgeConfig {
         return Optional.empty();
     }
 
-    private static Optional<ITag<Item>> resolveTag(String id) {
+    private static Optional<List<Item>> resolveTag(String id) {
 
         try {
-            return ForgeRegistries.ITEMS.tags().stream()
-                    .filter(tag -> tag.getKey().location().toString().equals(id))
-                    .findFirst();
+            TagKey<Item> key = TagKey.create(Registries.ITEM, ResourceLocation.parse(id));
+            return BuiltInRegistries.ITEM.getTag(key)
+                    .map(tag -> tag.stream().map(Holder::value).toList());
         } catch (Exception ignored) {
             return Optional.empty();
         }

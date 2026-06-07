@@ -7,8 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -31,8 +29,7 @@ public final class ForgeCreativeTab {
                             output.accept(WaterPurity.addPurity(new ItemStack(ModItems.WOODEN_WATER_BOWL.get()), p));
                         }
                         for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
-                            output.accept(WaterPurity.addPurity(
-                                    PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER), p));
+                            output.accept(WaterPurity.addPurity(WaterPurity.waterPotion(), p));
                         }
                         for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
                             output.accept(WaterPurity.addPurity(new ItemStack(Items.WATER_BUCKET), p));

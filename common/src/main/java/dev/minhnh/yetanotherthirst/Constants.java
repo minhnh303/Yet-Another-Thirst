@@ -15,6 +15,6 @@ public class Constants {
 	@Nonnull
 	public static ResourceLocation asResource(@Nonnull String path) {
 
-		return new ResourceLocation(MOD_ID, path);
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
 	}
 }

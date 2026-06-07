@@ -2,6 +2,7 @@ package dev.minhnh.yetanotherthirst.compat;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.platform.Services;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -164,9 +165,12 @@ public final class ThirstCompat {
         return false;
     }
 
-    public static ResourceLocation effectId(Registry<MobEffect> effects, MobEffect effect) {
+    public static ResourceLocation effectId(Registry<MobEffect> effects, Holder<MobEffect> effect) {
 
-        return effects.getResourceKey(effect).map(ResourceKey::location).orElse(null);
+        return effect.unwrapKey()
+                .map(ResourceKey::location)
+                .or(() -> effects.getResourceKey(effect.value()).map(ResourceKey::location))
+                .orElse(null);
     }
 
     private static final class Vampirism {

@@ -1,13 +1,10 @@
 plugins {
     id 'multiloader-common'
-    id 'net.neoforged.moddev.legacyforge'
+    id 'net.neoforged.moddev'
 }
 
-legacyForge {
-    mcpVersion = minecraft_version
-    if (file("src/main/resources/META-INF/accesstransformer.cfg").exists()) {
-        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
-    }
+neoForge {
+    neoFormVersion = neoform_version
     parchment {
         minecraftVersion = parchment_minecraft
         mappingsVersion = parchment_version
@@ -17,8 +14,9 @@ legacyForge {
 dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly 'org.spongepowered:mixin:0.8.5'
-    compileOnly 'maven.modrinth:jade:11.13.2+forge'
-    compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
+    compileOnly("maven.modrinth:jade:${jade_version}") {
+        transitive = false
+    }
 }
 
 configurations {

@@ -1,59 +1,70 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.moddev.legacyforge'
+    id 'net.minecraftforge.gradle'
 }
 
-legacyForge {
-    version = "${minecraft_version}-${forge_version}"
+apply plugin: 'org.spongepowered.mixin'
 
-    validateAccessTransformers = true
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    copyIdeResources = true
 
     def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
-        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
+        accessTransformer = at
     }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
+
     runs {
         client {
-            client()
+            workingDirectory project.file('runs/client')
+            property 'forge.logging.console.level', 'debug'
+            arg "-mixin.config=${mod_id}.mixins.json"
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
         }
         data {
-            data()
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            workingDirectory project.file('runs/data')
+            property 'forge.logging.console.level', 'debug'
+            args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
         }
         server {
-            server()
+            workingDirectory project.file('runs/server')
+            property 'forge.logging.console.level', 'debug'
+            arg "-mixin.config=${mod_id}.mixins.json"
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
         }
-    }
-
-    mods {
-        "${mod_id}" {
-            sourceSet sourceSets.main
-        }
-    }
-
-    mixin {
-        add(sourceSets.main, "yet_another_thirst.mixins.json")
     }
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly project(":common")
-    compileOnly 'maven.modrinth:jade:11.13.2+forge'
-    compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
+    compileOnly("maven.modrinth:jade:${jade_version}") {
+        transitive = false
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+    config "${mod_id}.mixins.json"
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(layout.buildDirectory.dir("mixin")) {
-        include "yet_another_thirst.mixins.json"
-        rename "yet_another_thirst.mixins.json", "yet_another_thirst.refmap.json"
-    }
-    finalizedBy('reobfJar')
+    from("build/tmp/compileJava/${mod_id}.refmap.json")
 }

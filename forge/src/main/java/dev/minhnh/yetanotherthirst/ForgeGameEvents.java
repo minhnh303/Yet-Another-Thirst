@@ -100,7 +100,7 @@ public final class ForgeGameEvents {
         var level = player.level();
         var pos = level.clip(new net.minecraft.world.level.ClipContext(
                 player.getEyePosition(),
-                player.getEyePosition().add(player.getLookAngle().scale(player.getBlockReach())),
+                player.getEyePosition().add(player.getLookAngle().scale(player.blockInteractionRange())),
                 net.minecraft.world.level.ClipContext.Block.OUTLINE,
                 net.minecraft.world.level.ClipContext.Fluid.ANY,
                 player)).getBlockPos();

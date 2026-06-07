@@ -3,12 +3,14 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -159,7 +161,8 @@ public final class ForgeConfig {
                 .defineInRange("regenThirstAmount", 1, 1, 20);
         builder.pop();
 
-        builder.push("compatibility");
+        builder.comment("Note: Except for Corail Tombstone, other mods do not support version 1.21 yet, so configurations related to those mods will not work.")
+                .push("compatibility");
         APPLESKIN_THIRST_TOOLTIP = builder
                 .comment("When AppleSkin is loaded, add YAT thirst and quenched values to item tooltips")
                 .define("appleSkinThirstTooltip", true);
@@ -395,7 +398,7 @@ public final class ForgeConfig {
             String id = (String) entry.get(0);
             ThirstValue value = new ThirstValue(((Number) entry.get(1)).intValue(), ((Number) entry.get(2)).intValue());
             if (id.startsWith("#")) {
-                resolveTag(id.substring(1)).ifPresent(tag -> tag.stream().forEach(item -> values.put(item, value)));
+                resolveTag(id.substring(1)).ifPresent(tag -> tag.forEach(item -> values.put(item, value)));
             } else {
                 resolveItem(id).ifPresent(item -> values.put(item, value));
             }
@@ -408,7 +411,7 @@ public final class ForgeConfig {
         Set<Item> items = new HashSet<>();
         for (String id : entries) {
             if (id.startsWith("#")) {
-                resolveTag(id.substring(1)).ifPresent(tag -> tag.stream().forEach(items::add));
+                resolveTag(id.substring(1)).ifPresent(tag -> tag.forEach(items::add));
             } else {
                 resolveItem(id).ifPresent(items::add);
             }
@@ -419,8 +422,8 @@ public final class ForgeConfig {
     private static Optional<Item> resolveItem(String id) {
 
         try {
-            ResourceLocation location = new ResourceLocation(id);
-            Item item = ForgeRegistries.ITEMS.getValue(location);
+            ResourceLocation location = ResourceLocation.parse(id);
+            Item item = BuiltInRegistries.ITEM.get(location);
             if (item != null && (item != Items.AIR || "minecraft:air".equals(id))) {
                 return Optional.of(item);
             }
@@ -429,12 +432,12 @@ public final class ForgeConfig {
         return Optional.empty();
     }
 
-    private static Optional<ITag<Item>> resolveTag(String id) {
+    private static Optional<List<Item>> resolveTag(String id) {
 
         try {
-            return ForgeRegistries.ITEMS.tags().stream()
-                    .filter(tag -> tag.getKey().location().toString().equals(id))
-                    .findFirst();
+            TagKey<Item> key = TagKey.create(Registries.ITEM, ResourceLocation.parse(id));
+            return BuiltInRegistries.ITEM.getTag(key)
+                    .map(tag -> tag.stream().map(Holder::value).toList());
         } catch (Exception ignored) {
             return Optional.empty();
         }

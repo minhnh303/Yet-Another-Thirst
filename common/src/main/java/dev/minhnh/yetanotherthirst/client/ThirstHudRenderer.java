@@ -27,6 +27,7 @@ public final class ThirstHudRenderer {
     private ThirstHudRenderer() {
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean render(GuiGraphics guiGraphics, int width, int height, int rightHeight) {
 
         Minecraft minecraft = Minecraft.getInstance();

@@ -230,7 +230,7 @@ public final class ThirstTicker {
             return 1.0F;
         }
 
-        int levels = EnchantmentHelper.getDamageProtection(player.getArmorSlots(), player.damageSources().onFire()) / 2;
+        int levels = (int) EnchantmentHelper.getDamageProtection(player.serverLevel(), player, player.damageSources().onFire()) / 2;
         levels = Math.min(levels, 12);
         return 1.0F - levels * 0.0625F * 0.75F;
     }

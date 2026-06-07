@@ -2,16 +2,18 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.minhnh.yetanotherthirst.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "refmap": "yet_another_thirst.refmap.json",
   "mixins": [
     "MixinFoodData",
     "MixinInventory",
-    "MixinItem",
     "MixinItemStack",
-    "MixinLayeredCauldronBlock",
+    "MixinStateDefinitionBuilder",
     "MixinAbstractCookingRecipe",
     "MixinAbstractFurnaceEntity"
+  ],
+  "client": [
+    "MixinGui"
   ],
   "injectors": {
     "defaultRequire": 1

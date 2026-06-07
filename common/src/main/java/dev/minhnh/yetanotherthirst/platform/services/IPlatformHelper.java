@@ -38,6 +38,18 @@ public interface IPlatformHelper {
         return new CompoundTag();
     }
 
+    default ThirstState getThirstState(Player player) {
+
+        return dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage.get(player);
+    }
+
+    default void syncThirst(Player player) {
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage.sync(serverPlayer);
+        }
+    }
+
     void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled);
 
     default void sendThirstSync(ServerPlayer player, ThirstState state) {
