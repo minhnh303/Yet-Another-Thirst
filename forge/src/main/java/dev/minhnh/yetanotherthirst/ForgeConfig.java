@@ -31,6 +31,13 @@ public final class ForgeConfig {
     private static final ForgeConfigSpec.IntValue SPRINT_THRESHOLD;
     private static final ForgeConfigSpec.BooleanValue DEHYDRATION_HALTS_HEALTH_REGEN;
 
+    // Dehydration
+    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE;
+    private static final ForgeConfigSpec.IntValue DAMAGE_INTERVAL_TICKS;
+    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_EASY_LIMIT;
+    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_NORMAL_LIMIT;
+    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_HARD_LIMIT;
+
     // Depletion
     private static final ForgeConfigSpec.DoubleValue THIRST_DEPLETION_MODIFIER;
     private static final ForgeConfigSpec.DoubleValue NETHER_THIRST_DEPLETION_MODIFIER;
@@ -93,6 +100,24 @@ public final class ForgeConfig {
         DEHYDRATION_HALTS_HEALTH_REGEN = builder
                 .comment("Prevent natural health regeneration while the thirst bar is not full")
                 .define("dehydrationHaltsHealthRegen", true);
+        builder.pop();
+
+        builder.push("dehydration");
+        DEHYDRATION_DAMAGE = builder
+                .comment("Amount of damage dealt when dehydrated")
+                .defineInRange("dehydrationDamage", 1.0, 0.0, 100.0);
+        DAMAGE_INTERVAL_TICKS = builder
+                .comment("Interval in ticks between dehydration damage ticks")
+                .defineInRange("damageIntervalTicks", 40, 1, 72000);
+        DEHYDRATION_DAMAGE_EASY_LIMIT = builder
+                .comment("Minimum health remaining on Easy difficulty when taking dehydration damage")
+                .defineInRange("dehydrationDamageEasyLimit", 10.0, 0.0, 20.0);
+        DEHYDRATION_DAMAGE_NORMAL_LIMIT = builder
+                .comment("Minimum health remaining on Normal difficulty when taking dehydration damage")
+                .defineInRange("dehydrationDamageNormalLimit", 0.0, 0.0, 20.0);
+        DEHYDRATION_DAMAGE_HARD_LIMIT = builder
+                .comment("Minimum health remaining on Hard difficulty when taking dehydration damage")
+                .defineInRange("dehydrationDamageHardLimit", 0.0, 0.0, 20.0);
         builder.pop();
 
         builder.push("depletion");
@@ -203,6 +228,11 @@ public final class ForgeConfig {
         ThirstConfig.SPRINT_PREVENTION = SPRINT_PREVENTION.get();
         ThirstConfig.SPRINT_THRESHOLD = SPRINT_THRESHOLD.get();
         ThirstConfig.DEHYDRATION_HALTS_HEALTH_REGEN = DEHYDRATION_HALTS_HEALTH_REGEN.get();
+        ThirstConfig.DAMAGE_INTERVAL_TICKS = DAMAGE_INTERVAL_TICKS.get();
+        ThirstConfig.DEHYDRATION_DAMAGE = DEHYDRATION_DAMAGE.get().floatValue();
+        ThirstConfig.DEHYDRATION_DAMAGE_EASY_LIMIT = DEHYDRATION_DAMAGE_EASY_LIMIT.get().floatValue();
+        ThirstConfig.DEHYDRATION_DAMAGE_NORMAL_LIMIT = DEHYDRATION_DAMAGE_NORMAL_LIMIT.get().floatValue();
+        ThirstConfig.DEHYDRATION_DAMAGE_HARD_LIMIT = DEHYDRATION_DAMAGE_HARD_LIMIT.get().floatValue();
         ThirstConfig.THIRST_DEPLETION_MODIFIER = THIRST_DEPLETION_MODIFIER.get().floatValue();
         ThirstConfig.NETHER_THIRST_DEPLETION_MODIFIER = NETHER_THIRST_DEPLETION_MODIFIER.get().floatValue();
         ThirstConfig.FIRE_RESISTANCE_DEHYDRATION_MODIFIER = FIRE_RESISTANCE_DEHYDRATION_MODIFIER.get().floatValue();
@@ -308,6 +338,7 @@ public final class ForgeConfig {
         addValue(values, "minecraft:honey_bottle", 3, 4);
         addValue(values, "minecraft:milk_bucket", 2, 4);
         addValue(values, Constants.MOD_ID + ":terracotta_water_bowl", 5, 7);
+        addValue(values, Constants.MOD_ID + ":wooden_water_bowl", 5, 7);
         addValue(values, "farmersrespite:green_tea", 10, 14);
         addValue(values, "farmersrespite:long_green_tea", 10, 14);
         addValue(values, "farmersrespite:strong_green_tea", 10, 14);

@@ -10,6 +10,7 @@ public final class ModItems {
     public static Supplier<Item> CLAY_BOWL;
     public static Supplier<Item> TERRACOTTA_BOWL;
     public static Supplier<Item> TERRACOTTA_WATER_BOWL;
+    public static Supplier<Item> WOODEN_WATER_BOWL;
 
     private ModItems() {}
 }

@@ -7,7 +7,11 @@ public final class ThirstConfig {
     public static final int DEFAULT_QUENCHED = 5;
     public static final float EXHAUSTION_LIMIT = 4.0F;
     public static final int SYNC_INTERVAL_TICKS = 10;
-    public static final int DAMAGE_INTERVAL_TICKS = 40;
+    public static int DAMAGE_INTERVAL_TICKS = 40;
+    public static float DEHYDRATION_DAMAGE = 1.0F;
+    public static float DEHYDRATION_DAMAGE_EASY_LIMIT = 10.0F;
+    public static float DEHYDRATION_DAMAGE_NORMAL_LIMIT = 0.0F;
+    public static float DEHYDRATION_DAMAGE_HARD_LIMIT = 0.0F;
 
     public static boolean EXTRA_HYDRATION_CONVERTS_TO_QUENCHED = true;
     public static boolean THIRST_DEPLETES_IN_PEACEFUL = false;

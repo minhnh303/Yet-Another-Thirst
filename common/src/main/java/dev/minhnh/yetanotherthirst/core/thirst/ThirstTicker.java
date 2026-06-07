@@ -142,8 +142,15 @@ public final class ThirstTicker {
             return;
         }
 
-        if (player.getHealth() > 10.0F || difficulty == Difficulty.HARD || player.getHealth() > 0.0F && difficulty == Difficulty.NORMAL) {
-            player.hurt(dehydrateSource(player), 1.0F);
+        float limit = ThirstConfig.DEHYDRATION_DAMAGE_EASY_LIMIT;
+        if (difficulty == Difficulty.NORMAL) {
+            limit = ThirstConfig.DEHYDRATION_DAMAGE_NORMAL_LIMIT;
+        } else if (difficulty == Difficulty.HARD) {
+            limit = ThirstConfig.DEHYDRATION_DAMAGE_HARD_LIMIT;
+        }
+
+        if (player.getHealth() > limit) {
+            player.hurt(dehydrateSource(player), ThirstConfig.DEHYDRATION_DAMAGE);
         }
         state.resetDamageTimer();
     }
@@ -183,14 +190,16 @@ public final class ThirstTicker {
 
         float humidity = biome.getPrecipitationAt(player.getOnPos()) == Biome.Precipitation.NONE ? 1.1F : 1.2F;
 
-        float temperature = biome.getBaseTemperature() + 0.2F;
-        if (temperature <= 0.0F) {
-            temperature = (float) Math.exp(temperature);
-        } else if (temperature > 1.0F) {
-            temperature /= 2.0F;
+        float baseTemp = biome.getBaseTemperature();
+        float tempFactor;
+        if (baseTemp >= 0.7F) {
+            tempFactor = 1.0F + (baseTemp - 0.7F) * 0.5F / 1.3F;
+        } else {
+            tempFactor = 1.0F - (0.7F - baseTemp) * 0.5F / 1.2F;
         }
+        tempFactor = Mth.clamp(tempFactor, 0.3F, 2.0F);
 
-        float modifier = ThirstConfig.THIRST_DEPLETION_MODIFIER * (temperature / humidity);
+        float modifier = ThirstConfig.THIRST_DEPLETION_MODIFIER * (tempFactor / humidity);
         if (modifier < 1.0F) {
             float offset = (1.0F - modifier) * ThirstConfig.ENVIRONMENT_MODIFIER_HARSHNESS;
             modifier = 1.0F - offset;

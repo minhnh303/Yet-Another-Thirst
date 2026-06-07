@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -38,6 +39,7 @@ public class YetAnotherThirstNeoForge {
     }
 
     private static void onCommonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(WaterPurity::init);
         ThirstConfig.COMPAT_TOMBSTONE = ModList.get().isLoaded("tombstone");
         ThirstConfig.COMPAT_VAMPIRISM = ModList.get().isLoaded("vampirism");
         ThirstConfig.COMPAT_FARMERS_DELIGHT = ModList.get().isLoaded("farmersdelight");

@@ -103,6 +103,26 @@ public final class ForgeNetwork {
                 ServerPlayer player = ctx.get().getSender();
                 if (player == null) return;
 
+                // 1. Distance check
+                double maxReach = 6.0;
+                if (player.getEyePosition().distanceToSqr(packet.pos.getX() + 0.5, packet.pos.getY() + 0.5, packet.pos.getZ() + 0.5) > maxReach * maxReach) {
+                    return;
+                }
+
+                // 2. Sneaking check
+                if (!player.isCrouching() && !player.isSecondaryUseActive()) {
+                    return;
+                }
+
+                // 3. Hand availability check
+                boolean handAvailable = ThirstConfig.DRINK_BOTH_HANDS_NEEDED
+                        ? player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty()
+                                && player.getItemInHand(net.minecraft.world.InteractionHand.OFF_HAND).isEmpty()
+                        : player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty();
+                if (!handAvailable) {
+                    return;
+                }
+
                 Level level = player.level();
                 if (!level.getFluidState(packet.pos).is(FluidTags.WATER)) return;
 

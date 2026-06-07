@@ -1,0 +1,19 @@
+{
+  "block.yet_another_thirst.sand_filter": "砂フィルター",
+  "death.attack.dehydrate": "%1$s が脱水で死亡しました。",
+  "death.attack.dehydrate.player": "%1$s が %2$s と戦って脱水で死亡しました。",
+  "effect.yet_another_thirst.quenchness": "潤い",
+  "item.yet_another_thirst.clay_bowl": "粘土の器",
+  "item.yet_another_thirst.terracotta_bowl": "テラコッタ 器",
+  "item.yet_another_thirst.terracotta_water_bowl": "テラコッタ 水入れ",
+  "item.yet_another_thirst.wooden_water_bowl": "木の水入れ",
+  "itemGroup.yet_another_thirst": "渇き",
+  "yet_another_thirst.ponder.sand_filter.header": "Purifying Water with a Sand Filter",
+  "yet_another_thirst.ponder.sand_filter.text_1": "A Sand Filter purifies by one step water pumped through it",
+  "yet_another_thirst.ponder.sand_filter.text_2": "Dirty Water needs to be pumped in from the top...",
+  "yet_another_thirst.ponder.sand_filter.text_3": "and Purified Water can be pumped out from the bottom",
+  "yet_another_thirst.purity.dirty": "汚れ",
+  "yet_another_thirst.purity.slightly_dirty": "やや汚れ",
+  "yet_another_thirst.purity.acceptable": "許容",
+  "yet_another_thirst.purity.purified": "精製された"
+}

@@ -19,6 +19,7 @@ public final class ThirstCommands {
     private ThirstCommands() {
     }
 
+    @SuppressWarnings({"null"})
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
         dispatcher.register(Commands.literal("thirst")

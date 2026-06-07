@@ -3,6 +3,7 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.item.DrinkableItem;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -20,11 +21,15 @@ public final class NeoForgeItems {
     static final RegistryObject<Item> TERRACOTTA_WATER_BOWL = ITEMS.register("terracotta_water_bowl",
             () -> new DrinkableItem(TERRACOTTA_BOWL));
 
+    static final RegistryObject<Item> WOODEN_WATER_BOWL = ITEMS.register("wooden_water_bowl",
+            () -> new DrinkableItem(() -> Items.BOWL));
+
     /** Binds NeoForge RegistryObjects into the loader-agnostic ModItems suppliers. */
     static void bindToCommon() {
         ModItems.CLAY_BOWL = CLAY_BOWL;
         ModItems.TERRACOTTA_BOWL = TERRACOTTA_BOWL;
         ModItems.TERRACOTTA_WATER_BOWL = TERRACOTTA_WATER_BOWL;
+        ModItems.WOODEN_WATER_BOWL = WOODEN_WATER_BOWL;
     }
 
     private NeoForgeItems() {}

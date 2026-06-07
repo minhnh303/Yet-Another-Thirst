@@ -28,6 +28,9 @@ public final class NeoForgeCreativeTab {
                             output.accept(WaterPurity.addPurity(new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get()), p));
                         }
                         for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
+                            output.accept(WaterPurity.addPurity(new ItemStack(ModItems.WOODEN_WATER_BOWL.get()), p));
+                        }
+                        for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
                             output.accept(WaterPurity.addPurity(
                                      PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER), p));
                         }

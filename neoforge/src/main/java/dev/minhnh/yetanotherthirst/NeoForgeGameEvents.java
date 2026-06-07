@@ -37,6 +37,7 @@ public final class NeoForgeGameEvents {
     public static void onServerStarted(ServerStartedEvent event) {
         WaterPurity.init();
         ThirstValues.registerDrink(ModItems.TERRACOTTA_WATER_BOWL.get(), 5, 7);
+        ThirstValues.registerDrink(ModItems.WOODEN_WATER_BOWL.get(), 5, 7);
     }
 
     // ── Tick / player state ───────────────────────────────────────────────────
@@ -113,6 +114,24 @@ public final class NeoForgeGameEvents {
         ItemStack result = ItemUtils.createFilledResult(held, player, filled);
         player.setItemInHand(event.getHand(), result);
         event.setCanceled(true);
+    }
+
+    // ── Purity: hand drinking trigger (client-side detect → server packet) ────
+
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
+        if (ThirstConfig.CAN_DRINK_BY_HAND && event.getEntity().level().isClientSide) {
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> NeoForgeHandDrinkClient.handleRightClickBlock(event));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        if (event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
+        if (ThirstConfig.CAN_DRINK_BY_HAND && event.getEntity().level().isClientSide) {
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> NeoForgeHandDrinkClient::tryDrink);
+        }
     }
 
     // ── Purity: tooltip ───────────────────────────────────────────────────────

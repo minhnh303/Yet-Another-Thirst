@@ -16,9 +16,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public final class ForgeHandDrinkClient {
+public final class NeoForgeHandDrinkClient {
 
-    private ForgeHandDrinkClient() {}
+    private NeoForgeHandDrinkClient() {}
 
     public static boolean tryDrink() {
         Minecraft mc = Minecraft.getInstance();
@@ -59,7 +59,7 @@ public final class ForgeHandDrinkClient {
         level.playSound(player, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.GENERIC_DRINK, SoundSource.NEUTRAL, 1.0F, 1.0F);
         player.swing(InteractionHand.MAIN_HAND);
-        ForgeNetwork.sendDrinkByHand(pos);
+        NeoForgeNetwork.sendDrinkByHand(pos);
         return true;
     }
 

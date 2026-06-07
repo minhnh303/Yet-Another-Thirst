@@ -5,12 +5,13 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "yet_another_thirst.refmap.json",
   "mixins": [
-    "MixinBootstrap",
     "MixinFoodData",
     "MixinInventory",
     "MixinItem",
     "MixinItemStack",
-    "MixinLayeredCauldronBlock"
+    "MixinLayeredCauldronBlock",
+    "MixinAbstractCookingRecipe",
+    "MixinAbstractFurnaceEntity"
   ],
   "injectors": {
     "defaultRequire": 1

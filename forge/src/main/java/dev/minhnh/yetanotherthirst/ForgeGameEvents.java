@@ -127,15 +127,15 @@ public final class ForgeGameEvents {
 
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-
+        if (event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
         if (ThirstConfig.CAN_DRINK_BY_HAND && event.getEntity().level().isClientSide) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ForgeHandDrinkClient::tryDrink);
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ForgeHandDrinkClient.handleRightClickBlock(event));
         }
     }
 
     @SubscribeEvent
     public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
-
+        if (event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
         if (ThirstConfig.CAN_DRINK_BY_HAND && event.getEntity().level().isClientSide) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ForgeHandDrinkClient::tryDrink);
         }
