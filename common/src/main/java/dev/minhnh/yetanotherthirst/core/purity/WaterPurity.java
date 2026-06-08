@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst.core.purity;
 
+import dev.minhnh.yetanotherthirst.core.effect.ModEffects;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import net.minecraft.core.BlockPos;
@@ -53,7 +54,7 @@ public final class WaterPurity {
 
     private WaterPurity() {}
 
-    /** Called after item registration is complete (ServerStartedEvent / FMLCommonSetupEvent). */
+    /** Called from common setup after item registration is complete. */
     public static void init() {
         CONTAINERS.clear();
         CONTAINERS.add(new ContainerWithPurity(
@@ -307,7 +308,9 @@ public final class WaterPurity {
                 if (val == 0) {
                     int defaultPurity = ThirstConfig.DEFAULT_PURITY;
                     // If cauldron does not have dirty water data yet, set it to the default
-                    level.setBlockAndUpdate(pos, blockState.setValue(BLOCK_PURITY, defaultPurity + 1));
+                    if (!level.isClientSide()) {
+                        level.setBlockAndUpdate(pos, blockState.setValue(BLOCK_PURITY, defaultPurity + 1));
+                    }
                     return defaultPurity;
                 }
                 return val - 1;
@@ -383,6 +386,7 @@ public final class WaterPurity {
             if (chance < nauseaChance) {
                 sp.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 20 * 5, 0));
                 sp.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20 * 30, 0));
+                sp.addEffect(new MobEffectInstance(ModEffects.THIRSTY.get(), 20 * 30, 0));
             }
             if (chance <= poisonChance) {
                 sp.addEffect(new MobEffectInstance(MobEffects.POISON, 20 * 10, 0));

@@ -44,11 +44,13 @@ Test how drinking from different sources impacts player health.
 | 3 | Purified | Bright Blue | 0% Poison, 0% Nausea | +6 Thirst, +8 Quenched (Bottle) |
 
 - [x] Water Collection Purity from World
-  - Expect: Glass Bottle or Terracotta Bowl filled from water blocks derives purity from coordinates and flow:
+  - Expect: Glass Bottle, Terracotta Bowl, or vanilla Bowl filled from water blocks derives purity from coordinates and flow:
     - Normal ground water (Y 48 to 100): Purity 0 (Dirty).
     - Mountain spring (`y > 100`): Purity 1 (Slightly Dirty).
     - Cave spring (`y < 48`): Purity 1 (Slightly Dirty).
     - Running water (non-source flowing block): Purity level is increased by +1 from coordinate default.
+- [x] Wooden Water Bowl filling and drinking
+  - Expect: Filling an empty vanilla Bowl from a water source or cauldron produces a purity-aware Wooden Water Bowl. Drinking it restores thirst/quenched and returns an empty Bowl.
 - [x] Water Bottle Stacking
   - Expect: Water bottles stack up to 64 (or configured stack limit).
   - Matching tags: Water bottles of the same purity stack together. Bottles with different purity levels do not.
@@ -71,11 +73,17 @@ Verify custom crafting, smelting, and cooking operations.
 - [x] Terracotta Bowl Smelting
   - Recipe: Smelt Clay Bowl in furnace or campfire -> 1 Terracotta Bowl.
 - [x] Water Bottle Purification
-  - Smelt Dirty (Purity 0) or Slightly Dirty (Purity 1) Water Bottle -> Acceptable (Purity 2) Water Bottle.
-  - Smelt Acceptable (Purity 2) or default Water Bottle -> Purified (Purity 3) Water Bottle.
+  - Expect: Smelting in a furnace or cooking on a campfire.
+    - Dirty (Purity 0) or Slightly Dirty (Purity 1) Water Bottle -> Acceptable (Purity 2) Water Bottle.
+    - Acceptable (Purity 2) or default Water Bottle -> Purified (Purity 3) Water Bottle.
 - [x] Terracotta Water Bowl Purification
-  - Smelt Dirty (Purity 0) or Slightly Dirty (Purity 1) Terracotta Water Bowl -> Acceptable (Purity 2) Terracotta Water Bowl.
-  - Smelt Acceptable (Purity 2) Terracotta Water Bowl -> Purified (Purity 3) Terracotta Water Bowl.
+  - Expect: Smelting in a furnace or cooking on a campfire.
+    - Dirty (Purity 0) or Slightly Dirty (Purity 1) Terracotta Water Bowl -> Acceptable (Purity 2) Terracotta Water Bowl.
+    - Acceptable (Purity 2) Terracotta Water Bowl -> Purified (Purity 3) Terracotta Water Bowl.
+- [x] Water Bucket Purification
+  - Expect: Smelting in a furnace or cooking on a campfire.
+    - Dirty (Purity 0) or Slightly Dirty (Purity 1) Water Bucket -> Acceptable (Purity 2) Water Bucket.
+    - Acceptable (Purity 2) Water Bucket -> Purified (Purity 3) Water Bucket.
 
 ---
 
@@ -142,3 +150,13 @@ Verify that custom bowls spawn as dungeon loot.
   - Shipwreck Supply (`minecraft:chests/shipwreck_supply`)
   - Bastion Other (`minecraft:chests/bastion_other`)
   - Nether Bridge (`minecraft:chests/nether_bridge`)
+
+---
+
+## 9. Custom Mob Effects
+Verify active effects and API functions.
+
+- [x] Hydration Effect (`yet_another_thirst:hydration`)
+  - Expect: Grants beneficial thirst and quenched values over time based on effect level/amplifier (e.g. +1 thirst and quenched per tick at level 1).
+- [x] Thirsty Effect (`yet_another_thirst:thirsty`)
+  - Expect: Speeds up thirst depletion by adding thirst exhaustion per tick (amplifier-scaled). Applied when receiving nausea from drinking dirty water.

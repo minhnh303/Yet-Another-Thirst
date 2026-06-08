@@ -1,6 +1,5 @@
 package dev.minhnh.yetanotherthirst;
 
-import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -27,6 +26,7 @@ public class YetAnotherThirstNeoForge {
 
         // Bind NeoForge RegistryObjects into loader-agnostic ModItems before registration fires
         NeoForgeItems.bindToCommon();
+        NeoForgeEffects.bindToCommon();
 
         // Register DeferredRegisters onto the mod event bus
         NeoForgeItems.ITEMS.register(modBus);

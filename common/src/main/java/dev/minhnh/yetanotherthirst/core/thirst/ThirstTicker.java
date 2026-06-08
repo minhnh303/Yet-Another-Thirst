@@ -56,7 +56,7 @@ public final class ThirstTicker {
 
         if (!depletionPaused && player.hasEffect(MobEffects.HUNGER)) {
             int amplifier = player.getEffect(MobEffects.HUNGER).getAmplifier() + 1;
-            state.addExhaustion(-0.005F * amplifier * exhaustionModifier(player));
+            state.addExhaustion(0.005F * amplifier * exhaustionModifier(player));
         }
 
         if (!depletionPaused && !player.isPassenger()) {

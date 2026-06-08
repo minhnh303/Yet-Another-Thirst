@@ -36,6 +36,11 @@ public final class ForgeConfig {
     private static final ForgeConfigSpec.IntValue REGEN_THIRST_INTERVAL;
     private static final ForgeConfigSpec.IntValue REGEN_THIRST_AMOUNT;
 
+    // Effects
+    private static final ForgeConfigSpec.IntValue HYDRATION_EFFECT_THIRST_PER_TICK;
+    private static final ForgeConfigSpec.IntValue HYDRATION_EFFECT_QUENCHED_PER_TICK;
+    private static final ForgeConfigSpec.DoubleValue THIRSTY_EFFECT_EXHAUSTION_PER_TICK;
+
     // Compatibility
     private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
     private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
@@ -159,6 +164,18 @@ public final class ForgeConfig {
                 .defineInRange("regenThirstAmount", 1, 1, 20);
         builder.pop();
 
+        builder.push("effects");
+        HYDRATION_EFFECT_THIRST_PER_TICK = builder
+                .comment("Base thirst restored by Hydration each tick per effect level")
+                .defineInRange("hydrationEffectThirstPerTick", 1, 0, 20);
+        HYDRATION_EFFECT_QUENCHED_PER_TICK = builder
+                .comment("Base quenched restored by Hydration each tick per effect level")
+                .defineInRange("hydrationEffectQuenchedPerTick", 1, 0, 20);
+        THIRSTY_EFFECT_EXHAUSTION_PER_TICK = builder
+                .comment("Base thirst exhaustion added by Thirsty each tick per effect level")
+                .defineInRange("thirstyEffectExhaustionPerTick", 0.005, 0.0, 4.0);
+        builder.pop();
+
         builder.push("compatibility");
         APPLESKIN_THIRST_TOOLTIP = builder
                 .comment("When AppleSkin is loaded, add YAT thirst and quenched values to item tooltips")
@@ -243,25 +260,25 @@ public final class ForgeConfig {
                 .comment("Grant hydration even if the player received a purity-related debuff")
                 .define("quenchWhenDebuffed", true);
         DIRTY_NAUSEA_CHANCE = builder
-                .comment("Chance (0.0-1.0) of getting Nausea+Hunger after drinking dirty water")
+                .comment("Chance (0.0-1.0) of getting Nausea+Hunger+Thirsty after drinking dirty water")
                 .defineInRange("dirtyNauseaChance", 1.0, 0.0, 1.0);
         DIRTY_POISON_CHANCE = builder
                 .comment("Chance (0.0-1.0) of getting Poison after drinking dirty water")
                 .defineInRange("dirtyPoisonChance", 0.3, 0.0, 1.0);
         SLIGHTLY_DIRTY_NAUSEA_CHANCE = builder
-                .comment("Chance of Nausea+Hunger from slightly dirty water")
+                .comment("Chance of Nausea+Hunger+Thirsty from slightly dirty water")
                 .defineInRange("slightlyDirtyNauseaChance", 0.5, 0.0, 1.0);
         SLIGHTLY_DIRTY_POISON_CHANCE = builder
                 .comment("Chance of Poison from slightly dirty water")
                 .defineInRange("slightlyDirtyPoisonChance", 0.1, 0.0, 1.0);
         ACCEPTABLE_NAUSEA_CHANCE = builder
-                .comment("Chance of Nausea+Hunger from acceptable water")
+                .comment("Chance of Nausea+Hunger+Thirsty from acceptable water")
                 .defineInRange("acceptableNauseaChance", 0.05, 0.0, 1.0);
         ACCEPTABLE_POISON_CHANCE = builder
                 .comment("Chance of Poison from acceptable water")
                 .defineInRange("acceptablePoisonChance", 0.0, 0.0, 1.0);
         PURIFIED_NAUSEA_CHANCE = builder
-                .comment("Chance of Nausea+Hunger from purified water")
+                .comment("Chance of Nausea+Hunger+Thirsty from purified water")
                 .defineInRange("purifiedNauseaChance", 0.0, 0.0, 1.0);
         PURIFIED_POISON_CHANCE = builder
                 .comment("Chance of Poison from purified water")
@@ -327,6 +344,9 @@ public final class ForgeConfig {
         ThirstConfig.setRegenThirstEffects(REGEN_THIRST_EFFECTS.get());
         ThirstConfig.REGEN_THIRST_INTERVAL = REGEN_THIRST_INTERVAL.get();
         ThirstConfig.REGEN_THIRST_AMOUNT = REGEN_THIRST_AMOUNT.get();
+        ThirstConfig.HYDRATION_EFFECT_THIRST_PER_TICK = HYDRATION_EFFECT_THIRST_PER_TICK.get();
+        ThirstConfig.HYDRATION_EFFECT_QUENCHED_PER_TICK = HYDRATION_EFFECT_QUENCHED_PER_TICK.get();
+        ThirstConfig.THIRSTY_EFFECT_EXHAUSTION_PER_TICK = THIRSTY_EFFECT_EXHAUSTION_PER_TICK.get().floatValue();
         ThirstConfig.APPLESKIN_THIRST_TOOLTIP = APPLESKIN_THIRST_TOOLTIP.get();
         ThirstConfig.APPLESKIN_THIRST_HUD_PREVIEW = APPLESKIN_THIRST_HUD_PREVIEW.get();
         ThirstConfig.TOUGH_AS_NAILS_MODE = TOUGH_AS_NAILS_MODE.get();
@@ -369,11 +389,24 @@ public final class ForgeConfig {
     }
 
     static void reloadThirstValues() {
+        Map<Item, ThirstValue> drinks = parseItemValues(DRINK_VALUES.get());
+        Map<Item, ThirstValue> foods = parseItemValues(FOOD_VALUES.get());
+        Set<Item> blacklist = parseItems(ITEMS_BLACKLIST.get());
 
-        ThirstValues.replaceConfiguredValues(
-                parseItemValues(DRINK_VALUES.get()),
-                parseItemValues(FOOD_VALUES.get()),
-                parseItems(ITEMS_BLACKLIST.get()));
+        if (dev.minhnh.yetanotherthirst.core.item.ModItems.TERRACOTTA_WATER_BOWL != null) {
+            Item terracotta = dev.minhnh.yetanotherthirst.core.item.ModItems.TERRACOTTA_WATER_BOWL.get();
+            if (terracotta != null && terracotta != Items.AIR) {
+                drinks.putIfAbsent(terracotta, new ThirstValue(5, 7));
+            }
+        }
+        if (dev.minhnh.yetanotherthirst.core.item.ModItems.WOODEN_WATER_BOWL != null) {
+            Item wooden = dev.minhnh.yetanotherthirst.core.item.ModItems.WOODEN_WATER_BOWL.get();
+            if (wooden != null && wooden != Items.AIR) {
+                drinks.putIfAbsent(wooden, new ThirstValue(5, 7));
+            }
+        }
+
+        ThirstValues.replaceConfiguredValues(drinks, foods, blacklist);
     }
 
     private static boolean validItemValueEntry(Object value) {
@@ -534,14 +567,14 @@ public final class ForgeConfig {
         addValue(values, "brewery:beer_wheat", 10, 14);
         addValue(values, "brewery:dark_brew", 10, 14);
         addValue(values, "brewery:whiskey_ak", 10, 14);
-        addValue(values, "brewery:whiskey_carrascon_label", 10, 14);
-        addValue(values, "brewery:whiskey_cristel_walker", 10, 14);
+        addValue(values, "brewery:whiskey_carrasconlabel", 10, 14);
+        addValue(values, "brewery:whiskey_cristelwalker", 10, 14);
         addValue(values, "brewery:whiskey_highland_hearth", 10, 14);
         addValue(values, "brewery:whiskey_jamesons_malt", 10, 14);
-        addValue(values, "brewery:whiskey_jo_jannik", 10, 14);
-        addValue(values, "brewery:whiskey_lilitu_single_malt", 10, 14);
+        addValue(values, "brewery:whiskey_jojannik", 10, 14);
+        addValue(values, "brewery:whiskey_lilitusinglemalt", 10, 14);
         addValue(values, "brewery:whiskey_maggoallan", 10, 14);
-        addValue(values, "brewery:whiskey_smoky_reverie", 10, 14);
+        addValue(values, "brewery:whiskey_smokey_reverie", 10, 14);
         addValue(values, "farm_and_charm:nettle_tea", 10, 14);
         addValue(values, "farm_and_charm:nettle_tea_cup", 10, 14);
         addValue(values, "farm_and_charm:ribwort_tea", 10, 14);
@@ -549,8 +582,6 @@ public final class ForgeConfig {
         addValue(values, "farm_and_charm:strawberry_tea", 10, 14);
         addValue(values, "farm_and_charm:strawberry_tea_cup", 10, 14);
         addValue(values, "cold_sweat:filled_waterskin", 6, 8);
-        addValue(values, "cold_sweat:waterskin_cold", 7, 10);
-        addValue(values, "cold_sweat:waterskin_hot", 5, 6);
         return values;
     }
 
@@ -604,7 +635,7 @@ public final class ForgeConfig {
         addValue(values, "brewery:potato_salad", 2, 3);
         addValue(values, "bakery:strawberry_cake_slice", 1, 2);
         addValue(values, "bakery:sweetberry_cake_slice", 1, 2);
-        addValue(values, "bakery:apple_pie_piece", 1, 2);
+        addValue(values, "bakery:apple_pie_slice", 1, 2);
         addValue(values, "bakery:glowberry_pie_slice", 1, 2);
         addValue(values, "bakery:chocolate_tart_slice", 1, 1);
         addValue(values, "bakery:linzer_tart_slice", 1, 2);

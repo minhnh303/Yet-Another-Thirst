@@ -1,14 +1,12 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.command.ThirstCommands;
-import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.purity.ContainerWithPurity;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.client.ThirstTooltip;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstEvents;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
-import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -36,9 +34,6 @@ public final class NeoForgeGameEvents {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        WaterPurity.init();
-        ThirstValues.registerDrink(ModItems.TERRACOTTA_WATER_BOWL.get(), 5, 7);
-        ThirstValues.registerDrink(ModItems.WOODEN_WATER_BOWL.get(), 5, 7);
         NeoForgeConfig.reloadThirstValues();
     }
 
@@ -76,6 +71,9 @@ public final class NeoForgeGameEvents {
     public static void onPlayerClone(PlayerEvent.Clone event) {
 
         ThirstEvents.onPlayerClone(event.getOriginal(), event.getEntity(), event.isWasDeath());
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            ThirstStorage.sync(serverPlayer);
+        }
     }
 
     @SubscribeEvent
@@ -143,5 +141,10 @@ public final class NeoForgeGameEvents {
 
         WaterPurity.appendTooltip(event.getItemStack(), event.getToolTip());
         ThirstTooltip.append(event.getItemStack(), event.getToolTip());
+    }
+
+    @SubscribeEvent
+    public static void onTagsUpdated(net.minecraftforge.event.TagsUpdatedEvent event) {
+        NeoForgeConfig.reloadThirstValues();
     }
 }

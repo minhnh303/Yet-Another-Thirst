@@ -27,7 +27,6 @@ public final class ForgeCommonSetup {
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             WaterPurity.init();
-            ForgeConfig.reloadThirstValues();
             registerDispenserBehaviors();
         });
     }
