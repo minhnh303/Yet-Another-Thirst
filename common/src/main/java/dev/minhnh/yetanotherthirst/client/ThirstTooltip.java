@@ -16,6 +16,20 @@ public final class ThirstTooltip {
     }
 
     public static void append(ItemStack stack, List<Component> tooltip) {
-        // Disabled: now rendered visually using ThirstTooltipComponent
+        if (ThirstCompat.showsAppleSkinThirstTooltip()) {
+            return;
+        }
+
+        Optional<ThirstValue> value = ThirstValues.get(stack);
+        value.filter(ThirstTooltip::shouldShow)
+                .ifPresent(thirstValue -> tooltip.add(Component.translatable(
+                        "yet_another_thirst.tooltip.thirst_value",
+                        thirstValue.thirst(),
+                        thirstValue.quenched()
+                ).withStyle(ChatFormatting.AQUA)));
+    }
+
+    private static boolean shouldShow(ThirstValue value) {
+        return value.thirst() > 0 || value.quenched() > 0;
     }
 }

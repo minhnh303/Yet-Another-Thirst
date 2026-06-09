@@ -22,6 +22,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -35,8 +36,6 @@ public final class ForgeGameEvents {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        // Items are registered; initialise purity containers now
-        WaterPurity.init();
         // Re-resolve config item values after registries and tags are available
         ForgeConfig.reloadThirstValues();
     }
@@ -75,6 +74,9 @@ public final class ForgeGameEvents {
     public static void onPlayerClone(PlayerEvent.Clone event) {
 
         ThirstEvents.onPlayerClone(event.getOriginal(), event.getEntity(), event.isWasDeath());
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            ThirstStorage.sync(serverPlayer);
+        }
     }
 
     @SubscribeEvent
@@ -147,5 +149,10 @@ public final class ForgeGameEvents {
 
         WaterPurity.appendTooltip(event.getItemStack(), event.getToolTip());
         ThirstTooltip.append(event.getItemStack(), event.getToolTip());
+    }
+
+    @SubscribeEvent
+    public static void onTagsUpdated(TagsUpdatedEvent event) {
+        ForgeConfig.reloadThirstValues();
     }
 }

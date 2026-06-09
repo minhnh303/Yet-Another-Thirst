@@ -22,7 +22,6 @@ public final class NeoForgeCommonSetup {
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             WaterPurity.init();
-            NeoForgeConfig.reloadThirstValues();
             registerDispenserBehaviors();
         });
     }

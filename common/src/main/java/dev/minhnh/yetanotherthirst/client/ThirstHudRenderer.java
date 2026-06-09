@@ -21,7 +21,7 @@ import java.util.Optional;
 public final class ThirstHudRenderer {
 
     @Nonnull
-    private static final ResourceLocation THIRST_ICONS = Constants.asResource("textures/gui/thirst_icons.png");
+    private static final ResourceLocation THIRST_ICONS = Constants.THIRST_ICONS;
     private static final RandomSource RANDOM = RandomSource.create();
 
     private ThirstHudRenderer() {
@@ -56,17 +56,7 @@ public final class ThirstHudRenderer {
         int level = state.getThirst();
         int quenched = state.getQuenched();
 
-        // 1. Draw backgrounds
-        for (int i = 0; i < 10; ++i) {
-            int x = left - i * 8 - 9;
-            int y = top;
-            if (quenched <= 0 && player.tickCount % (level * 3 + 1) == 0) {
-                y = top + RANDOM.nextInt(3) - 1;
-            }
-            guiGraphics.blit(THIRST_ICONS, x, y, 0, 0, 9, 9, 36, 36);
-        }
-
-        // 2. Draw exhaustion progress over background (Row 3, u=0, v=18)
+        // 1. Draw exhaustion progress over background (Row 2, u=27, v=9)
         float exhaustion = state.getExhaustion();
         if (exhaustion > 0.0F) {
             float ratio = Math.min(1.0F, exhaustion / ThirstConfig.EXHAUSTION_LIMIT);
@@ -81,10 +71,23 @@ public final class ThirstHudRenderer {
                 if (iLeft < iRight) {
                     int w = iRight - iLeft;
                     int u = iLeft - xLeft;
-                    guiGraphics.blit(THIRST_ICONS, iLeft, top, u, 18, w, 9, 36, 36);
+                    guiGraphics.blit(THIRST_ICONS, iLeft, top, 27 + u, 9, w, 9, 36, 25);
                 }
             }
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        // 2. Draw backgrounds
+        for (int i = 0; i < 10; ++i) {
+            int index = i * 2 + 1;
+            if (index > level) {
+                int x = left - i * 8 - 9;
+                int y = top;
+                if (quenched <= 0 && player.tickCount % (level * 3 + 1) == 0) {
+                    y = top + RANDOM.nextInt(3) - 1;
+                }
+                guiGraphics.blit(THIRST_ICONS, x, y, 0, 0, 9, 9, 36, 25);
+            }
         }
 
         // 3. Draw thirst droplets
@@ -100,9 +103,9 @@ public final class ThirstHudRenderer {
             }
 
             if (index < level) {
-                guiGraphics.blit(THIRST_ICONS, x, y, isPoisoned ? 27 : 18, 0, 9, 9, 36, 36);
+                guiGraphics.blit(THIRST_ICONS, x, y, isPoisoned ? 27 : 18, 0, 9, 9, 36, 25);
             } else if (index == level) {
-                guiGraphics.blit(THIRST_ICONS, x, y, 9, 0, 9, 9, 36, 36);
+                guiGraphics.blit(THIRST_ICONS, x, y, 9, 0, 9, 9, 36, 25);
             }
         }
 
@@ -113,9 +116,9 @@ public final class ThirstHudRenderer {
             int slotMax = i * 2 + 2;
             if (quenched > slotMin) {
                 if (quenched >= slotMax) {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 0, 9, 9, 9, 36, 36);
+                    guiGraphics.blit(THIRST_ICONS, x, top, 0, 9, 9, 9, 36, 25);
                 } else {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 9, 9, 9, 9, 36, 36);
+                    guiGraphics.blit(THIRST_ICONS, x, top, 9, 9, 9, 9, 36, 25);
                 }
             }
         }
@@ -172,9 +175,9 @@ public final class ThirstHudRenderer {
                 }
                 int x = left - i * 8 - 9;
                 if (index < previewThirst) {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 18, 0, 9, 9, 36, 36);
+                    guiGraphics.blit(THIRST_ICONS, x, top, 18, 0, 9, 9, 36, 25);
                 } else if (index == previewThirst) {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 9, 0, 9, 9, 36, 36);
+                    guiGraphics.blit(THIRST_ICONS, x, top, 9, 0, 9, 9, 36, 25);
                 }
             }
         }
@@ -193,9 +196,9 @@ public final class ThirstHudRenderer {
 
                 if (previewQuenched > slotMin) {
                     if (previewQuenched >= slotMax) {
-                        guiGraphics.blit(THIRST_ICONS, x, top, 0, 9, 9, 9, 36, 36);
+                        guiGraphics.blit(THIRST_ICONS, x, top, 0, 9, 9, 9, 36, 25);
                     } else {
-                        guiGraphics.blit(THIRST_ICONS, x, top, 9, 9, 9, 9, 36, 36);
+                        guiGraphics.blit(THIRST_ICONS, x, top, 9, 9, 9, 9, 36, 25);
                     }
                 }
             }

@@ -110,6 +110,9 @@ public final class ThirstConfig {
     public static java.util.List<EffectCondition> REGEN_THIRST_EFFECTS = new java.util.ArrayList<>();
     public static int REGEN_THIRST_INTERVAL = 40;
     public static int REGEN_THIRST_AMOUNT = 1;
+    public static int HYDRATION_EFFECT_THIRST_PER_TICK = 1;
+    public static int HYDRATION_EFFECT_QUENCHED_PER_TICK = 1;
+    public static float THIRSTY_EFFECT_EXHAUSTION_PER_TICK = 0.005F;
 
     public static void setRegenThirstEffects(java.util.List<? extends String> rawList) {
         java.util.List<String> list = new java.util.ArrayList<>();

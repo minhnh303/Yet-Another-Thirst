@@ -26,6 +26,7 @@ public class YetAnotherThirstForge {
 
         // Bind Forge RegistryObjects into loader-agnostic ModItems before registration fires
         ForgeItems.bindToCommon();
+        ForgeEffects.bindToCommon();
 
         // Register DeferredRegisters onto the mod event bus
         ForgeItems.ITEMS.register(modBus);
