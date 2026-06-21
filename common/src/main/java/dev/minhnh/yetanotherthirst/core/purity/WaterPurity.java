@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst.core.purity;
 
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.effect.ModEffects;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+@SuppressWarnings("null")
 public final class WaterPurity {
 
     public static final int MIN_PURITY = 0;
@@ -176,6 +178,22 @@ public final class WaterPurity {
         CauldronInteraction.WATER.put(ModItems.WOODEN_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) -> {
             return fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(Items.BOWL));
         });
+
+        // ── Washing clogged fabric filter in water cauldron ──────────────────
+        CauldronInteraction.WATER.put(ModItems.CLOGGED_FABRIC_FILTER.get(), (blockState, level, pos, player, hand, itemStack) -> {
+            if (!level.isClientSide()) {
+                ItemStack result = new ItemStack(ModItems.FABRIC_FILTER_CORE.get());
+                player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
+                player.awardStat(Stats.USE_CAULDRON);
+                player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
+                LayeredCauldronBlock.lowerFillLevel(blockState, level, pos);
+                level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.BLOCKS, 1.0F, 1.0F);
+                if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
+                    ModAdvancements.award(sp, ModAdvancements.WASH_FILTER);
+                }
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        });
     }
 
     public static InteractionResult fillCauldron(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack itemStack, int addLevels, int addedPurity, ItemStack emptyContainer) {
@@ -197,15 +215,9 @@ public final class WaterPurity {
         if (!level.isClientSide()) {
             Item item = itemStack.getItem();
             int newLevel = Math.min(3, currentLevel + addLevels);
-            int addedVolume = newLevel - currentLevel;
 
-            int finalPurity;
-            if (currentLevel == 0) {
-                finalPurity = addedPurity;
-            } else {
-                double blended = (currentLevel * currentPurity + addedVolume * addedPurity) / (double) newLevel;
-                finalPurity = (int) Math.round(blended);
-            }
+            // Empty cauldron takes the added purity as-is; mixing dilutes to the worst of the two purities
+            int finalPurity = (currentLevel == 0) ? addedPurity : Math.min(currentPurity, addedPurity);
 
             BlockState newState = Blocks.WATER_CAULDRON.defaultBlockState()
                     .setValue(LayeredCauldronBlock.LEVEL, newLevel)
@@ -321,6 +333,7 @@ public final class WaterPurity {
         // Open water: derive from Y-coordinate bands and flow
         int purity = 0;
         int y = pos.getY();
+        // Mountain water (above MOUNTAINS_Y) or deep cave water (below both CAVES_Y and MOUNTAINS_Y-32) gets base purity 1
         if (y > ThirstConfig.MOUNTAINS_Y || (y < ThirstConfig.CAVES_Y && y < ThirstConfig.MOUNTAINS_Y - 32)) {
             purity = 1;
         }
@@ -350,6 +363,7 @@ public final class WaterPurity {
     private static int getOpenWaterPurity(Level level, BlockPos pos) {
         int purity = 0;
         int y = pos.getY();
+        // Mountain water (above MOUNTAINS_Y) or deep cave water (below both CAVES_Y and MOUNTAINS_Y-32) gets base purity 1
         if (y > ThirstConfig.MOUNTAINS_Y || (y < ThirstConfig.CAVES_Y && y < ThirstConfig.MOUNTAINS_Y - 32)) {
             purity = 1;
         }
@@ -383,14 +397,21 @@ public final class WaterPurity {
         }
 
         if (entity instanceof ServerPlayer sp) {
+            boolean debuffed = false;
             if (chance < nauseaChance) {
                 sp.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 20 * 5, 0));
                 sp.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20 * 30, 0));
                 sp.addEffect(new MobEffectInstance(ModEffects.THIRSTY.get(), 20 * 30, 0));
+                debuffed = true;
             }
+            // <= (not <) intentional: when chance == poisonChance both nausea and poison can apply simultaneously
             if (chance <= poisonChance) {
                 sp.addEffect(new MobEffectInstance(MobEffects.POISON, 20 * 10, 0));
                 shouldDrink = false;
+                debuffed = true;
+            }
+            if (debuffed) {
+                ModAdvancements.award(sp, ModAdvancements.DIRTY_WATER);
             }
         }
 

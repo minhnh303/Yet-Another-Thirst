@@ -1,0 +1,23 @@
+{
+  "parent": "yet_another_thirst:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:skeleton_skull"
+    },
+    "title": {
+      "translate": "advancements.yet_another_thirst.dehydration_survival.title"
+    },
+    "description": {
+      "translate": "advancements.yet_another_thirst.dehydration_survival.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

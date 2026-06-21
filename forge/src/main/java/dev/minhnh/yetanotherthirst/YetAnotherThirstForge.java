@@ -1,6 +1,7 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.core.block.ModBlocks;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -16,9 +17,14 @@ public class YetAnotherThirstForge {
 
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        ConfigMigration.run();
+
         ModLoadingContext ctx = ModLoadingContext.get();
-        ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfig.SPEC, Constants.MOD_ID + "/common.toml");
-        ctx.registerConfig(ModConfig.Type.CLIENT, ForgeClientConfig.SPEC, Constants.MOD_ID + "/client.toml");
+        String dir = Constants.CONFIG_DIR + "/";
+        ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfigCommon.SPEC, dir + "common.toml");
+        ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfigItems.SPEC, dir + "items.toml");
+        ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfigCompat.SPEC, dir + "compat.toml");
+        ctx.registerConfig(ModConfig.Type.CLIENT, ForgeClientConfig.SPEC, dir + "client.toml");
 
         modBus.addListener(YetAnotherThirstForge::onConfigLoading);
         modBus.addListener(YetAnotherThirstForge::onConfigReloading);
@@ -29,10 +35,13 @@ public class YetAnotherThirstForge {
         ForgeEffects.bindToCommon();
 
         // Register DeferredRegisters onto the mod event bus
+        ModBlocks.BLOCKS.register(modBus);
+        ModBlocks.BLOCK_ENTITIES.register(modBus);
         ForgeItems.ITEMS.register(modBus);
         ForgeEffects.EFFECTS.register(modBus);
         ForgeCreativeTab.TABS.register(modBus);
         ForgeLootModifier.SERIALIZERS.register(modBus);
+        dev.minhnh.yetanotherthirst.screen.ModMenuTypes.MENU_TYPES.register(modBus);
 
         ForgeNetwork.register();
         CommonClass.init();
@@ -50,25 +59,24 @@ public class YetAnotherThirstForge {
         ThirstConfig.COMPAT_TOUGH_AS_NAILS = ModList.get().isLoaded("toughasnails");
         ThirstConfig.COMPAT_COLD_SWEAT = ModList.get().isLoaded("cold_sweat");
         ThirstConfig.COMPAT_SUPERNATURAL = ModList.get().isLoaded("supernatural");
+        ThirstConfig.COMPAT_IE_HEATER = ModList.get().isLoaded("immersiveengineering");
     }
 
-    private static void onConfigLoading(ModConfigEvent.Loading event) {
-        onConfigEvent(event);
-    }
-
-    private static void onConfigReloading(ModConfigEvent.Reloading event) {
-        onConfigEvent(event);
-    }
+    private static void onConfigLoading(ModConfigEvent.Loading event) { onConfigEvent(event); }
+    private static void onConfigReloading(ModConfigEvent.Reloading event) { onConfigEvent(event); }
 
     private static void onConfigEvent(ModConfigEvent event) {
-        Constants.LOG.info("onConfigEvent called for config: {}", event.getConfig().getFileName());
-        if (event.getConfig().getSpec() == ForgeConfig.SPEC) {
-            ForgeConfig.sync();
-            ForgeConfig.reloadThirstValues();
-            Constants.LOG.info("ForgeConfig synced. extraHydrationConvertsToQuenched: {}", ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED);
-        } else if (event.getConfig().getSpec() == ForgeClientConfig.SPEC) {
+        Constants.LOG.info("onConfigEvent: {}", event.getConfig().getFileName());
+        var spec = event.getConfig().getSpec();
+        if (spec == ForgeConfigCommon.SPEC) {
+            ForgeConfigCommon.sync();
+        } else if (spec == ForgeConfigItems.SPEC) {
+            ForgeConfigItems.sync();
+            ForgeConfigItems.reloadThirstValues();
+        } else if (spec == ForgeConfigCompat.SPEC) {
+            ForgeConfigCompat.sync();
+        } else if (spec == ForgeClientConfig.SPEC) {
             ForgeClientConfig.sync();
-            Constants.LOG.info("ForgeClientConfig synced.");
         }
     }
 }

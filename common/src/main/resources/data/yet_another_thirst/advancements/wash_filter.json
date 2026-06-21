@@ -1,0 +1,37 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ],
+  "parent": "yet_another_thirst:clogged_filter",
+  "display": {
+    "icon": {
+      "item": "minecraft:cauldron"
+    },
+    "title": {
+      "translate": "advancements.yet_another_thirst.wash_filter.title"
+    },
+    "description": {
+      "translate": "advancements.yet_another_thirst.wash_filter.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

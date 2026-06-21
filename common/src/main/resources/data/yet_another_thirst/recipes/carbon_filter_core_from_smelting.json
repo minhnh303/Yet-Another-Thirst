@@ -1,0 +1,23 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ],
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "yet_another_thirst:clogged_carbon_filter"
+  },
+  "result": "yet_another_thirst:carbon_filter_core",
+  "experience": 0.35,
+  "cookingtime": 200
+}

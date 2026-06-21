@@ -1,0 +1,23 @@
+{
+  "parent": "yet_another_thirst:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:redstone"
+    },
+    "title": {
+      "translate": "advancements.yet_another_thirst.vampire_immunity.title"
+    },
+    "description": {
+      "translate": "advancements.yet_another_thirst.vampire_immunity.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

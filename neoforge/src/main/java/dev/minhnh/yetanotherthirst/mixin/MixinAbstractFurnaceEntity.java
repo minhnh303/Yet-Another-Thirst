@@ -12,6 +12,8 @@ import javax.annotation.Nonnull;
  * Ensures furnaces check NBT tags (not just item types) when deciding if a new
  * recipe result can stack with items already in the output slot. This prevents
  * water containers of different purities from merging in the output slot.
+ *
+ * NeoForge patches canBurn in AbstractFurnaceBlockEntity to be non-static.
  */
 @Mixin(AbstractFurnaceBlockEntity.class)
 public class MixinAbstractFurnaceEntity {

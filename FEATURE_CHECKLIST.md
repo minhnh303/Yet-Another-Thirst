@@ -1,6 +1,6 @@
 # Feature Implementation Checklist
 
-Scope: current multi-loader rebuild for Minecraft 1.20.1.
+Scope: current multi-loader rebuild for Minecraft 1.20.1 (Forge, NeoForge, and Fabric).
 
 ## Implemented
 
@@ -50,11 +50,19 @@ Scope: current multi-loader rebuild for Minecraft 1.20.1.
 - [x] Custom terracotta bowl item (`yet_another_thirst:terracotta_bowl`)
 - [x] Custom terracotta water bowl item (`yet_another_thirst:terracotta_water_bowl`, drinkable)
 - [x] Custom wooden water bowl item (`yet_another_thirst:wooden_water_bowl`, drinkable)
+- [x] Custom filter cores: Fabric (`yet_another_thirst:fabric_filter_core`), Sand (`yet_another_thirst:sand_filter_core`), and Carbon (`yet_another_thirst:carbon_filter_core`) along with their clogged variants
+- [x] Filter core lifespan tracking via NBT tags, including dynamic item durability-bar rendering in tooltips
 - [x] Drinkable custom item behavior (`DrinkableItem` with purity effect + container return)
-- [x] Creative tab (`itemGroup.yet_another_thirst`) with all purity variants
-- [x] Recipes — clay bowl craft, terracotta bowl smelt/campfire, purity-upgrade smelting and campfire cooking for water bottle, terracotta water bowl, and water bucket
+- [x] Creative tab (`itemGroup.yet_another_thirst`) with all purity variants, filter cores, and blocks
+- [x] Recipes — clay bowl craft, terracotta bowl smelting/campfire cooking, purity-upgrade smelting/campfire cooking for water containers, filter core shaped crafting, shapeless cauldron-free washing for clogged Fabric filters, and smelting/campfire recycling for clogged Carbon filters
 - [x] Loot modifiers — custom items injected into simple_dungeon, abandoned_mineshaft, shipwreck_supply, bastion_other, nether_bridge chests
 - [x] Water bottle stack-size change (`MixinItemStack` injects into `ItemStack.getMaxStackSize`; stack size configurable via `yet_another_thirst/common.toml`; mixin moved to `common` so NeoForge also benefits)
+
+### Custom Blocks & Machines
+- [x] Water Boiler block and block entity (`yet_another_thirst:water_boiler`) with custom GUI and container screen/menu for heating and boiling water
+- [x] Modular Filter Frame block and block entity (`yet_another_thirst:filter_frame`) supporting fluid-based water filtration using the three tiers of filter cores
+- [x] Cauldron washing behavior to clean clogged Fabric filter cores back into clean cores
+- [x] Immersive Engineering external heater support (`IEHeatableImpl`) to power the Water Boiler block (if IE is loaded)
 
 ### Commands & Admin Tools
 - [x] `/thirst query <player>`
@@ -75,9 +83,13 @@ Scope: current multi-loader rebuild for Minecraft 1.20.1.
 - [x] NeoForge 1.20.1 event adapter
 - [x] NeoForge 1.20.1 network adapter
 - [x] NeoForge 1.20.1 client HUD adapter
+- [x] Fabric 1.20.1 event adapter
+- [x] Fabric 1.20.1 network adapter
+- [x] Fabric 1.20.1 client HUD adapter
 - [x] Template demo mixins removed
 - [x] Forge build passes
 - [x] NeoForge build passes
+- [x] Fabric build passes
 - [x] Unified developer API class (`YetAnotherThirstAPI`) and default helper methods in `IPlatformHelper` for easy integration
 
 ### Custom Mob Effects
@@ -89,16 +101,18 @@ Scope: current multi-loader rebuild for Minecraft 1.20.1.
 - [x] Vampirism compatibility (skip thirst tick and hide HUD for vampire players via loader-neutral reflection checking `Helper.isVampire`)
 - [x] Let's Do Farm & Charm compatibility (satiation, sustenance, and feast effects mapped to dynamic pause/regen configuration)
 - [x] AppleSkin compatibility (compile-only AppleSkin API dependency, thirst tooltips, held-item HUD preview)
-- [x] Jade compatibility (compile-only Jade dependency, water and cauldron purity component)
+- [x] Jade compatibility (compile-only Jade dependency, water/cauldron purity component, fluid handler tooltip prepending, and in-tooltip thirst icon rendering)
 - [x] Tough As Nails compatibility (configurable coexistence mode with default YAT auto-disable)
 - [x] Cold Sweat compatibility (body-temperature dehydration modifier with YAT environment modifier replacement)
 - [x] Supernatural compatibility (vampire detection suspends YAT thirst and hides HUD)
+- [x] Create compatibility (wrench toggling Filter Frame, goggles overlay for filter cores/fluid tanks, mechanical pump/pipe/spout/filler purity preservation, and splashing washing recipes)
+- [x] Immersive Engineering compatibility (fluid pump purity preservation and external heater integration)
 
 ## Partial
 
 - [ ] Loader-neutral storage abstraction beyond persistent NBT delegation
-- [x] Cauldron purity block state (`BLOCK_PURITY` injected into `LayeredCauldronBlock` via Forge mixin; cauldron interactions replace glass bottle and bucket with purity-aware versions)
-- [x] Dispenser purity-aware fill behavior (bucket and glass bottle dispenser behaviors registered in `FMLCommonSetupEvent`)
+- [x] Cauldron purity block state (`BLOCK_PURITY` injected into `LayeredCauldronBlock` via common mixin; cauldron interactions replace water containers with purity-aware versions on all loaders)
+- [x] Dispenser purity-aware fill behavior (bucket and glass bottle dispenser behaviors registered on all three platforms)
 
 ## Not Implemented
 

@@ -1,0 +1,14 @@
+{
+  "textures": {
+    "port": "yet_another_thirst:block/water_boiler_inlet"
+  },
+  "elements": [
+    {
+      "from": [ 0.0, 0.0, -0.005 ],
+      "to": [ 16.0, 16.0, 0.0 ],
+      "faces": {
+        "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#port", "cullface": "north" }
+      }
+    }
+  ]
+}

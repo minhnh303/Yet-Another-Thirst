@@ -1,6 +1,7 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.core.block.ModBlocks;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -16,9 +17,14 @@ public class YetAnotherThirstNeoForge {
 
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        ConfigMigration.run();
+
         ModLoadingContext ctx = ModLoadingContext.get();
-        ctx.registerConfig(ModConfig.Type.COMMON, NeoForgeConfig.SPEC, Constants.MOD_ID + "/common.toml");
-        ctx.registerConfig(ModConfig.Type.CLIENT, NeoForgeClientConfig.SPEC, Constants.MOD_ID + "/client.toml");
+        String dir = Constants.CONFIG_DIR + "/";
+        ctx.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigCommon.SPEC, dir + "common.toml");
+        ctx.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigItems.SPEC, dir + "items.toml");
+        ctx.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigCompat.SPEC, dir + "compat.toml");
+        ctx.registerConfig(ModConfig.Type.CLIENT, NeoForgeClientConfig.SPEC, dir + "client.toml");
 
         modBus.addListener(YetAnotherThirstNeoForge::onConfigLoading);
         modBus.addListener(YetAnotherThirstNeoForge::onConfigReloading);
@@ -29,10 +35,13 @@ public class YetAnotherThirstNeoForge {
         NeoForgeEffects.bindToCommon();
 
         // Register DeferredRegisters onto the mod event bus
+        ModBlocks.BLOCKS.register(modBus);
+        ModBlocks.BLOCK_ENTITIES.register(modBus);
         NeoForgeItems.ITEMS.register(modBus);
         NeoForgeEffects.EFFECTS.register(modBus);
         NeoForgeCreativeTab.TABS.register(modBus);
         NeoForgeLootModifier.SERIALIZERS.register(modBus);
+        dev.minhnh.yetanotherthirst.screen.ModMenuTypes.MENU_TYPES.register(modBus);
 
         NeoForgeNetwork.register();
         CommonClass.init();
@@ -50,25 +59,24 @@ public class YetAnotherThirstNeoForge {
         ThirstConfig.COMPAT_TOUGH_AS_NAILS = ModList.get().isLoaded("toughasnails");
         ThirstConfig.COMPAT_COLD_SWEAT = ModList.get().isLoaded("cold_sweat");
         ThirstConfig.COMPAT_SUPERNATURAL = ModList.get().isLoaded("supernatural");
+        ThirstConfig.COMPAT_IE_HEATER = ModList.get().isLoaded("immersiveengineering");
     }
 
-    private static void onConfigLoading(ModConfigEvent.Loading event) {
-        onConfigEvent(event);
-    }
-
-    private static void onConfigReloading(ModConfigEvent.Reloading event) {
-        onConfigEvent(event);
-    }
+    private static void onConfigLoading(ModConfigEvent.Loading event) { onConfigEvent(event); }
+    private static void onConfigReloading(ModConfigEvent.Reloading event) { onConfigEvent(event); }
 
     private static void onConfigEvent(ModConfigEvent event) {
-        Constants.LOG.info("onConfigEvent called for config: {}", event.getConfig().getFileName());
-        if (event.getConfig().getSpec() == NeoForgeConfig.SPEC) {
-            NeoForgeConfig.sync();
-            NeoForgeConfig.reloadThirstValues();
-            Constants.LOG.info("NeoForgeConfig synced. extraHydrationConvertsToQuenched: {}", ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED);
-        } else if (event.getConfig().getSpec() == NeoForgeClientConfig.SPEC) {
+        Constants.LOG.info("onConfigEvent: {}", event.getConfig().getFileName());
+        var spec = event.getConfig().getSpec();
+        if (spec == NeoForgeConfigCommon.SPEC) {
+            NeoForgeConfigCommon.sync();
+        } else if (spec == NeoForgeConfigItems.SPEC) {
+            NeoForgeConfigItems.sync();
+            NeoForgeConfigItems.reloadThirstValues();
+        } else if (spec == NeoForgeConfigCompat.SPEC) {
+            NeoForgeConfigCompat.sync();
+        } else if (spec == NeoForgeClientConfig.SPEC) {
             NeoForgeClientConfig.sync();
-            Constants.LOG.info("NeoForgeClientConfig synced.");
         }
     }
 }

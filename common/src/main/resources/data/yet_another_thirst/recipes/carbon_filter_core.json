@@ -1,0 +1,37 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CPC",
+    "PFP",
+    "CPC"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:charcoal"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "F": {
+      "item": "yet_another_thirst:sand_filter_core"
+    }
+  },
+  "result": {
+    "item": "yet_another_thirst:carbon_filter_core",
+    "count": 1
+  }
+}

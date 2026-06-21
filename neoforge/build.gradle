@@ -38,7 +38,9 @@ legacyForge {
     }
 
     mixin {
-        add(sourceSets.main, "yet_another_thirst.mixins.json")
+        add sourceSets.main, "yet_another_thirst.refmap.json"
+        config "yet_another_thirst.mixins.json"
+        config "yet_another_thirst.compat.mixins.json"
     }
 }
 
@@ -49,13 +51,16 @@ dependencies {
     compileOnly project(":common")
     compileOnly 'maven.modrinth:jade:11.13.2+forge'
     compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
+    // Optional mod compat — Create and ImmersiveEngineering fluid contamination
+    compileOnly "com.simibubi.create:create-1.20.1:6.0.8-291:all"
+    compileOnly "net.createmod.ponder:Ponder-Forge-1.20.1:1.0.91"
+    compileOnly "maven.modrinth:immersiveengineering:10.2.0-183"
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(layout.buildDirectory.dir("mixin")) {
-        include "yet_another_thirst.mixins.json"
-        rename "yet_another_thirst.mixins.json", "yet_another_thirst.refmap.json"
+        include "yet_another_thirst.refmap.json"
     }
     finalizedBy('reobfJar')
 }

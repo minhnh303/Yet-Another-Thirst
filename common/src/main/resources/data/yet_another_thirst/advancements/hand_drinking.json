@@ -1,0 +1,23 @@
+{
+  "parent": "yet_another_thirst:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:water_bucket"
+    },
+    "title": {
+      "translate": "advancements.yet_another_thirst.hand_drinking.title"
+    },
+    "description": {
+      "translate": "advancements.yet_another_thirst.hand_drinking.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

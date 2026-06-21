@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-version = providers.gradleProperty('mod_version').get()
+version = "${minecraft_version}-${providers.gradleProperty('mod_version').get()}"
 
 base {
     archivesName = "YetAnotherThirst"
@@ -43,6 +43,10 @@ repositories {
     maven {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
+    }
+    maven {
+        name = 'CreateMod'
+        url = 'https://maven.createmod.net'
     }
     maven {
         name = 'Modrinth'
@@ -88,7 +92,7 @@ jar {
                 'Implementation-Version': project.jar.archiveVersion,
                 'Implementation-Vendor' : mod_author,
                 'Built-On-Minecraft'    : minecraft_version,
-                'MixinConfigs'          : "${mod_id}.mixins.json"
+                'MixinConfigs'          : "${mod_id}.mixins.json,${mod_id}.compat.mixins.json"
         ])
     }
 }
@@ -99,6 +103,7 @@ processResources {
             'group'                        : project.group, //Else we target the task's group.
             'minecraft_version'            : minecraft_version,
             'minecraft_version_range'      : minecraft_version_range,
+            'fabric_minecraft_version_range': fabric_minecraft_version_range,
             'mod_name'                     : mod_name,
             'mod_author'                   : mod_author,
             'mod_id'                       : mod_id,
@@ -108,6 +113,8 @@ processResources {
             "forge_loader_version_range"   : forge_loader_version_range,
             "neoforge_version"             : neoforge_version,
             "neoforge_loader_version_range": neoforge_loader_version_range,
+            "fabric_loader_version"        : fabric_loader_version,
+            "fabric_api_version"           : fabric_api_version,
             'credits'                      : credits,
             'java_version'                 : java_version
     ]
@@ -120,7 +127,7 @@ processResources {
         expand expandProps
     }
 
-    filesMatching(['pack.mcmeta', '*.mixins.json']) {
+    filesMatching(['pack.mcmeta', '*.mixins.json', 'fabric.mod.json']) {
         expand jsonExpandProps
     }
 
@@ -139,4 +146,10 @@ publishing {
             url System.getenv('local_maven_url')
         }
     }
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
 }

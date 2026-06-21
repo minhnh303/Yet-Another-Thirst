@@ -20,11 +20,15 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
+@SuppressWarnings({"removal", "null"})
 public final class NeoForgeGameEvents {
 
     private NeoForgeGameEvents() {
@@ -34,7 +38,7 @@ public final class NeoForgeGameEvents {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        NeoForgeConfig.reloadThirstValues();
+        NeoForgeConfigItems.reloadThirstValues();
     }
 
     // ── Tick / player state ───────────────────────────────────────────────────
@@ -145,6 +149,24 @@ public final class NeoForgeGameEvents {
 
     @SubscribeEvent
     public static void onTagsUpdated(net.minecraftforge.event.TagsUpdatedEvent event) {
-        NeoForgeConfig.reloadThirstValues();
+        NeoForgeConfigItems.reloadThirstValues();
+    }
+
+    @SubscribeEvent
+    public static void onFillBucket(FillBucketEvent event) {
+        if (event.getLevel().isClientSide()) return;
+        net.minecraft.world.phys.HitResult target = event.getTarget();
+        if (target != null && target.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
+            net.minecraft.world.phys.BlockHitResult blockHit = (net.minecraft.world.phys.BlockHitResult) target;
+            BlockPos pos = blockHit.getBlockPos();
+            Level level = event.getLevel();
+            if (level.getFluidState(pos).is(FluidTags.WATER) && level.getFluidState(pos).isSource()) {
+                int purity = WaterPurity.getBlockPurity(level, pos);
+                ItemStack waterBucket = new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET);
+                WaterPurity.addPurity(waterBucket, purity);
+                event.setFilledBucket(waterBucket);
+                event.setResult(net.minecraftforge.eventbus.api.Event.Result.ALLOW);
+            }
+        }
     }
 }

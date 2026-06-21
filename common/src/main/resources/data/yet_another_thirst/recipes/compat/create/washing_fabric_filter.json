@@ -1,0 +1,28 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ],
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "item": "yet_another_thirst:clogged_fabric_filter"
+    }
+  ],
+  "results": [
+    {
+      "item": "yet_another_thirst:fabric_filter_core",
+      "count": 1
+    }
+  ]
+}

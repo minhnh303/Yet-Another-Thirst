@@ -52,4 +52,9 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
         NeoForgeNetwork.sendToPlayer(player, thirst, quenched, exhaustion, enabled);
     }
+
+    @Override
+    public boolean tryHandDrink() {
+        return net.minecraftforge.fml.DistExecutor.unsafeCallWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> dev.minhnh.yetanotherthirst.NeoForgeHandDrinkClient::tryDrink);
+    }
 }

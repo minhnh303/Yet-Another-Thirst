@@ -1,6 +1,7 @@
 package dev.minhnh.yetanotherthirst.core.item;
 
 import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
@@ -34,6 +35,10 @@ public class DrinkableItem extends Item {
         if (entity instanceof ServerPlayer player) {
             CriteriaTriggers.CONSUME_ITEM.trigger(player, stack);
             player.awardStat(Stats.ITEM_USED.get(this));
+
+            if (WaterPurity.hasPurity(stack) && WaterPurity.getPurity(stack) == WaterPurity.MAX_PURITY) {
+                ModAdvancements.award(player, ModAdvancements.PURIFIED_WATER);
+            }
 
             boolean shouldDrink = !ThirstCompat.usesExternalThirst(player) && WaterPurity.givePurityEffects(entity, stack);
             if (shouldDrink) {

@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
@@ -21,6 +22,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@SuppressWarnings("removal")
 public final class NeoForgeNetwork {
 
     private static final String PROTOCOL_VERSION = "1";
@@ -141,6 +143,7 @@ public final class NeoForgeNetwork {
                 if (shouldDrink) {
                     state.drink(ThirstConfig.HAND_DRINKING_THIRST, ThirstConfig.HAND_DRINKING_QUENCHED);
                 }
+                ModAdvancements.award(player, ModAdvancements.HAND_DRINKING);
                 ThirstStorage.sync(player);
             });
             ctx.get().setPacketHandled(true);

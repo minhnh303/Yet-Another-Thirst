@@ -22,6 +22,20 @@ public final class ForgeCreativeTab {
                     .title(Component.translatable("itemGroup.yet_another_thirst"))
                     .icon(() -> new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get()))
                     .displayItems((params, output) -> {
+                        if (ForgeItems.FILTER_FRAME != null) {
+                            output.accept(new ItemStack(ForgeItems.FILTER_FRAME.get()));
+                        }
+                        if (ForgeItems.WATER_BOILER != null) {
+                            output.accept(new ItemStack(ForgeItems.WATER_BOILER.get()));
+                        }
+                        if (ModItems.FABRIC_FILTER_CORE.get() != Items.AIR) {
+                            output.accept(new ItemStack(ModItems.FABRIC_FILTER_CORE.get()));
+                            output.accept(new ItemStack(ModItems.SAND_FILTER_CORE.get()));
+                            output.accept(new ItemStack(ModItems.CARBON_FILTER_CORE.get()));
+                            output.accept(new ItemStack(ModItems.CLOGGED_FABRIC_FILTER.get()));
+                            output.accept(new ItemStack(ModItems.CLOGGED_SAND_FILTER.get()));
+                            output.accept(new ItemStack(ModItems.CLOGGED_CARBON_FILTER.get()));
+                        }
                         output.accept(new ItemStack(ModItems.CLAY_BOWL.get()));
                         output.accept(new ItemStack(ModItems.TERRACOTTA_BOWL.get()));
                         for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {

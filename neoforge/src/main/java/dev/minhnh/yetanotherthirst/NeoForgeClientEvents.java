@@ -28,4 +28,26 @@ public final class NeoForgeClientEvents {
     public static void onRegisterTooltipComponentFactories(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(dev.minhnh.yetanotherthirst.client.ThirstTooltipComponent.class, dev.minhnh.yetanotherthirst.client.ClientThirstTooltipComponent::new);
     }
+
+    @SubscribeEvent
+    public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            if (dev.minhnh.yetanotherthirst.screen.ModMenuTypes.WATER_BOILER != null) {
+                net.minecraft.client.gui.screens.MenuScreens.register(
+                        dev.minhnh.yetanotherthirst.screen.ModMenuTypes.WATER_BOILER.get(),
+                        dev.minhnh.yetanotherthirst.screen.WaterBoilerScreen::new
+                );
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public static void onRegisterRenderers(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
+        if (dev.minhnh.yetanotherthirst.core.block.ModBlocks.WATER_BOILER_BLOCK_ENTITY != null) {
+            event.registerBlockEntityRenderer(
+                    dev.minhnh.yetanotherthirst.core.block.ModBlocks.WATER_BOILER_BLOCK_ENTITY.get(),
+                    context -> new dev.minhnh.yetanotherthirst.client.WaterBoilerRenderer(context)
+            );
+        }
+    }
 }

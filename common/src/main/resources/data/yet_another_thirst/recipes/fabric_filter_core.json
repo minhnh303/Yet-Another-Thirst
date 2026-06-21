@@ -1,0 +1,37 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SPS",
+    "PWP",
+    "SPS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:string"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    }
+  },
+  "result": {
+    "item": "yet_another_thirst:fabric_filter_core",
+    "count": 1
+  }
+}

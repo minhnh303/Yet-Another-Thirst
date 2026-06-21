@@ -11,7 +11,7 @@
     "MixinItemStack",
     "MixinLayeredCauldronBlock",
     "MixinAbstractCookingRecipe",
-    "MixinAbstractFurnaceEntity"
+    "MixinMinecraft"
   ],
   "injectors": {
     "defaultRequire": 1

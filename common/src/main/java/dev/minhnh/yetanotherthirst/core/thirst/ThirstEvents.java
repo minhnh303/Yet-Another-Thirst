@@ -2,6 +2,7 @@ package dev.minhnh.yetanotherthirst.core.thirst;
 
 import dev.minhnh.yetanotherthirst.core.item.DrinkableItem;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,6 +33,9 @@ public final class ThirstEvents {
         }
 
         ThirstValues.get(stack).ifPresent(value -> {
+            if (WaterPurity.hasPurity(stack) && WaterPurity.getPurity(stack) == WaterPurity.MAX_PURITY) {
+                ModAdvancements.award(player, ModAdvancements.PURIFIED_WATER);
+            }
             boolean shouldDrink = WaterPurity.givePurityEffects(entity, stack);
             if (shouldDrink) {
                 ThirstStorage.get(player).drink(value.thirst(), value.quenched());

@@ -1,0 +1,196 @@
+{
+  "multipart": [
+    {
+      "when": { "facing": "north", "half": "lower", "lit": "false" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom" }
+    },
+    {
+      "when": { "facing": "south", "half": "lower", "lit": "false" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom", "y": 180 }
+    },
+    {
+      "when": { "facing": "west", "half": "lower", "lit": "false" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom", "y": 270 }
+    },
+    {
+      "when": { "facing": "east", "half": "lower", "lit": "false" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom", "y": 90 }
+    },
+    {
+      "when": { "facing": "north", "half": "lower", "lit": "true" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom_lit" }
+    },
+    {
+      "when": { "facing": "south", "half": "lower", "lit": "true" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom_lit", "y": 180 }
+    },
+    {
+      "when": { "facing": "west", "half": "lower", "lit": "true" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom_lit", "y": 270 }
+    },
+    {
+      "when": { "facing": "east", "half": "lower", "lit": "true" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_bottom_lit", "y": 90 }
+    },
+    {
+      "when": { "facing": "north", "half": "upper" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_top" }
+    },
+    {
+      "when": { "facing": "south", "half": "upper" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_top", "y": 180 }
+    },
+    {
+      "when": { "facing": "west", "half": "upper" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_top", "y": 270 }
+    },
+    {
+      "when": { "facing": "east", "half": "upper" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_top", "y": 90 }
+    },
+    {
+      "when": { "inlet": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet" }
+    },
+    {
+      "when": { "inlet": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "y": 180 }
+    },
+    {
+      "when": { "inlet": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "y": 270 }
+    },
+    {
+      "when": { "inlet": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "y": 90 }
+    },
+    {
+      "when": { "inlet": "up", "facing": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 270, "y": 180 }
+    },
+    {
+      "when": { "inlet": "up", "facing": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 270 }
+    },
+    {
+      "when": { "inlet": "up", "facing": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 270, "y": 270 }
+    },
+    {
+      "when": { "inlet": "up", "facing": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 270, "y": 90 }
+    },
+    {
+      "when": { "inlet": "down", "facing": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 90 }
+    },
+    {
+      "when": { "inlet": "down", "facing": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 90, "y": 180 }
+    },
+    {
+      "when": { "inlet": "down", "facing": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 90, "y": 90 }
+    },
+    {
+      "when": { "inlet": "down", "facing": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_inlet", "x": 90, "y": 270 }
+    },
+    {
+      "when": { "outlet": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet" }
+    },
+    {
+      "when": { "outlet": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "y": 180 }
+    },
+    {
+      "when": { "outlet": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "y": 270 }
+    },
+    {
+      "when": { "outlet": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "y": 90 }
+    },
+    {
+      "when": { "outlet": "up", "facing": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 270, "y": 180 }
+    },
+    {
+      "when": { "outlet": "up", "facing": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 270 }
+    },
+    {
+      "when": { "outlet": "up", "facing": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 270, "y": 270 }
+    },
+    {
+      "when": { "outlet": "up", "facing": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 270, "y": 90 }
+    },
+    {
+      "when": { "outlet": "down", "facing": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 90 }
+    },
+    {
+      "when": { "outlet": "down", "facing": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 90, "y": 180 }
+    },
+    {
+      "when": { "outlet": "down", "facing": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 90, "y": 90 }
+    },
+    {
+      "when": { "outlet": "down", "facing": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_outlet", "x": 90, "y": 270 }
+    },
+    {
+      "when": { "port": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port" }
+    },
+    {
+      "when": { "port": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "y": 180 }
+    },
+    {
+      "when": { "port": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "y": 270 }
+    },
+    {
+      "when": { "port": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "y": 90 }
+    },
+    {
+      "when": { "port": "up", "facing": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 270, "y": 180 }
+    },
+    {
+      "when": { "port": "up", "facing": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 270 }
+    },
+    {
+      "when": { "port": "up", "facing": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 270, "y": 270 }
+    },
+    {
+      "when": { "port": "up", "facing": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 270, "y": 90 }
+    },
+    {
+      "when": { "port": "down", "facing": "north" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 90 }
+    },
+    {
+      "when": { "port": "down", "facing": "south" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 90, "y": 180 }
+    },
+    {
+      "when": { "port": "down", "facing": "east" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 90, "y": 90 }
+    },
+    {
+      "when": { "port": "down", "facing": "west" },
+      "apply": { "model": "yet_another_thirst:block/water_boiler_port", "x": 90, "y": 270 }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "yet_another_thirst:block/water_boiler_side",
+    "up": "yet_another_thirst:block/water_boiler_side",
+    "down": "yet_another_thirst:block/water_boiler_side",
+    "north": "yet_another_thirst:block/water_boiler_water_level",
+    "south": "yet_another_thirst:block/water_boiler_side",
+    "east": "yet_another_thirst:block/water_boiler_side",
+    "west": "yet_another_thirst:block/water_boiler_side"
+  }
+}

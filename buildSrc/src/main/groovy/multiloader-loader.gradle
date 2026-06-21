@@ -23,6 +23,8 @@ dependencies {
     }
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')
+    compileOnly files(project(':common').file('src/main/resources'))
+    annotationProcessor files(project(':common').file('src/main/resources'))
 }
 
 tasks.named('compileJava', JavaCompile) {

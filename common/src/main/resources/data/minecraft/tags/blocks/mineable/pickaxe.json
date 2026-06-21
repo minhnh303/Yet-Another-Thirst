@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "yet_another_thirst:filter_frame",
+      "required": false
+    }
+  ]
+}
