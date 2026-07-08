@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,14 +21,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGui {
 
     @Inject(
-            method = "renderPlayerHealth",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/Gui;renderFood(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;II)V",
-                    shift = At.Shift.AFTER),
+            method = "renderFood(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;II)V",
+            at = @At("TAIL"),
             remap = false)
-    private void yet_another_thirst$renderThirstAfterFood(GuiGraphics guiGraphics, CallbackInfo ci) {
-        ThirstHudRenderer.render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 49);
+    private void yet_another_thirst$renderThirstAfterFood(GuiGraphics guiGraphics, Player player, int top, int right, CallbackInfo ci) {
+        ThirstHudRenderer.render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() - top + 10);
     }
 
     @Redirect(
@@ -36,7 +34,8 @@ public class MixinGui {
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"
             ),
-            remap = false)
+            remap = false,
+            require = 0)
     private void yet_another_thirst$shiftAirBubbles(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height) {
         if ("minecraft".equals(sprite.getNamespace()) &&
                 ("hud/air".equals(sprite.getPath()) || "hud/air_bursting".equals(sprite.getPath())) &&

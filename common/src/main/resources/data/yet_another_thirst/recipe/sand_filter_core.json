@@ -1,0 +1,37 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SGS",
+    "GFG",
+    "SGS"
+  ],
+  "key": {
+    "S": {
+      "tag": "forge:sand"
+    },
+    "G": {
+      "tag": "forge:gravel"
+    },
+    "F": {
+      "item": "yet_another_thirst:fabric_filter_core"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "yet_another_thirst:sand_filter_core"
+  }
+}

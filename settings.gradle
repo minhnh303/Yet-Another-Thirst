@@ -2,6 +2,10 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
             name = 'Forge'
             url = 'https://maven.minecraftforge.net/'
         }
@@ -18,6 +22,7 @@ pluginManagement {
 
 plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+    id 'fabric-loom' version '1.8.9' apply false
 }
 
 // This should match the folder name of the project, or else IDEA may complain (see https://youtrack.jetbrains.com/issue/IDEA-317606)
@@ -25,3 +30,4 @@ rootProject.name = 'Yet-Another-Thirst'
 include("common")
 include("forge")
 include("neoforge")
+include("fabric")

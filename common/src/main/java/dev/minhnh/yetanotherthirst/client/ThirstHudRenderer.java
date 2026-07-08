@@ -35,6 +35,9 @@ public final class ThirstHudRenderer {
         if (player == null || !player.isAlive() || minecraft.options.hideGui) {
             return false;
         }
+        if (player.getAbilities().instabuild) {
+            return false;
+        }
         if (ThirstCompat.hidesThirstHud(player)) {
             return false;
         }

@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {"id": "yet_another_thirst:clogged_fabric_filter"},
+    "title": {"translate": "advancements.yet_another_thirst.clogged_filter.title"},
+    "description": {"translate": "advancements.yet_another_thirst.clogged_filter.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "yet_another_thirst:filter_frame",
+  "criteria": {
+    "has_clogged_fabric": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items": "yet_another_thirst:clogged_fabric_filter"}]
+      }
+    },
+    "has_clogged_sand": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items": "yet_another_thirst:clogged_sand_filter"}]
+      }
+    },
+    "has_clogged_carbon": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items": "yet_another_thirst:clogged_carbon_filter"}]
+      }
+    }
+  },
+  "requirements": [["has_clogged_fabric", "has_clogged_sand", "has_clogged_carbon"]]
+}

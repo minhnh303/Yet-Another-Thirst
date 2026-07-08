@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C",
+    "T",
+    "C"
+  ],
+  "key": {
+    "C": {
+      "item": "create:copper_casing"
+    },
+    "T": {
+      "item": "create:fluid_tank"
+    }
+  },
+  "result": {
+    "id": "yet_another_thirst:filter_frame",
+    "count": 1
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "display": {
+    "icon": {"id": "yet_another_thirst:filter_frame"},
+    "title": {"translate": "advancements.yet_another_thirst.filter_frame.title"},
+    "description": {"translate": "advancements.yet_another_thirst.filter_frame.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "yet_another_thirst:root",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items": "yet_another_thirst:filter_frame"}]
+      }
+    }
+  },
+  "requirements": [["requirement"]]
+}

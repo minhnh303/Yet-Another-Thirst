@@ -1,0 +1,14 @@
+{
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "item": "yet_another_thirst:clogged_sand_filter"
+    }
+  ],
+  "results": [
+    {
+      "item": "yet_another_thirst:sand_filter_core",
+      "count": 1
+    }
+  ]
+}

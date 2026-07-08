@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "Yet Another Thirst",
+  "description": "A thirst mod for Minecraft.",
+  "authors": ["minhnh"],
+  "license": "MIT",
+  "icon": "assets/yet_another_thirst/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.minhnh.yetanotherthirst.YetAnotherThirstFabric"
+    ],
+    "client": [
+      "dev.minhnh.yetanotherthirst.YetAnotherThirstFabricClient"
+    ],
+    "jade": [
+      "dev.minhnh.yetanotherthirst.compat.JadeCompatPlugin"
+    ]
+  },
+  "mixins": [
+    "yet_another_thirst.fabric.mixins.json",
+    "yet_another_thirst.compat.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${fabric_minecraft_version_range}"
+  },
+  "suggests": {
+    "jade": "*",
+    "appleskin": "*",
+    "toughasnails": "*",
+    "supernatural": "*",
+    "farmersdelight": "*",
+    "bakery": "*",
+    "brewery": "*",
+    "farm_and_charm": "*",
+    "create": "*"
+  }
+}

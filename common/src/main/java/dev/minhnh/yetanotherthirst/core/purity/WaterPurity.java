@@ -1,5 +1,7 @@
 package dev.minhnh.yetanotherthirst.core.purity;
 
+import dev.minhnh.yetanotherthirst.Constants;
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.effect.ModEffects;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
@@ -438,6 +440,9 @@ public final class WaterPurity {
         }
 
         if (entity instanceof ServerPlayer sp) {
+            if (dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig.DEBUG_LOGGING) Constants.LOG.info("[Advancements] givePurityEffects: player='{}' purity={}", sp.getName().getString(), purity);
+            if (purity == 0) ModAdvancements.award(sp, ModAdvancements.DIRTY_WATER);
+            else if (purity == MAX_PURITY) ModAdvancements.award(sp, ModAdvancements.PURIFIED_WATER);
             if (chance < nauseaChance) {
                 sp.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 20 * 5, 0));
                 sp.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20 * 30, 0));

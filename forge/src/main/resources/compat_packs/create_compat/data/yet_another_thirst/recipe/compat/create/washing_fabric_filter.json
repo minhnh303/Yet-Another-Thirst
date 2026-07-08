@@ -1,0 +1,14 @@
+{
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "item": "yet_another_thirst:clogged_fabric_filter"
+    }
+  ],
+  "results": [
+    {
+      "item": "yet_another_thirst:fabric_filter_core",
+      "count": 1
+    }
+  ]
+}

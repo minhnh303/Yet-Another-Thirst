@@ -1,0 +1,16 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "dev.minhnh.yetanotherthirst.mixin.create",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "yet_another_thirst.refmap.json",
+  "plugin": "dev.minhnh.yetanotherthirst.mixin.CompatMixinPlugin",
+  "mixins": [
+    "MixinFilterFrameBlock",
+    "MixinFilterFrameBlockEntity",
+    "MixinFluidTankBlockEntity"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

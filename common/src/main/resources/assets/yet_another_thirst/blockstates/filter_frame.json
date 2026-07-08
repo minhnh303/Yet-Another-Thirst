@@ -1,0 +1,368 @@
+{
+  "variants": {
+    "core=empty,facing=up,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_empty"
+    },
+    "core=empty,facing=up,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 180
+    },
+    "core=fabric,facing=up,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_fabric"
+    },
+    "core=fabric,facing=up,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 180
+    },
+    "core=sand,facing=up,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_sand"
+    },
+    "core=sand,facing=up,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 180
+    },
+    "core=carbon,facing=up,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_carbon"
+    },
+    "core=carbon,facing=up,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 180
+    },
+    "core=clogged_fabric,facing=up,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric"
+    },
+    "core=clogged_fabric,facing=up,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 180
+    },
+    "core=clogged_sand,facing=up,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand"
+    },
+    "core=clogged_sand,facing=up,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 180
+    },
+    "core=clogged_carbon,facing=up,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon"
+    },
+    "core=clogged_carbon,facing=up,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 180
+    },
+    "core=empty,facing=down,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 180
+    },
+    "core=empty,facing=down,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_empty"
+    },
+    "core=fabric,facing=down,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 180
+    },
+    "core=fabric,facing=down,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_fabric"
+    },
+    "core=sand,facing=down,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 180
+    },
+    "core=sand,facing=down,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_sand"
+    },
+    "core=carbon,facing=down,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 180
+    },
+    "core=carbon,facing=down,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_carbon"
+    },
+    "core=clogged_fabric,facing=down,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 180
+    },
+    "core=clogged_fabric,facing=down,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric"
+    },
+    "core=clogged_sand,facing=down,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 180
+    },
+    "core=clogged_sand,facing=down,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand"
+    },
+    "core=clogged_carbon,facing=down,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 180
+    },
+    "core=clogged_carbon,facing=down,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon"
+    },
+    "core=empty,facing=north,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90
+    },
+    "core=empty,facing=north,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90,
+      "y": 180
+    },
+    "core=fabric,facing=north,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90
+    },
+    "core=fabric,facing=north,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90,
+      "y": 180
+    },
+    "core=sand,facing=north,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90
+    },
+    "core=sand,facing=north,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90,
+      "y": 180
+    },
+    "core=carbon,facing=north,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90
+    },
+    "core=carbon,facing=north,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90,
+      "y": 180
+    },
+    "core=clogged_fabric,facing=north,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90
+    },
+    "core=clogged_fabric,facing=north,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90,
+      "y": 180
+    },
+    "core=clogged_sand,facing=north,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90
+    },
+    "core=clogged_sand,facing=north,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90,
+      "y": 180
+    },
+    "core=clogged_carbon,facing=north,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90
+    },
+    "core=clogged_carbon,facing=north,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90,
+      "y": 180
+    },
+    "core=empty,facing=south,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90,
+      "y": 180
+    },
+    "core=empty,facing=south,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90
+    },
+    "core=fabric,facing=south,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90,
+      "y": 180
+    },
+    "core=fabric,facing=south,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90
+    },
+    "core=sand,facing=south,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90,
+      "y": 180
+    },
+    "core=sand,facing=south,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90
+    },
+    "core=carbon,facing=south,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90,
+      "y": 180
+    },
+    "core=carbon,facing=south,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90
+    },
+    "core=clogged_fabric,facing=south,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90,
+      "y": 180
+    },
+    "core=clogged_fabric,facing=south,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90
+    },
+    "core=clogged_sand,facing=south,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90,
+      "y": 180
+    },
+    "core=clogged_sand,facing=south,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90
+    },
+    "core=clogged_carbon,facing=south,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90,
+      "y": 180
+    },
+    "core=clogged_carbon,facing=south,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90
+    },
+    "core=empty,facing=west,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90,
+      "y": 270
+    },
+    "core=empty,facing=west,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90,
+      "y": 90
+    },
+    "core=fabric,facing=west,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90,
+      "y": 270
+    },
+    "core=fabric,facing=west,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90,
+      "y": 90
+    },
+    "core=sand,facing=west,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90,
+      "y": 270
+    },
+    "core=sand,facing=west,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90,
+      "y": 90
+    },
+    "core=carbon,facing=west,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90,
+      "y": 270
+    },
+    "core=carbon,facing=west,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90,
+      "y": 90
+    },
+    "core=clogged_fabric,facing=west,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90,
+      "y": 270
+    },
+    "core=clogged_fabric,facing=west,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90,
+      "y": 90
+    },
+    "core=clogged_sand,facing=west,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90,
+      "y": 270
+    },
+    "core=clogged_sand,facing=west,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90,
+      "y": 90
+    },
+    "core=clogged_carbon,facing=west,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90,
+      "y": 270
+    },
+    "core=clogged_carbon,facing=west,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90,
+      "y": 90
+    },
+    "core=empty,facing=east,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90,
+      "y": 90
+    },
+    "core=empty,facing=east,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_empty",
+      "x": 90,
+      "y": 270
+    },
+    "core=fabric,facing=east,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90,
+      "y": 90
+    },
+    "core=fabric,facing=east,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_fabric",
+      "x": 90,
+      "y": 270
+    },
+    "core=sand,facing=east,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90,
+      "y": 90
+    },
+    "core=sand,facing=east,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_sand",
+      "x": 90,
+      "y": 270
+    },
+    "core=carbon,facing=east,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90,
+      "y": 90
+    },
+    "core=carbon,facing=east,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_carbon",
+      "x": 90,
+      "y": 270
+    },
+    "core=clogged_fabric,facing=east,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90,
+      "y": 90
+    },
+    "core=clogged_fabric,facing=east,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_fabric",
+      "x": 90,
+      "y": 270
+    },
+    "core=clogged_sand,facing=east,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90,
+      "y": 90
+    },
+    "core=clogged_sand,facing=east,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_sand",
+      "x": 90,
+      "y": 270
+    },
+    "core=clogged_carbon,facing=east,reversed=false": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90,
+      "y": 90
+    },
+    "core=clogged_carbon,facing=east,reversed=true": {
+      "model": "yet_another_thirst:block/filter_frame_clogged_carbon",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

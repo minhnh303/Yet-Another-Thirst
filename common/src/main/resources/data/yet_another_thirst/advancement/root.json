@@ -1,0 +1,20 @@
+{
+  "display": {
+    "icon": {"id": "yet_another_thirst:clay_bowl"},
+    "title": {"translate": "advancements.yet_another_thirst.root.title"},
+    "description": {"translate": "advancements.yet_another_thirst.root.description"},
+    "frame": "task",
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items": "yet_another_thirst:clay_bowl"}]
+      }
+    }
+  },
+  "requirements": [["requirement"]]
+}

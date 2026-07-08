@@ -45,6 +45,26 @@ public final class ThirstConfig {
     public static int CAVES_Y = 48;
     public static int RUNNING_WATER_PURIFICATION_AMOUNT = 1;
 
+    // Modular Filter System Config
+    public static int FILTER_BASE_SPEED = 1;
+    public static float DIRTY_WATER_DECAY_MULTIPLIER = 4.0F;
+    public static float SLIGHTLY_DIRTY_WATER_DECAY_MULTIPLIER = 2.0F;
+    public static float ACCEPTABLE_WATER_DECAY_MULTIPLIER = 1.0F;
+
+    public static int FABRIC_FILTER_DURABILITY = 10000;
+    public static int FABRIC_FILTER_MAX_PURITY = 1;
+
+    public static int SAND_FILTER_DURABILITY = 50000;
+    public static int SAND_FILTER_MAX_PURITY = 2;
+
+    public static int CARBON_FILTER_DURABILITY = 250000;
+    public static int CARBON_FILTER_MAX_PURITY = 3;
+
+    // Water Boiler Config
+    public static int WATER_BOILER_CAPACITY = 2000;
+    public static int WATER_BOILER_BOIL_TIME = 200;
+    public static int WATER_BOILER_ENERGY_CONSUMPTION = 32;
+
     // Hand drinking
     public static boolean CAN_DRINK_BY_HAND = false;
     public static int HAND_DRINKING_THIRST = 3;
@@ -53,6 +73,9 @@ public final class ThirstConfig {
 
     // Items
     public static int WATER_BOTTLE_STACKSIZE = 64;
+
+    // Debug
+    public static boolean DEBUG_LOGGING = false;
 
     // Client-side only — set by the loader's client config
     public static int HUD_X_OFFSET = 0;
@@ -70,6 +93,7 @@ public final class ThirstConfig {
     public static boolean COMPAT_TOUGH_AS_NAILS = false;
     public static boolean COMPAT_COLD_SWEAT = false;
     public static boolean COMPAT_SUPERNATURAL = false;
+    public static boolean COMPAT_IE_HEATER = false;
 
     // Mod compatibility behavior
     public static boolean APPLESKIN_THIRST_TOOLTIP = true;

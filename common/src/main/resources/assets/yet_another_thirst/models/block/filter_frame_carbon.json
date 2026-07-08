@@ -1,0 +1,6 @@
+{
+  "parent": "yet_another_thirst:block/filter_frame",
+  "textures": {
+    "core": "yet_another_thirst:item/carbon_filter_core"
+  }
+}

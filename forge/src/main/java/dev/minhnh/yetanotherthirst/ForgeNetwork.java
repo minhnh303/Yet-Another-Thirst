@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
@@ -130,6 +131,7 @@ public final class ForgeNetwork {
                 if (shouldDrink) {
                     state.drink(ThirstConfig.HAND_DRINKING_THIRST, ThirstConfig.HAND_DRINKING_QUENCHED);
                 }
+                ModAdvancements.award(player, ModAdvancements.HAND_DRINKING);
                 ThirstStorage.sync(player);
             });
             context.setPacketHandled(true);

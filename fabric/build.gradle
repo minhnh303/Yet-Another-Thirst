@@ -1,0 +1,90 @@
+plugins {
+    id 'multiloader-common'
+    id 'fabric-loom'
+}
+
+base {
+    archivesName = "${base.archivesName.get()}-fabric"
+}
+
+configurations {
+    commonJava {
+        canBeResolved = true
+    }
+    commonResources {
+        canBeResolved = true
+    }
+}
+
+loom {
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+    mixin {
+        add sourceSets.main, "yet_another_thirst.refmap.json"
+        useLegacyMixinAp = true
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+
+    compileOnly(project(':common')) {
+        capabilities {
+            requireCapability "$group:$mod_id"
+        }
+    }
+    commonJava project(path: ':common', configuration: 'commonJava')
+    commonResources project(path: ':common', configuration: 'commonResources')
+    compileOnly files(project(':common').file('src/main/resources'))
+    annotationProcessor files(project(':common').file('src/main/resources'))
+
+    // Jade API stub — Fabric version for compilation
+    compileOnly "maven.modrinth:jade:${jade_fabric_version}"
+    // NeoForge Jade jar needed for common sources (JadeCompatPlugin) which use named-mapped Jade types
+    compileOnly("maven.modrinth:jade:${jade_version}") {
+        transitive = false
+    }
+
+    // javax.annotation (@Nonnull etc.) — provided transitively by Forge, must be explicit for Loom
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+tasks.named('sourcesJar', Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn(configurations.commonJava)
+    from(configurations.commonJava)
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

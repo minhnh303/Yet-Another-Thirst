@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:tag",
+          "name": "yet_another_thirst:filter_frame",
+          "expand": true
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

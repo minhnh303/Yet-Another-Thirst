@@ -2,6 +2,7 @@ package dev.minhnh.yetanotherthirst.core.thirst;
 
 import dev.minhnh.yetanotherthirst.Constants;
 import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,6 +44,9 @@ public final class ThirstTicker {
         }
 
         if (ThirstCompat.suspendsThirst(player)) {
+            if (ThirstCompat.isVampire(player) || ThirstCompat.isSupernaturalVampire(player)) {
+                ModAdvancements.award(player, ModAdvancements.VAMPIRE_IMMUNITY);
+            }
             state.resetDamageTimer();
             return;
         }
@@ -141,6 +145,8 @@ public final class ThirstTicker {
         if (angle <= -80.0F && player.level().isRainingAt(player.blockPosition().above())) {
             state.setThirst(state.getThirst() + 1);
             state.setQuenched(state.getQuenched() + 1);
+            if (ThirstConfig.DEBUG_LOGGING) Constants.LOG.info("[Advancements] Rain drinking triggered for '{}'", player.getName().getString());
+            ModAdvancements.award(player, ModAdvancements.RAIN_DRINKING);
         }
     }
 
@@ -163,7 +169,9 @@ public final class ThirstTicker {
         }
 
         if (player.getHealth() > limit) {
+            if (ThirstConfig.DEBUG_LOGGING) Constants.LOG.info("[Advancements] Dehydration damage applied to '{}' (health={}, limit={})", player.getName().getString(), player.getHealth(), limit);
             player.hurt(dehydrateSource(player), ThirstConfig.DEHYDRATION_DAMAGE);
+            ModAdvancements.award(player, ModAdvancements.DEHYDRATION_SURVIVAL);
         }
         state.resetDamageTimer();
     }

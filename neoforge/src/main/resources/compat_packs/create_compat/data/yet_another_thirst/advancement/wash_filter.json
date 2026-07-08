@@ -1,0 +1,17 @@
+{
+  "display": {
+    "icon": {"id": "yet_another_thirst:fabric_filter_core"},
+    "title": {"translate": "advancements.yet_another_thirst.wash_filter.title"},
+    "description": {"translate": "advancements.yet_another_thirst.wash_filter.description"},
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "yet_another_thirst:clogged_filter",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [["requirement"]]
+}

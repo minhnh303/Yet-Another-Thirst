@@ -41,6 +41,8 @@ public final class NeoForgeLootModifier extends LootModifier {
 
     private final ResourceLocation lootTable;
 
+    private static final ThreadLocal<Boolean> IS_APPLYING = ThreadLocal.withInitial(() -> false);
+
     private NeoForgeLootModifier(LootItemCondition[] conditions, ResourceLocation lootTable) {
         super(conditions);
         this.lootTable = lootTable;
@@ -49,15 +51,23 @@ public final class NeoForgeLootModifier extends LootModifier {
     @Nonnull
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        LootTable table = context.getResolver()
-                .get(Registries.LOOT_TABLE, ResourceKey.create(Registries.LOOT_TABLE, lootTable))
-                .map(holder -> holder.value())
-                .orElse(LootTable.EMPTY);
-        Objects.requireNonNull(generatedLoot);
-        LootContext subContext = new LootContext.Builder(context)
-                .withQueriedLootTableId(lootTable)
-                .create(null);
-        table.getRandomItems(subContext, generatedLoot::add);
+        if (IS_APPLYING.get()) {
+            return generatedLoot;
+        }
+        IS_APPLYING.set(true);
+        try {
+            LootTable table = context.getResolver()
+                    .get(Registries.LOOT_TABLE, ResourceKey.create(Registries.LOOT_TABLE, lootTable))
+                    .map(holder -> holder.value())
+                    .orElse(LootTable.EMPTY);
+            Objects.requireNonNull(generatedLoot);
+            LootContext subContext = new LootContext.Builder(context)
+                    .withQueriedLootTableId(lootTable)
+                    .create(null);
+            table.getRandomItems(subContext, generatedLoot::add);
+        } finally {
+            IS_APPLYING.set(false);
+        }
         return generatedLoot;
     }
 

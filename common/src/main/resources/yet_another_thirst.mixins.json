@@ -5,15 +5,16 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "yet_another_thirst.refmap.json",
   "mixins": [
+    "MixinAbstractCookingRecipe",
+    "MixinAbstractFurnaceEntity",
     "MixinFoodData",
     "MixinInventory",
     "MixinItemStack",
-    "MixinStateDefinitionBuilder",
-    "MixinAbstractCookingRecipe",
-    "MixinAbstractFurnaceEntity"
+    "MixinStateDefinitionBuilder"
   ],
   "client": [
-    "MixinGui"
+    "MixinGui",
+    "MixinMinecraft"
   ],
   "injectors": {
     "defaultRequire": 1

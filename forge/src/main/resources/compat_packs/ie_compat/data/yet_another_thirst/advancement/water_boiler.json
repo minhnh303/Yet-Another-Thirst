@@ -1,0 +1,20 @@
+{
+  "display": {
+    "icon": {"id": "yet_another_thirst:water_boiler"},
+    "title": {"translate": "advancements.yet_another_thirst.water_boiler.title"},
+    "description": {"translate": "advancements.yet_another_thirst.water_boiler.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "yet_another_thirst:root",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items": "yet_another_thirst:water_boiler"}]
+      }
+    }
+  },
+  "requirements": [["requirement"]]
+}

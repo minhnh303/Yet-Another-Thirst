@@ -21,9 +21,10 @@ public class MixinAbstractFurnaceEntity {
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/item/ItemStack;isSameItemSameComponents(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"
             ),
-            remap = false
+            remap = false,
+            require = 0
     )
-    private boolean yet_another_thirst$canBurnCheckComponents(ItemStack outputSlotItem, ItemStack recipeResult) {
+    private static boolean yet_another_thirst$canBurnCheckComponents(ItemStack outputSlotItem, ItemStack recipeResult) {
         if (WaterPurity.isWaterFilledContainer(outputSlotItem) || WaterPurity.isWaterFilledContainer(recipeResult)) {
             return WaterPurity.isSameWaterFilledContainer(outputSlotItem, recipeResult);
         }

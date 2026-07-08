@@ -124,7 +124,11 @@ processResources {
             "neoform_version"              : neoform_version,
             "jade_version"                 : jade_version,
             'credits'                      : credits,
-            'java_version'                 : java_version
+            'java_version'                 : java_version,
+            'fabric_minecraft_version_range': fabric_minecraft_version_range,
+            'fabric_loader_version'        : fabric_loader_version,
+            'fabric_api_version'           : fabric_api_version,
+            'jade_fabric_version'          : jade_fabric_version
     ]
 
     var jsonExpandProps = expandProps.collectEntries {
@@ -135,7 +139,7 @@ processResources {
         expand expandProps
     }
 
-    filesMatching(['pack.mcmeta', '*.mixins.json']) {
+    filesMatching(['pack.mcmeta', '*.mixins.json', 'fabric.mod.json']) {
         expand jsonExpandProps
     }
 

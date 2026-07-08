@@ -1,12 +1,22 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
+import dev.minhnh.yetanotherthirst.core.block.AbstractFilterFrameBlockEntity;
+import dev.minhnh.yetanotherthirst.core.block.WaterBoilerBlock;
+import dev.minhnh.yetanotherthirst.core.block.WaterBoilerBlockEntity;
+import net.minecraft.core.registries.BuiltInRegistries;
 import dev.minhnh.yetanotherthirst.core.command.ThirstCommands;
+import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.purity.ContainerWithPurity;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.client.ThirstTooltip;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstEvents;
-import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
+import net.minecraft.world.item.Item;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -33,7 +43,8 @@ public final class NeoForgeGameEvents {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        NeoForgeConfig.reloadThirstValues();
+        NeoForgeConfigItems.reloadThirstValues();
+        ModAdvancements.checkDatapack(event.getServer());
     }
 
     // ── Tick / player state ───────────────────────────────────────────────────
@@ -70,9 +81,6 @@ public final class NeoForgeGameEvents {
     public static void onPlayerClone(PlayerEvent.Clone event) {
 
         ThirstEvents.onPlayerClone(event.getOriginal(), event.getEntity(), event.isWasDeath());
-        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-            ThirstStorage.sync(serverPlayer);
-        }
     }
 
     @SubscribeEvent
@@ -133,6 +141,37 @@ public final class NeoForgeGameEvents {
         }
     }
 
+    // ── IE hammer: intercept before IE rotates the block ─────────────────────
+
+    public static void onIEHammerBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (!ThirstConfig.COMPAT_IE_HEATER) return;
+
+        // IE doesn't register in any neoforge:tools/hammers tag — check by registry key
+        net.minecraft.resources.ResourceLocation itemKey =
+                BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem());
+        if (!"immersiveengineering".equals(itemKey.getNamespace())
+                || !"hammer".equals(itemKey.getPath())) return;
+
+        Level level = event.getLevel();
+        BlockPos pos = event.getPos();
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof WaterBoilerBlock)) return;
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof WaterBoilerBlockEntity boiler) {
+            boiler.hammerUseSide(event.getHitVec().getDirection(), event.getEntity(),
+                    event.getHand(), event.getHitVec().getLocation());
+        }
+
+        if (level.isClientSide()) {
+            // Deny item use to block IE's onItemUseFirst, but do NOT cancel the event —
+            // cancelling would suppress the interaction packet and the server would never run.
+            event.setUseItem(net.neoforged.neoforge.common.util.TriState.FALSE);
+        } else {
+            event.setCanceled(true);
+        }
+    }
+
     // ── Purity: tooltip ───────────────────────────────────────────────────────
 
     @SubscribeEvent
@@ -144,6 +183,23 @@ public final class NeoForgeGameEvents {
 
     @SubscribeEvent
     public static void onTagsUpdated(TagsUpdatedEvent event) {
-        NeoForgeConfig.reloadThirstValues();
+        NeoForgeConfigItems.reloadThirstValues();
+    }
+
+    // ── Advancements: wash filter ─────────────────────────────────────────────
+
+    @SubscribeEvent
+    public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        Item crafted = event.getCrafting().getItem();
+        if (crafted != ModItems.FABRIC_FILTER_CORE.get()
+                && crafted != ModItems.SAND_FILTER_CORE.get()
+                && crafted != ModItems.CARBON_FILTER_CORE.get()) return;
+        for (int i = 0; i < event.getInventory().getContainerSize(); i++) {
+            if (AbstractFilterFrameBlockEntity.isClogged(event.getInventory().getItem(i))) {
+                ModAdvancements.award(player, ModAdvancements.WASH_FILTER);
+                return;
+            }
+        }
     }
 }

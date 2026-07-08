@@ -66,4 +66,13 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    /**
+     * Attempts to drink water by hand on the client side.
+     *
+     * @return True if successful, false otherwise.
+     */
+    default boolean tryHandDrink() {
+        return false;
+    }
 }

@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
@@ -87,13 +88,17 @@ public final class NeoForgeNetwork {
         private static void handle(DrinkByHandPacket packet, IPayloadContext context) {
             context.enqueueWork(() -> {
                 ServerPlayer player = (ServerPlayer) context.player();
+                boolean debug = ThirstConfig.DEBUG_LOGGING;
+                if (debug) Constants.LOG.info("[HandDrink] Packet received from '{}' at {}", player.getName().getString(), packet.pos);
 
                 double maxReach = 6.0;
                 if (player.getEyePosition().distanceToSqr(packet.pos.getX() + 0.5, packet.pos.getY() + 0.5, packet.pos.getZ() + 0.5) > maxReach * maxReach) {
+                    if (debug) Constants.LOG.info("[HandDrink] Rejected: too far from pos {}", packet.pos);
                     return;
                 }
 
                 if (!player.isCrouching() && !player.isSecondaryUseActive()) {
+                    if (debug) Constants.LOG.info("[HandDrink] Rejected: not crouching/secondary use");
                     return;
                 }
 
@@ -102,16 +107,24 @@ public final class NeoForgeNetwork {
                         && player.getItemInHand(net.minecraft.world.InteractionHand.OFF_HAND).isEmpty()
                         : player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty();
                 if (!handAvailable) {
+                    if (debug) Constants.LOG.info("[HandDrink] Rejected: hands not empty");
                     return;
                 }
 
                 Level level = player.level();
-                if (!level.getFluidState(packet.pos).is(FluidTags.WATER)) return;
+                if (!level.getFluidState(packet.pos).is(FluidTags.WATER)) {
+                    if (debug) Constants.LOG.info("[HandDrink] Rejected: no water at {}", packet.pos);
+                    return;
+                }
 
                 var state = ThirstStorage.get(player);
-                if (!state.isEnabled() || state.getThirst() >= ThirstConfig.MAX_THIRST) return;
+                if (!state.isEnabled() || state.getThirst() >= ThirstConfig.MAX_THIRST) {
+                    if (debug) Constants.LOG.info("[HandDrink] Rejected: enabled={} thirst={}/{}", state.isEnabled(), state.getThirst(), ThirstConfig.MAX_THIRST);
+                    return;
+                }
 
                 int purity = WaterPurity.getBlockPurity(level, packet.pos);
+                if (debug) Constants.LOG.info("[HandDrink] Drinking: player='{}' purity={}", player.getName().getString(), purity);
                 level.playSound(player, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.GENERIC_DRINK, SoundSource.NEUTRAL, 1.0F, 1.0F);
 
@@ -119,6 +132,7 @@ public final class NeoForgeNetwork {
                 if (shouldDrink) {
                     state.drink(ThirstConfig.HAND_DRINKING_THIRST, ThirstConfig.HAND_DRINKING_QUENCHED);
                 }
+                ModAdvancements.award(player, ModAdvancements.HAND_DRINKING);
                 ThirstStorage.sync(player);
             });
         }

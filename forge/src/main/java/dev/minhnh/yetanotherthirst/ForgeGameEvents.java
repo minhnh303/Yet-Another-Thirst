@@ -5,9 +5,13 @@ import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.client.ThirstTooltip;
 import dev.minhnh.yetanotherthirst.core.command.ThirstCommands;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
+import dev.minhnh.yetanotherthirst.core.block.AbstractFilterFrameBlockEntity;
+import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstEvents;
-import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
+import java.util.ArrayList;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
@@ -36,8 +40,20 @@ public final class ForgeGameEvents {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        // Re-resolve config item values after registries and tags are available
-        ForgeConfig.reloadThirstValues();
+        ForgeConfigItems.reloadThirstValues();
+        var server = event.getServer();
+        var packRepo = server.getPackRepository();
+        String packId = "mod:" + Constants.MOD_ID;
+        if (!packRepo.getSelectedIds().contains(packId) && packRepo.getAvailableIds().contains(packId)) {
+            var newIds = new ArrayList<>(packRepo.getSelectedIds());
+            newIds.add(packId);
+            Constants.LOG.info("[{}] Auto-enabling mod datapack (first run on existing world)...", Constants.MOD_ID);
+            server.reloadResources(newIds)
+                .thenRun(() -> Constants.LOG.info("[{}] Mod datapack enabled successfully.", Constants.MOD_ID))
+                .exceptionally(e -> { Constants.LOG.error("[{}] Failed to auto-enable mod datapack", Constants.MOD_ID, e); return null; });
+        } else {
+            ModAdvancements.checkDatapack(server);
+        }
     }
 
     // ── Tick / player state ───────────────────────────────────────────────────
@@ -74,9 +90,6 @@ public final class ForgeGameEvents {
     public static void onPlayerClone(PlayerEvent.Clone event) {
 
         ThirstEvents.onPlayerClone(event.getOriginal(), event.getEntity(), event.isWasDeath());
-        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-            ThirstStorage.sync(serverPlayer);
-        }
     }
 
     @SubscribeEvent
@@ -153,6 +166,23 @@ public final class ForgeGameEvents {
 
     @SubscribeEvent
     public static void onTagsUpdated(TagsUpdatedEvent event) {
-        ForgeConfig.reloadThirstValues();
+        ForgeConfigItems.reloadThirstValues();
+    }
+
+    // ── Advancements: wash filter ─────────────────────────────────────────────
+
+    @SubscribeEvent
+    public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        Item crafted = event.getCrafting().getItem();
+        if (crafted != ModItems.FABRIC_FILTER_CORE.get()
+                && crafted != ModItems.SAND_FILTER_CORE.get()
+                && crafted != ModItems.CARBON_FILTER_CORE.get()) return;
+        for (int i = 0; i < event.getInventory().getContainerSize(); i++) {
+            if (AbstractFilterFrameBlockEntity.isClogged(event.getInventory().getItem(i))) {
+                ModAdvancements.award(player, ModAdvancements.WASH_FILTER);
+                return;
+            }
+        }
     }
 }

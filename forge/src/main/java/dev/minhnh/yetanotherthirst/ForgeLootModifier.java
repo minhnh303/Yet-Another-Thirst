@@ -18,7 +18,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -41,6 +40,8 @@ public final class ForgeLootModifier extends LootModifier {
 
     private final ResourceLocation lootTable;
 
+    private static final ThreadLocal<Boolean> IS_APPLYING = ThreadLocal.withInitial(() -> false);
+
     private ForgeLootModifier(LootItemCondition[] conditions, ResourceLocation lootTable) {
         super(conditions);
         this.lootTable = lootTable;
@@ -49,15 +50,24 @@ public final class ForgeLootModifier extends LootModifier {
     @Nonnull
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        LootTable table = context.getResolver()
-                .get(Registries.LOOT_TABLE, ResourceKey.create(Registries.LOOT_TABLE, lootTable))
-                .map(holder -> holder.value())
-                .orElse(LootTable.EMPTY);
-        Objects.requireNonNull(generatedLoot);
-        LootContext subContext = new LootContext.Builder(context)
-                .withQueriedLootTableId(lootTable)
-                .create(null);
-        table.getRandomItems(subContext, generatedLoot::add);
+        if (IS_APPLYING.get()) {
+            return generatedLoot;
+        }
+        IS_APPLYING.set(true);
+        try {
+            // In 1.21, loot tables live in ReloadableServerRegistries, not in the frozen RegistryAccess
+            // that LootContext.getResolver() exposes — looking them up there always returns empty.
+            ResourceKey<LootTable> key = ResourceKey.create(Registries.LOOT_TABLE, lootTable);
+            LootTable table = context.getLevel().getServer()
+                    .reloadableRegistries()
+                    .getLootTable(key);
+            LootContext subContext = new LootContext.Builder(context)
+                    .withQueriedLootTableId(lootTable)
+                    .create(null);
+            table.getRandomItems(subContext, generatedLoot::add);
+        } finally {
+            IS_APPLYING.set(false);
+        }
         return generatedLoot;
     }
 

@@ -38,11 +38,22 @@ neoForge {
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
+repositories {
+    maven {
+        name = "Create"
+        url = "https://maven.createmod.net"
+    }
+}
+
 dependencies {
     compileOnly project(":common")
     compileOnly("maven.modrinth:jade:${jade_version}") {
         transitive = false
     }
+    compileOnly("com.simibubi.create:create-1.21.1:6.0.4-50:slim") {
+        transitive = false
+    }
+    compileOnly(files(System.getProperty("user.home") + "/Library/Application Support/minecraft/Instances/NeoForge 1.21.1/mods/ImmersiveEngineering-1.21.1-12.4.2-194.jar"))
 }
 
 jar {

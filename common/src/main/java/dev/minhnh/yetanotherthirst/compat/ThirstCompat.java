@@ -231,7 +231,7 @@ public final class ThirstCompat {
             try {
                 Class<?> temperature = Class.forName("com.momosoftworks.coldsweat.api.util.Temperature", false,
                         ThirstCompat.class.getClassLoader());
-                Class<?> trait = Class.forName("com.momosoftworks.coldsweat.api.util.Trait", false,
+                Class<?> trait = Class.forName("com.momosoftworks.coldsweat.api.util.Temperature$Trait", false,
                         ThirstCompat.class.getClassLoader());
                 @SuppressWarnings({"unchecked", "rawtypes"})
                 Object body = Enum.valueOf((Class<? extends Enum>) trait.asSubclass(Enum.class), "BODY");
