@@ -91,6 +91,7 @@ public final class ThirstConfig {
     public static boolean COMPAT_COLD_SWEAT = false;
     public static boolean COMPAT_SUPERNATURAL = false;
     public static boolean COMPAT_IE_HEATER = false;
+    public static boolean COMPAT_ENVIRONMENTZ = false;
 
     // Mod compatibility behavior
     public static boolean APPLESKIN_THIRST_TOOLTIP = true;
@@ -101,6 +102,32 @@ public final class ThirstConfig {
     public static float COLD_SWEAT_HOT_BODY_TEMPERATURE = 50.0F;
     public static float COLD_SWEAT_BURNING_BODY_TEMPERATURE = 100.0F;
     public static float COLD_SWEAT_MAX_DEHYDRATION_MODIFIER = 1.75F;
+    public static boolean ENVIRONMENTZ_DEHYDRATION_MODIFIER = true;
+    public static boolean ENVIRONMENTZ_REPLACES_ENVIRONMENT_MODIFIERS = true;
+
+    /**
+     * User-defined EnvironmentZ {@code playerTemperature} -> dehydration modifier tiers, e.g.
+     * "playerTemperature >= 20 applies 1.0x". Always kept sorted ascending by threshold; the
+     * modifier used is the one for the highest threshold at or below the player's current body
+     * temperature. Temperatures below every configured threshold get the neutral 1.0x modifier.
+     */
+    public static java.util.List<TemperatureTier> ENVIRONMENTZ_TEMPERATURE_TIERS = new java.util.ArrayList<>();
+
+    public static void setEnvironmentzTemperatureTiers(java.util.List<TemperatureTier> tiers) {
+        java.util.List<TemperatureTier> sorted = new java.util.ArrayList<>(tiers);
+        sorted.sort(java.util.Comparator.comparingInt(tier -> tier.threshold));
+        ENVIRONMENTZ_TEMPERATURE_TIERS = sorted;
+    }
+
+    public static final class TemperatureTier {
+        public final int threshold;
+        public final float modifier;
+
+        public TemperatureTier(int threshold, float modifier) {
+            this.threshold = threshold;
+            this.modifier = modifier;
+        }
+    }
     public static boolean SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST = true;
     public static boolean VAMPIRISM_VAMPIRE_SUSPENDS_THIRST = true;
 

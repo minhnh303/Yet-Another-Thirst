@@ -101,8 +101,8 @@ public final class NeoForgeConfigItems {
 
         builder.push("boiler");
         WATER_BOILER_CAPACITY = builder
-                .comment("Maximum water capacity of the Water Boiler block in mB (default: 16000)")
-                .defineInRange("waterBoilerCapacity", 16000, 1000, 1000000);
+                .comment("Maximum water capacity of the Water Boiler block in mB (default: 2000)")
+                .defineInRange("waterBoilerCapacity", 2000, 1000, 1000000);
         WATER_BOILER_BOIL_TIME = builder
                 .comment("Ticks required to boil water (default: 200)")
                 .defineInRange("waterBoilerBoilTime", 200, 1, 72000);

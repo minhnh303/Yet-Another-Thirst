@@ -24,6 +24,7 @@ public class YetAnotherThirstFabric implements ModInitializer {
 
         FabricConfig.load();
         ThirstConfig.COMPAT_APPLESKIN = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("appleskin");
+        ThirstConfig.COMPAT_ENVIRONMENTZ = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("environmentz");
         FabricEffects.register();
         dev.minhnh.yetanotherthirst.core.block.ModBlocks.register();
         FabricFluidStorage.register();

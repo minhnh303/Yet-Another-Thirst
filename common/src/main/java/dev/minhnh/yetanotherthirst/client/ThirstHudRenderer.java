@@ -27,9 +27,12 @@ public final class ThirstHudRenderer {
     private ThirstHudRenderer() {
     }
 
-    public static boolean render(GuiGraphics guiGraphics, int width, int height, int rightHeight) {
-
-        Minecraft minecraft = Minecraft.getInstance();
+    /**
+     * Mirrors the guard checks at the top of {@link #render}, exposed so loaders without a shared
+     * HUD-height accumulator (Fabric) can decide ahead of time whether the thirst bar will draw
+     * this frame, e.g. to know whether to make room for it next to other HUD elements.
+     */
+    public static boolean shouldRender(Minecraft minecraft) {
         LocalPlayer player = minecraft.player;
         if (player == null || !player.isAlive() || minecraft.options.hideGui) {
             return false;
@@ -43,10 +46,17 @@ public final class ThirstHudRenderer {
             return false;
         }
 
-        ThirstState state = ThirstStorage.get(player);
-        if (!state.isEnabled()) {
+        return ThirstStorage.get(player).isEnabled();
+    }
+
+    public static boolean render(GuiGraphics guiGraphics, int width, int height, int rightHeight) {
+
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!shouldRender(minecraft)) {
             return false;
         }
+        LocalPlayer player = minecraft.player;
+        ThirstState state = ThirstStorage.get(player);
 
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
