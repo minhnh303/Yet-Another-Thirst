@@ -57,7 +57,11 @@ public final class FabricConfig {
             "coldSweatDehydrationModifier", "coldSweatReplacesEnvironmentModifiers",
             "coldSweatHotBodyTemperature", "coldSweatBurningBodyTemperature",
             "coldSweatMaxDehydrationModifier", "supernaturalVampireSuspendsThirst",
-            "vampirismVampireSuspendsThirst"
+            "vampirismVampireSuspendsThirst", "environmentzDehydrationModifier",
+            "environmentzReplacesEnvironmentModifiers", "environmentzTemperatureTiers",
+            "environmentzShowTemperatureText", "environmentzTemperatureTextType",
+            "environmentzTemperatureTextUnit", "environmentzTemperatureTextXOffset",
+            "environmentzTemperatureTextYOffset", "environmentzTemperatureTextColor"
     );
 
     private FabricConfig() {}
@@ -215,6 +219,16 @@ public final class FabricConfig {
         ThirstConfig.COLD_SWEAT_MAX_DEHYDRATION_MODIFIER = (float) getDouble(compatJson, "coldSweatMaxDehydrationModifier", 1.75);
         ThirstConfig.SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST = getBool(compatJson, "supernaturalVampireSuspendsThirst", true);
         ThirstConfig.VAMPIRISM_VAMPIRE_SUSPENDS_THIRST = getBool(compatJson, "vampirismVampireSuspendsThirst", true);
+        ThirstConfig.ENVIRONMENTZ_DEHYDRATION_MODIFIER = getBool(compatJson, "environmentzDehydrationModifier", true);
+        ThirstConfig.ENVIRONMENTZ_REPLACES_ENVIRONMENT_MODIFIERS = getBool(compatJson, "environmentzReplacesEnvironmentModifiers", true);
+        ThirstConfig.setEnvironmentzTemperatureTiers(
+                getTemperatureTiers(compatJson, "environmentzTemperatureTiers", defaultEnvironmentzTemperatureTiers()));
+        ThirstConfig.ENVIRONMENTZ_SHOW_TEMPERATURE_TEXT = getBool(compatJson, "environmentzShowTemperatureText", true);
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_TYPE = getString(compatJson, "environmentzTemperatureTextType", "PLAYER");
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT = getString(compatJson, "environmentzTemperatureTextUnit", "°C");
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_X_OFFSET = getInt(compatJson, "environmentzTemperatureTextXOffset", 0);
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_Y_OFFSET = getInt(compatJson, "environmentzTemperatureTextYOffset", 0);
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR = getInt(compatJson, "environmentzTemperatureTextColor", 0xFFFFFF);
 
         // client
         ThirstConfig.HUD_X_OFFSET = getInt(clientJson, "hudXOffset", 0);
@@ -242,17 +256,37 @@ public final class FabricConfig {
     private static JsonObject loadOrCreate(Path path, JsonObject defaults) {
         if (Files.exists(path)) {
             try (Reader r = Files.newBufferedReader(path)) {
-                return GSON.fromJson(r, JsonObject.class);
+                JsonObject loaded = GSON.fromJson(r, JsonObject.class);
+                if (loaded == null) {
+                    loaded = new JsonObject();
+                }
+                if (addMissingKeys(loaded, defaults)) {
+                    writeJson(path, loaded);
+                }
+                return loaded;
             } catch (Exception e) {
                 Constants.LOG.error("Failed to read config {}", path, e);
             }
         }
-        try (Writer w = Files.newBufferedWriter(path)) {
-            GSON.toJson(defaults, w);
-        } catch (IOException e) {
-            Constants.LOG.error("Failed to write config {}", path, e);
-        }
+        writeJson(path, defaults);
         return defaults;
+    }
+
+    /**
+     * Adds any key present in {@code defaults} but missing from {@code target} — e.g. a setting
+     * introduced by a mod update — without touching keys the user already has on disk.
+     *
+     * @return true if at least one key was added.
+     */
+    private static boolean addMissingKeys(JsonObject target, JsonObject defaults) {
+        boolean changed = false;
+        for (var entry : defaults.entrySet()) {
+            if (!target.has(entry.getKey())) {
+                target.add(entry.getKey(), entry.getValue());
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     private static boolean getBool(JsonObject obj, String key, boolean def) {
@@ -447,7 +481,54 @@ public final class FabricConfig {
         obj.addProperty("coldSweatMaxDehydrationModifier", 1.75);
         obj.addProperty("supernaturalVampireSuspendsThirst", true);
         obj.addProperty("vampirismVampireSuspendsThirst", true);
+        obj.addProperty("environmentzDehydrationModifier", true);
+        obj.addProperty("environmentzReplacesEnvironmentModifiers", true);
+        obj.add("environmentzTemperatureTiers", temperatureTiersToJson(defaultEnvironmentzTemperatureTiers()));
+        obj.addProperty("environmentzShowTemperatureText", true);
+        obj.addProperty("environmentzTemperatureTextType", "PLAYER");
+        obj.addProperty("environmentzTemperatureTextUnit", "");
+        obj.addProperty("environmentzTemperatureTextXOffset", 0);
+        obj.addProperty("environmentzTemperatureTextYOffset", 0);
+        obj.addProperty("environmentzTemperatureTextColor", 0xFFFFFF);
         return obj;
+    }
+
+    /**
+     * Starting point for {@code environmentzTemperatureTiers}, matching the example threshold from
+     * the feature request ("playerTemperature >= 20 -> 1.0x"). EnvironmentZ's own tier boundaries
+     * are datapack-configurable per server, so these are just a reasonable starting shape — use
+     * {@code /thirst query} to read the live body temperature and retune to taste.
+     */
+    private static List<ThirstConfig.TemperatureTier> defaultEnvironmentzTemperatureTiers() {
+        return new ArrayList<>(List.of(
+                new ThirstConfig.TemperatureTier(-1000, 0.5F),
+                new ThirstConfig.TemperatureTier(-50, 0.85F),
+                new ThirstConfig.TemperatureTier(20, 1.0F),
+                new ThirstConfig.TemperatureTier(50, 1.5F),
+                new ThirstConfig.TemperatureTier(100, 2.5F)
+        ));
+    }
+
+    private static List<ThirstConfig.TemperatureTier> getTemperatureTiers(
+            JsonObject obj, String key, List<ThirstConfig.TemperatureTier> def) {
+        if (!obj.has(key)) return def;
+        List<ThirstConfig.TemperatureTier> result = new ArrayList<>();
+        obj.getAsJsonArray(key).forEach(e -> {
+            var arr = e.getAsJsonArray();
+            result.add(new ThirstConfig.TemperatureTier(arr.get(0).getAsInt(), (float) arr.get(1).getAsDouble()));
+        });
+        return result;
+    }
+
+    private static JsonArray temperatureTiersToJson(List<ThirstConfig.TemperatureTier> tiers) {
+        var arr = new JsonArray();
+        for (var tier : tiers) {
+            var row = new JsonArray();
+            row.add(tier.threshold);
+            row.add(tier.modifier);
+            arr.add(row);
+        }
+        return arr;
     }
 
     private static JsonObject buildDefaultClient() {

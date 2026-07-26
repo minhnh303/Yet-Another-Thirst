@@ -189,7 +189,8 @@ public final class ThirstTicker {
 
     private static float exhaustionModifier(ServerPlayer player) {
 
-        float modifier = biomeModifier(player) * fireProtectionModifier(player) * ThirstCompat.coldSweatDehydrationModifier(player);
+        float modifier = biomeModifier(player) * fireProtectionModifier(player)
+                * ThirstCompat.externalTemperatureDehydrationModifier(player);
 
         if (player.hasEffect(MobEffects.FIRE_RESISTANCE)) {
             modifier *= ThirstConfig.FIRE_RESISTANCE_DEHYDRATION_MODIFIER;
@@ -199,7 +200,7 @@ public final class ThirstTicker {
 
     private static float biomeModifier(ServerPlayer player) {
 
-        if (ThirstCompat.coldSweatReplacesEnvironmentModifiers()) {
+        if (ThirstCompat.replacesEnvironmentModifiers()) {
             return ThirstConfig.THIRST_DEPLETION_MODIFIER;
         }
 

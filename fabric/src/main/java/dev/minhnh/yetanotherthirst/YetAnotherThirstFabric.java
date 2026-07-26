@@ -33,6 +33,7 @@ public class YetAnotherThirstFabric implements ModInitializer {
         ThirstConfig.COMPAT_COLD_SWEAT = loader.isModLoaded("cold_sweat");
         ThirstConfig.COMPAT_SUPERNATURAL = loader.isModLoaded("supernatural");
         ThirstConfig.COMPAT_IE_HEATER = loader.isModLoaded("immersiveengineering");
+        ThirstConfig.COMPAT_ENVIRONMENTZ = loader.isModLoaded("environmentz");
         FabricEffects.register();
         dev.minhnh.yetanotherthirst.core.block.ModBlocks.register();
         FabricFluidStorage.register();

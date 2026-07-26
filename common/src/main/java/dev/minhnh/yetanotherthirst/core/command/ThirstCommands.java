@@ -3,6 +3,8 @@ package dev.minhnh.yetanotherthirst.core.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import net.minecraft.commands.CommandSourceStack;
@@ -49,6 +51,9 @@ public final class ThirstCommands {
 
         ThirstState state = ThirstStorage.get(player);
         source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.query", state.getThirst(), state.getQuenched()), false);
+        if (ThirstConfig.COMPAT_ENVIRONMENTZ) {
+            source.sendSuccess(() -> ThirstCompat.environmentzDebugInfo(player), false);
+        }
         return state.getThirst();
     }
 
