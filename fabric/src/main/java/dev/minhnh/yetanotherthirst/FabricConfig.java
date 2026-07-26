@@ -56,7 +56,10 @@ public final class FabricConfig {
             "coldSweatHotBodyTemperature", "coldSweatBurningBodyTemperature",
             "coldSweatMaxDehydrationModifier", "supernaturalVampireSuspendsThirst",
             "vampirismVampireSuspendsThirst", "environmentzDehydrationModifier",
-            "environmentzReplacesEnvironmentModifiers", "environmentzTemperatureTiers"
+            "environmentzReplacesEnvironmentModifiers", "environmentzTemperatureTiers",
+            "environmentzShowTemperatureText", "environmentzTemperatureTextType",
+            "environmentzTemperatureTextUnit", "environmentzTemperatureTextXOffset",
+            "environmentzTemperatureTextYOffset", "environmentzTemperatureTextColor"
     );
 
     private FabricConfig() {}
@@ -217,6 +220,12 @@ public final class FabricConfig {
         ThirstConfig.ENVIRONMENTZ_REPLACES_ENVIRONMENT_MODIFIERS = getBool(compatJson, "environmentzReplacesEnvironmentModifiers", true);
         ThirstConfig.setEnvironmentzTemperatureTiers(
                 getTemperatureTiers(compatJson, "environmentzTemperatureTiers", defaultEnvironmentzTemperatureTiers()));
+        ThirstConfig.ENVIRONMENTZ_SHOW_TEMPERATURE_TEXT = getBool(compatJson, "environmentzShowTemperatureText", true);
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_TYPE = getString(compatJson, "environmentzTemperatureTextType", "PLAYER");
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT = getString(compatJson, "environmentzTemperatureTextUnit", "°C");
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_X_OFFSET = getInt(compatJson, "environmentzTemperatureTextXOffset", 0);
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_Y_OFFSET = getInt(compatJson, "environmentzTemperatureTextYOffset", 0);
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR = getInt(compatJson, "environmentzTemperatureTextColor", 0xFFFFFF);
 
         // client
         ThirstConfig.HUD_X_OFFSET = getInt(clientJson, "hudXOffset", 0);
@@ -455,6 +464,12 @@ public final class FabricConfig {
         obj.addProperty("environmentzDehydrationModifier", true);
         obj.addProperty("environmentzReplacesEnvironmentModifiers", true);
         obj.add("environmentzTemperatureTiers", temperatureTiersToJson(defaultEnvironmentzTemperatureTiers()));
+        obj.addProperty("environmentzShowTemperatureText", true);
+        obj.addProperty("environmentzTemperatureTextType", "PLAYER");
+        obj.addProperty("environmentzTemperatureTextUnit", "");
+        obj.addProperty("environmentzTemperatureTextXOffset", 0);
+        obj.addProperty("environmentzTemperatureTextYOffset", 0);
+        obj.addProperty("environmentzTemperatureTextColor", 0xFFFFFF);
         return obj;
     }
 

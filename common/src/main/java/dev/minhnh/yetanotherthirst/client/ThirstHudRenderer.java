@@ -135,8 +135,38 @@ public final class ThirstHudRenderer {
         // 5. Draw item preview overlays (thirst and quenched)
         renderHeldItemPreview(guiGraphics, player, state, left, top);
 
+        // 6. Draw EnvironmentZ temperature text next to thermometer icon
+        renderEnvironmentzTemperature(guiGraphics, minecraft, player, width, height);
+
         RenderSystem.disableBlend();
         return true;
+    }
+
+    private static void renderEnvironmentzTemperature(GuiGraphics guiGraphics, Minecraft minecraft, LocalPlayer player, int width, int height) {
+        if (!ThirstConfig.COMPAT_ENVIRONMENTZ
+                || !ThirstConfig.ENVIRONMENTZ_SHOW_TEMPERATURE_TEXT
+                || !ThirstCompat.isEnvironmentzThermometerVisible()) {
+            return;
+        }
+
+        int temp;
+        if ("THERMOMETER".equalsIgnoreCase(ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_TYPE)
+                || "ENVIRONMENT".equalsIgnoreCase(ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_TYPE)) {
+            temp = ThirstCompat.getEnvironmentzThermometerTemperature(player);
+        } else {
+            temp = ThirstCompat.getEnvironmentzPlayerTemperature(player);
+        }
+
+        String unit = ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT != null ? ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT : "";
+        String text = temp + unit;
+
+        int iconX = (width / 2) - ThirstCompat.getEnvironmentzThermometerIconX();
+        int iconY = height - ThirstCompat.getEnvironmentzThermometerIconY();
+
+        int textX = iconX + 18 + ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_X_OFFSET;
+        int textY = iconY + 11 + ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_Y_OFFSET;
+
+        guiGraphics.drawString(minecraft.font, text, textX, textY, ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR, true);
     }
 
     private static void renderHeldItemPreview(GuiGraphics guiGraphics, LocalPlayer player, ThirstState state, int left, int top) {

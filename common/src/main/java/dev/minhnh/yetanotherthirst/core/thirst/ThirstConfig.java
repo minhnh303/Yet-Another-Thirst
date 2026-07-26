@@ -104,6 +104,12 @@ public final class ThirstConfig {
     public static float COLD_SWEAT_MAX_DEHYDRATION_MODIFIER = 1.75F;
     public static boolean ENVIRONMENTZ_DEHYDRATION_MODIFIER = true;
     public static boolean ENVIRONMENTZ_REPLACES_ENVIRONMENT_MODIFIERS = true;
+    public static boolean ENVIRONMENTZ_SHOW_TEMPERATURE_TEXT = true;
+    public static String ENVIRONMENTZ_TEMPERATURE_TEXT_TYPE = "PLAYER";
+    public static String ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT = "";
+    public static int ENVIRONMENTZ_TEMPERATURE_TEXT_X_OFFSET = 0;
+    public static int ENVIRONMENTZ_TEMPERATURE_TEXT_Y_OFFSET = 0;
+    public static int ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR = 0xFFFFFF;
 
     /**
      * User-defined EnvironmentZ {@code playerTemperature} -> dehydration modifier tiers, e.g.
