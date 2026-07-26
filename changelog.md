@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.5.1] - 2026-07-27
+
+### Added
+- **EnvironmentZ Compatibility**: Dynamic integration with EnvironmentZ for temperature-based dehydration modifiers and HUD integration:
+  - Dehydration rate modifiers based on player body temperature (`playerTemperature`) with configurable temperature tiers (`environmentzTemperatureTiers`).
+  - Configuration option `environmentzReplacesEnvironmentModifiers` allowing EnvironmentZ body temperature to override standard environmental dehydration factors (biomes, altitude, heat sources).
+  - Customizable temperature text overlay rendered next to the thirst bar and aligned with EnvironmentZ's thermometer HUD icon, with options for display type (`PLAYER` body temperature or `THERMOMETER` ambient temperature), temperature unit (e.g. `°C`), position offsets, and text color (`environmentzShowTemperatureText`, `environmentzTemperatureTextType`, `environmentzTemperatureTextUnit`, `environmentzTemperatureTextXOffset`, `environmentzTemperatureTextYOffset`, `environmentzTemperatureTextColor`).
+  - Expanded `/thirst query` command output to display EnvironmentZ body temperature, thermometer reading, and active dehydration modifier.
+
+### Fixed
+- **Damage Type Knockback**: Added custom damage type tag `minecraft:tags/damage_type/no_knockback.json` to prevent unwanted knockback when taking dehydration damage.
+- **Config Auto-Healing (Fabric)**: Added `addMissingKeys` utility for Fabric JSON configurations to automatically inject newly introduced config options into existing user config files without overwriting saved settings.
+
+---
+
 ## [1.5.0] - 2026-07-09
 
 ### Forge
