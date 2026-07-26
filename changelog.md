@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.1] - 2026-07-27
+
+### Added
+- **EnvironmentZ Compatibility**: Integration with EnvironmentZ for temperature-based dehydration modifiers and HUD integration:
+  - Dehydration rate modifiers based on player body temperature (`playerTemperature`) with configurable temperature tiers (`environmentzTemperatureTiers`).
+  - Option `environmentzReplacesEnvironmentModifiers` allowing EnvironmentZ body temperature to override standard environmental dehydration factors (biomes, altitude, heat sources).
+  - Customizable temperature text overlay rendered alongside EnvironmentZ's thermometer HUD icon with options for display type (`PLAYER` body temperature or `THERMOMETER` ambient temperature), temperature unit (e.g. `°C`), position offsets, and text color (`environmentzShowTemperatureText`, `environmentzTemperatureTextType`, `environmentzTemperatureTextUnit`, `environmentzTemperatureTextXOffset`, `environmentzTemperatureTextYOffset`, `environmentzTemperatureTextColor`).
+  - Automatic alignment with EnvironmentZ's thermometer HUD icon positions (`thermometerIconX`, `thermometerIconY`).
+  - Expanded `/thirst query` command output to display EnvironmentZ body temperature, thermometer reading, and active dehydration modifier.
+
+### Changed
+- Reduced default Water Boiler capacity (`waterBoilerCapacity`) from 16,000 mB to 2,000 mB (Forge & NeoForge).
+
+### Fixed
+- **Fabric HUD Rendering**: Shifted vanilla underwater air bubble icons 10px upward when the thirst bar is visible to prevent overlapping elements above the food bar.
+
+---
+
 ## [1.5.0] - 2026-06-21
 
 ### Forge
