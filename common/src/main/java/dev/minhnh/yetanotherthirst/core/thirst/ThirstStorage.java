@@ -32,11 +32,14 @@ public final class ThirstStorage {
 
     public static void copy(Player oldPlayer, Player newPlayer, boolean resetOnDeath) {
 
+        ThirstState oldState = get(oldPlayer);
         ThirstState newState = get(newPlayer);
         if (resetOnDeath) {
+            boolean wasEnabled = oldState.isEnabled();
             newState.reset();
+            newState.setEnabled(wasEnabled);
         } else {
-            newState.copyFrom(get(oldPlayer));
+            newState.copyFrom(oldState);
         }
         save(newPlayer);
     }

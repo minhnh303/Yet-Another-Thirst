@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2] - 2026-08-04
+
+### Fixed
+- **Player Death Thirst Persistence**: Fixed an issue where disabling thirst mechanics using `/thirst enable false` would reset and re-enable thirst upon player death. Preserved player disabled status across respawns.
+
+---
+
 ## [1.5.1] - 2026-07-27
 
 ### Added

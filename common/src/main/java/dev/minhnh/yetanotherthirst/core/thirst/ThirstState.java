@@ -147,7 +147,6 @@ public class ThirstState {
         thirst = ThirstConfig.DEFAULT_THIRST;
         quenched = ThirstConfig.DEFAULT_QUENCHED;
         exhaustion = 0.0F;
-        enabled = true;
         damageTimer = 0;
         syncTimer = 0;
         previousFoodExhaustion = 0.0F;
