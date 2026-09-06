@@ -34,7 +34,7 @@ public abstract class MixinFluidTank {
 
         boolean resourceHasPurity = FluidPurityHelper.hasPurity(resource);
         boolean fluidHasPurity = FluidPurityHelper.hasPurity(fluid);
-        int incomingPurity = resourceHasPurity ? FluidPurityHelper.getPurity(resource) : 0;
+        int incomingPurity = FluidPurityHelper.getPurity(resource);
         int existingPurity = FluidPurityHelper.getPurity(fluid);
 
         // Identical purity state — isSameFluidSameComponents() will pass and normal fill works

@@ -11,14 +11,17 @@ This file provides guidance to AI Agents when working with code in this reposito
 # Build a specific loader
 ./gradlew :forge:build
 ./gradlew :neoforge:build
+./gradlew :fabric:build
 
 # Run the game with mod loaded (for testing)
 ./gradlew :forge:runClient
 ./gradlew :neoforge:runClient
+./gradlew :fabric:runClient
 
 # Run dedicated server
 ./gradlew :forge:runServer
 ./gradlew :neoforge:runServer
+./gradlew :fabric:runServer
 
 # Clean
 ./gradlew clean
@@ -26,16 +29,17 @@ This file provides guidance to AI Agents when working with code in this reposito
 
 ## Architecture
 
-Multi-loader Minecraft mod (Minecraft 1.21, Java 21) targeting **Forge** and **NeoForge** via a shared `common` subproject.
+Multi-loader Minecraft mod (Minecraft 1.21, Java 21) targeting **Forge**, **NeoForge**, and **Fabric** via a shared `common` subproject.
 
 ```
 common/     — Loader-agnostic game logic, events, mixins, screens, blocks, items
 forge/      — Forge entry point + platform service impl
 neoforge/   — NeoForge entry point + platform service impl
+fabric/     — Fabric entry point + platform service impl
 buildSrc/   — Shared Gradle convention plugin (multiloader-common.gradle)
 ```
 
-**Platform abstraction** uses Java `ServiceLoader`: `common` defines `IPlatformHelper` in `platform/services/`, loaded via `Services.java`. Each loader provides `ForgePlatformHelper` / `NeoForgePlatformHelper` registered in `META-INF/services/`.
+**Platform abstraction** uses Java `ServiceLoader`: `common` defines `IPlatformHelper` in `platform/services/`, loaded via `Services.java`. Each loader provides `ForgePlatformHelper` / `NeoForgePlatformHelper` / `FabricPlatformHelper` registered in `META-INF/services/`.
 
 Key `IPlatformHelper` methods: `loadThirstData`, `saveThirstData`, `sendThirstSync`, `tryHandDrink`, `isModLoaded`.
 
@@ -78,6 +82,6 @@ See [COMPATIBLE_MODS_VERSIONS.md](COMPATIBLE_MODS_VERSIONS.md) for tested mod ve
 ## Key Constraints
 
 - Any new property added to `gradle.properties` **must also be added** to `buildSrc/src/main/groovy/multiloader-common.gradle` in the `expandProps` map. Current keys: `version`, `group`, `minecraft_version`, `minecraft_version_range`, `mod_name`, `mod_author`, `mod_id`, `license`, `description`, `forge_version`, `forge_loader_version_range`, `neoforge_version`, `neoforge_version_range`, `neoforge_loader_version_range`, `jade_version`, `fabric_loader_version`, `fabric_api_version`, `fabric_minecraft_version_range`, `jade_fabric_version`.
-- Common code must not import Forge/NeoForge APIs directly — use `IPlatformHelper` instead.
+- Common code must not import Forge/NeoForge/Fabric APIs directly — use `IPlatformHelper` instead.
 - Mod ID: `yet_another_thirst` | Group: `dev.minhnh.yetanotherthirst` | Version: `1.21-1.5.0`
 - Loader-specific block/item registries live in each loader's subproject, not in `common`.
