@@ -155,18 +155,26 @@ public final class NeoForgeGameEvents {
     @SubscribeEvent
     public static void onFillBucket(FillBucketEvent event) {
         if (event.getLevel().isClientSide()) return;
-        net.minecraft.world.phys.HitResult target = event.getTarget();
-        if (target != null && target.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
-            net.minecraft.world.phys.BlockHitResult blockHit = (net.minecraft.world.phys.BlockHitResult) target;
-            BlockPos pos = blockHit.getBlockPos();
-            Level level = event.getLevel();
-            if (level.getFluidState(pos).is(FluidTags.WATER) && level.getFluidState(pos).isSource()) {
-                int purity = WaterPurity.getBlockPurity(level, pos);
-                ItemStack waterBucket = new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET);
-                WaterPurity.addPurity(waterBucket, purity);
-                event.setFilledBucket(waterBucket);
-                event.setResult(net.minecraftforge.eventbus.api.Event.Result.ALLOW);
-            }
-        }
+        if (!event.getEmptyBucket().is(net.minecraft.world.item.Items.BUCKET)) return;
+        if (!(event.getTarget() instanceof net.minecraft.world.phys.BlockHitResult blockHit)) return;
+
+        BlockPos pos = blockHit.getBlockPos();
+        Level level = event.getLevel();
+        if (!level.getFluidState(pos).is(FluidTags.WATER) || !level.getFluidState(pos).isSource()) return;
+
+        net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof net.minecraft.world.level.block.BucketPickup pickup)) return;
+
+        // ALLOW skips vanilla pickup, so the fluid must be removed here via BucketPickup to avoid duplication.
+        // Purity is read before pickup because removing the block may discard its data.
+        int purity = WaterPurity.getBlockPurity(level, pos);
+        ItemStack filled = pickup.pickupBlock(level, pos, state);
+        if (filled.isEmpty()) return;
+
+        WaterPurity.addPurity(filled, purity);
+        pickup.getPickupSound(state).ifPresent(sound -> event.getEntity().playSound(sound, 1.0F, 1.0F));
+        level.gameEvent(event.getEntity(), GameEvent.FLUID_PICKUP, pos);
+        event.setFilledBucket(filled);
+        event.setResult(net.minecraftforge.eventbus.api.Event.Result.ALLOW);
     }
 }
