@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.3] - 2026-10-29
+
+### Added
+- **Default Item Hydration Support**: Added built-in default thirst and quenched values across Forge, NeoForge, and Fabric for 7 mods:
+  - **Vanilla Delight** (`vanilladelight`): juices, teas, milkshakes, fruit slices, salads, stews, custards, puddings, and pie/cake slices.
+  - **Fruits Delight** (`fruitsdelight`): juices, teas, wines, fruits, popsicles, shaved ice, salads, stews, jellos, jellies, and baked goods.
+  - **Delightful** (`delightful`): teas, lavender/azalea drinks, prickly pear juice, milkshakes, jam jars/jelly bottles, popsicles, ice creams, soups, stews, gummies, and pie slices.
+  - **[Let's Do] Beachparty** (`beachparty`): open coconut, cocktails, milkshakes, popsicles, ice creams, sundaes, and mussel meats (supporting both v1.1.x and v2.0.x).
+  - **[Let's Do] HerbalBrews** (`herbalbrews`): green/black/hibiscus/lavender/yerba mate/rooibos/oolong teas, coffee, milk coffee, and flasks.
+  - **Hearth & Harvest** (`hearthandharvest`): goat/chocolate milk, syrup, fruit juices, beer, root beer, hard cider, mead, moonshine, fruit wines, berries, grapes, jams, pickled vegetables, stews/soups, and pastries.
+  - **Crock Pot** (`crockpot`): milk bottle, syrup, avaj, hot cocoa, veg stinger, teas, gazpacho, soups, stews, popsicles, ice cream, fruit medley, and cooked dishes (including `crockpot:stew` for Fabric's *A Cute Little Crock Pot*).
+
+### Fixed (Forge & NeoForge)
+- **Water Bucket Pickup**: Fixed an issue where filling a bucket from a water source block did not properly remove the block, causing water source duplication when preserving water purity. Bucket pickup sounds and game events are now properly triggered.
+- **FoodData Mixin Priority**: Set priority to 1100 on `MixinFoodData` to prevent mixin injection conflicts with other mods targeting `FoodData`.
+
+---
+
 ## [1.5.2] - 2026-08-04
 
 ### Fixed
