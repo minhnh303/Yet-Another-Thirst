@@ -3,22 +3,26 @@ package dev.minhnh.yetanotherthirst.core.item;
 import dev.minhnh.yetanotherthirst.Lang;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
 
-import java.util.List;
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
 
 public class FilterCoreItem extends Item {
 
     public FilterCoreItem(Properties properties) {
-        super(properties);
+        super(properties.stacksTo(1));
+    }
+
+    public FilterCoreItem() {
+        this(new Properties());
     }
 
     public static double getMaxLifespan(ItemStack stack) {
@@ -38,8 +42,9 @@ public class FilterCoreItem extends Item {
     }
 
     public static double readLifespan(ItemStack stack, double maxL) {
-        CompoundTag tag = stack.getTag();
-        return tag != null && tag.contains("Lifespan") ? tag.getDouble("Lifespan") : maxL;
+        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+        if (customData == null) return maxL;
+        return customData.copyTag().getDoubleOr("Lifespan", maxL);
     }
 
     public static MutableComponent getFilterMaterialName(Item item) {
@@ -79,12 +84,12 @@ public class FilterCoreItem extends Item {
     }
 
     @Override
-    public void appendHoverText(@Nonnull ItemStack stack, @Nullable Level level, @Nonnull List<Component> tooltip, @Nonnull TooltipFlag flag) {
+    public void appendHoverText(@Nonnull ItemStack stack, @Nonnull Item.TooltipContext context, @Nonnull TooltipDisplay display, @Nonnull Consumer<Component> tooltipAdder, @Nonnull TooltipFlag flag) {
         double maxL = getMaxLifespan(stack);
         if (maxL > 0) {
             int pct = (int) Math.round((readLifespan(stack, maxL) / maxL) * 100);
-            tooltip.add(Lang.Tooltip.filterLifespan(pct + "%"));
-            tooltip.add(Lang.Tooltip.filterMaxPurity(WaterPurity.purityComponent(getMaxPurity(stack))));
+            tooltipAdder.accept(Lang.Tooltip.filterLifespan(pct + "%"));
+            tooltipAdder.accept(Lang.Tooltip.filterMaxPurity(WaterPurity.purityComponent(getMaxPurity(stack))));
         }
     }
 }

@@ -3,10 +3,14 @@ package dev.minhnh.yetanotherthirst.core.block;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,6 +27,17 @@ public abstract class AbstractFilterFrameBlockEntity extends BlockEntity {
     public abstract ItemStack getFilterCore();
     public abstract void setFilterCore(ItemStack stack);
     public abstract ItemStack removeFilterCore();
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        if (this.level != null) {
+            ItemStack core = getFilterCore();
+            if (!core.isEmpty()) {
+                Containers.dropItemStack(this.level, pos.getX(), pos.getY(), pos.getZ(), core);
+            }
+        }
+        super.preRemoveSideEffects(pos, state);
+    }
 
     public static boolean isFilterCore(ItemStack stack) {
         Item item = stack.getItem();
@@ -55,13 +70,14 @@ public abstract class AbstractFilterFrameBlockEntity extends BlockEntity {
 
     protected double getLifespan(ItemStack stack) {
         Item item = stack.getItem();
-        CompoundTag tag = stack.getTag();
+        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag tag = customData != null ? customData.copyTag() : null;
         if (item == ModItems.FABRIC_FILTER_CORE.get()) {
-            return tag != null && tag.contains("Lifespan") ? tag.getDouble("Lifespan") : ThirstConfig.FABRIC_FILTER_DURABILITY;
+            return tag != null && tag.contains("Lifespan") ? tag.getDoubleOr("Lifespan", ThirstConfig.FABRIC_FILTER_DURABILITY) : ThirstConfig.FABRIC_FILTER_DURABILITY;
         } else if (item == ModItems.SAND_FILTER_CORE.get()) {
-            return tag != null && tag.contains("Lifespan") ? tag.getDouble("Lifespan") : ThirstConfig.SAND_FILTER_DURABILITY;
+            return tag != null && tag.contains("Lifespan") ? tag.getDoubleOr("Lifespan", ThirstConfig.SAND_FILTER_DURABILITY) : ThirstConfig.SAND_FILTER_DURABILITY;
         } else if (item == ModItems.CARBON_FILTER_CORE.get()) {
-            return tag != null && tag.contains("Lifespan") ? tag.getDouble("Lifespan") : ThirstConfig.CARBON_FILTER_DURABILITY;
+            return tag != null && tag.contains("Lifespan") ? tag.getDoubleOr("Lifespan", ThirstConfig.CARBON_FILTER_DURABILITY) : ThirstConfig.CARBON_FILTER_DURABILITY;
         }
         return 0;
     }
@@ -105,9 +121,7 @@ public abstract class AbstractFilterFrameBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        CompoundTag tag = new CompoundTag();
-        saveAdditional(tag);
-        return tag;
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveCustomOnly(registries);
     }
 }

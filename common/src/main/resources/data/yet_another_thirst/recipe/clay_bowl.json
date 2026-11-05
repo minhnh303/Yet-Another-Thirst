@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "# #",
+    " # "
+  ],
+  "key": {
+    "#": "minecraft:clay_ball"
+  },
+  "result": {
+    "count": 4,
+    "id": "yet_another_thirst:clay_bowl"
+  }
+}

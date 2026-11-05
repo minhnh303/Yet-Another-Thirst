@@ -179,14 +179,14 @@ public class ThirstState {
     public void load(CompoundTag tag) {
 
         if (tag.contains("thirst")) {
-            setThirst(tag.getInt("thirst"));
+            setThirst(tag.getIntOr("thirst", ThirstConfig.DEFAULT_THIRST));
         }
         if (tag.contains("quenched")) {
-            setQuenched(tag.getInt("quenched"));
+            setQuenched(tag.getIntOr("quenched", ThirstConfig.DEFAULT_QUENCHED));
         }
         if (tag.contains("exhaustion")) {
-            setExhaustion(tag.getFloat("exhaustion"));
+            setExhaustion(tag.getFloatOr("exhaustion", 0.0F));
         }
-        enabled = !tag.contains("enable") || tag.getBoolean("enable");
+        enabled = !tag.contains("enable") || tag.getBooleanOr("enable", true);
     }
 }

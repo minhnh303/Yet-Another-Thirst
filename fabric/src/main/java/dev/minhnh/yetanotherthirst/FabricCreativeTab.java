@@ -2,21 +2,21 @@ package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 
 public final class FabricCreativeTab {
 
     static void register() {
 
-        CreativeModeTab tab = FabricItemGroup.builder()
+        CreativeModeTab tab = FabricCreativeModeTab.builder()
                 .title(Component.translatable("itemGroup.yet_another_thirst"))
                 .icon(() -> new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get()))
                 .displayItems((params, output) -> {
@@ -41,7 +41,7 @@ public final class FabricCreativeTab {
                     }
                     for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
                         output.accept(WaterPurity.addPurity(
-                                PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER), p));
+                                PotionContents.createItemStack(Items.POTION, Potions.WATER), p));
                     }
                     for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
                         output.accept(WaterPurity.addPurity(new ItemStack(Items.WATER_BUCKET), p));

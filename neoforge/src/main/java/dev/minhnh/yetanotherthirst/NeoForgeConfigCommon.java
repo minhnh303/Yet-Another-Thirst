@@ -1,68 +1,68 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import java.util.List;
 
 public final class NeoForgeConfigCommon {
 
-    static final ForgeConfigSpec SPEC;
+    static final ModConfigSpec SPEC;
 
     @SuppressWarnings("unused")
-    private static final ForgeConfigSpec.IntValue CONFIG_VERSION;
+    private static final ModConfigSpec.IntValue CONFIG_VERSION;
     // [general]
-    private static final ForgeConfigSpec.BooleanValue EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
-    private static final ForgeConfigSpec.BooleanValue THIRST_DEPLETES_IN_PEACEFUL;
-    private static final ForgeConfigSpec.BooleanValue DRINK_RAIN_WATER;
-    private static final ForgeConfigSpec.BooleanValue DEPLETES_WHEN_NAUSEA;
-    private static final ForgeConfigSpec.BooleanValue SPRINT_PREVENTION;
-    private static final ForgeConfigSpec.IntValue SPRINT_THRESHOLD;
-    private static final ForgeConfigSpec.BooleanValue DEHYDRATION_HALTS_HEALTH_REGEN;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SUSPEND_THIRST_EFFECTS;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> PAUSE_DEPLETION_EFFECTS;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> REGEN_THIRST_EFFECTS;
-    private static final ForgeConfigSpec.IntValue REGEN_THIRST_INTERVAL;
-    private static final ForgeConfigSpec.IntValue REGEN_THIRST_AMOUNT;
+    private static final ModConfigSpec.BooleanValue EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
+    private static final ModConfigSpec.BooleanValue THIRST_DEPLETES_IN_PEACEFUL;
+    private static final ModConfigSpec.BooleanValue DRINK_RAIN_WATER;
+    private static final ModConfigSpec.BooleanValue DEPLETES_WHEN_NAUSEA;
+    private static final ModConfigSpec.BooleanValue SPRINT_PREVENTION;
+    private static final ModConfigSpec.IntValue SPRINT_THRESHOLD;
+    private static final ModConfigSpec.BooleanValue DEHYDRATION_HALTS_HEALTH_REGEN;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> SUSPEND_THIRST_EFFECTS;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> PAUSE_DEPLETION_EFFECTS;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> REGEN_THIRST_EFFECTS;
+    private static final ModConfigSpec.IntValue REGEN_THIRST_INTERVAL;
+    private static final ModConfigSpec.IntValue REGEN_THIRST_AMOUNT;
     // [effects]
-    private static final ForgeConfigSpec.IntValue HYDRATION_EFFECT_THIRST_PER_TICK;
-    private static final ForgeConfigSpec.IntValue HYDRATION_EFFECT_QUENCHED_PER_TICK;
-    private static final ForgeConfigSpec.DoubleValue THIRSTY_EFFECT_EXHAUSTION_PER_TICK;
+    private static final ModConfigSpec.IntValue HYDRATION_EFFECT_THIRST_PER_TICK;
+    private static final ModConfigSpec.IntValue HYDRATION_EFFECT_QUENCHED_PER_TICK;
+    private static final ModConfigSpec.DoubleValue THIRSTY_EFFECT_EXHAUSTION_PER_TICK;
     // [dehydration]
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE;
-    private static final ForgeConfigSpec.IntValue DAMAGE_INTERVAL_TICKS;
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_EASY_LIMIT;
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_NORMAL_LIMIT;
-    private static final ForgeConfigSpec.DoubleValue DEHYDRATION_DAMAGE_HARD_LIMIT;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE;
+    private static final ModConfigSpec.IntValue DAMAGE_INTERVAL_TICKS;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE_EASY_LIMIT;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE_NORMAL_LIMIT;
+    private static final ModConfigSpec.DoubleValue DEHYDRATION_DAMAGE_HARD_LIMIT;
     // [depletion]
-    private static final ForgeConfigSpec.DoubleValue THIRST_DEPLETION_MODIFIER;
-    private static final ForgeConfigSpec.DoubleValue NETHER_THIRST_DEPLETION_MODIFIER;
-    private static final ForgeConfigSpec.DoubleValue FIRE_RESISTANCE_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue BIOME_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue FIRE_PROTECTION_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.DoubleValue ENVIRONMENT_MODIFIER_HARSHNESS;
+    private static final ModConfigSpec.DoubleValue THIRST_DEPLETION_MODIFIER;
+    private static final ModConfigSpec.DoubleValue NETHER_THIRST_DEPLETION_MODIFIER;
+    private static final ModConfigSpec.DoubleValue FIRE_RESISTANCE_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue BIOME_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue FIRE_PROTECTION_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.DoubleValue ENVIRONMENT_MODIFIER_HARSHNESS;
     // [purity]
-    private static final ForgeConfigSpec.IntValue DEFAULT_PURITY;
-    private static final ForgeConfigSpec.BooleanValue QUENCH_WHEN_DEBUFFED;
-    private static final ForgeConfigSpec.DoubleValue DIRTY_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue DIRTY_POISON_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue SLIGHTLY_DIRTY_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue SLIGHTLY_DIRTY_POISON_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue ACCEPTABLE_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue ACCEPTABLE_POISON_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue PURIFIED_NAUSEA_CHANCE;
-    private static final ForgeConfigSpec.DoubleValue PURIFIED_POISON_CHANCE;
+    private static final ModConfigSpec.IntValue DEFAULT_PURITY;
+    private static final ModConfigSpec.BooleanValue QUENCH_WHEN_DEBUFFED;
+    private static final ModConfigSpec.DoubleValue DIRTY_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue DIRTY_POISON_CHANCE;
+    private static final ModConfigSpec.DoubleValue SLIGHTLY_DIRTY_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue SLIGHTLY_DIRTY_POISON_CHANCE;
+    private static final ModConfigSpec.DoubleValue ACCEPTABLE_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue ACCEPTABLE_POISON_CHANCE;
+    private static final ModConfigSpec.DoubleValue PURIFIED_NAUSEA_CHANCE;
+    private static final ModConfigSpec.DoubleValue PURIFIED_POISON_CHANCE;
     // [world]
-    private static final ForgeConfigSpec.IntValue MOUNTAINS_Y;
-    private static final ForgeConfigSpec.IntValue CAVES_Y;
-    private static final ForgeConfigSpec.IntValue RUNNING_WATER_PURIFICATION_AMOUNT;
+    private static final ModConfigSpec.IntValue MOUNTAINS_Y;
+    private static final ModConfigSpec.IntValue CAVES_Y;
+    private static final ModConfigSpec.IntValue RUNNING_WATER_PURIFICATION_AMOUNT;
     // [handDrinking]
-    private static final ForgeConfigSpec.BooleanValue CAN_DRINK_BY_HAND;
-    private static final ForgeConfigSpec.IntValue HAND_DRINKING_THIRST;
-    private static final ForgeConfigSpec.IntValue HAND_DRINKING_QUENCHED;
-    private static final ForgeConfigSpec.BooleanValue DRINK_BOTH_HANDS_NEEDED;
+    private static final ModConfigSpec.BooleanValue CAN_DRINK_BY_HAND;
+    private static final ModConfigSpec.IntValue HAND_DRINKING_THIRST;
+    private static final ModConfigSpec.IntValue HAND_DRINKING_QUENCHED;
+    private static final ModConfigSpec.BooleanValue DRINK_BOTH_HANDS_NEEDED;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         CONFIG_VERSION = builder
                 .comment("Config file version — do not modify")

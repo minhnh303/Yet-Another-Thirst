@@ -8,7 +8,7 @@ import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
 import net.minecraft.nbt.CompoundTag;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -31,7 +31,7 @@ import java.util.List;
 @WailaPlugin("jade")
 public final class JadeCompatPlugin implements IWailaPlugin {
 
-    private static final ResourceLocation WATER_PURITY = Constants.asResource("water_purity");
+    private static final Identifier WATER_PURITY = Constants.asResource("water_purity");
 
     @Override
     public void register(IWailaCommonRegistration registration) {
@@ -131,7 +131,7 @@ public final class JadeCompatPlugin implements IWailaPlugin {
         }
 
         @Override
-        public ResourceLocation getUid() {
+        public Identifier getUid() {
             return WATER_PURITY;
         }
     }
@@ -269,7 +269,7 @@ public final class JadeCompatPlugin implements IWailaPlugin {
         }
 
         @Override
-        public ResourceLocation getUid() {
+        public Identifier getUid() {
             return WATER_PURITY;
         }
     }
@@ -304,7 +304,7 @@ public final class JadeCompatPlugin implements IWailaPlugin {
         }
 
         @Override
-        public ResourceLocation getUid() {
+        public Identifier getUid() {
             return WATER_PURITY;
         }
     }

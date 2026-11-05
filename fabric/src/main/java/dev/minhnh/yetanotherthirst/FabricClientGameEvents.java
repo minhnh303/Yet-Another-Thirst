@@ -18,7 +18,7 @@ public final class FabricClientGameEvents {
 
     public static void register() {
 
-        ItemTooltipCallback.EVENT.register((stack, tooltipContext, lines) -> {
+        ItemTooltipCallback.EVENT.register((stack, tooltipContext, tooltipFlag, lines) -> {
             dev.minhnh.yetanotherthirst.client.TooltipStackTracker.set(stack);
             dev.minhnh.yetanotherthirst.core.purity.WaterPurity.appendTooltip(stack, lines);
             dev.minhnh.yetanotherthirst.client.ThirstTooltip.append(stack, lines);

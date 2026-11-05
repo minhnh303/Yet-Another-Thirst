@@ -46,7 +46,7 @@ public final class ForgeHandDrinkClient {
         var eyePos = player.getEyePosition();
         BlockHitResult hit = level.clip(new ClipContext(
                 eyePos,
-                eyePos.add(player.getLookAngle().scale(player.getBlockReach())),
+                eyePos.add(player.getLookAngle().scale(player.isCreative() ? 5.0 : 4.5)),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.ANY,
                 player));
@@ -63,10 +63,11 @@ public final class ForgeHandDrinkClient {
         return true;
     }
 
-    public static void handleRightClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+    public static boolean handleRightClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
         if (tryDrink()) {
             event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
-            event.setCanceled(true);
+            return true;
         }
+        return false;
     }
 }

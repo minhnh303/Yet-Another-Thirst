@@ -3,7 +3,7 @@ package dev.minhnh.yetanotherthirst.mixin;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.food.FoodData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,9 +27,9 @@ public abstract class MixinFoodData {
 
     @Redirect(
             method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V", ordinal = 0)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;heal(F)V", ordinal = 0)
     )
-    private void yet_another_thirst$healWithSaturation(Player player, float amount) {
+    private void yet_another_thirst$healWithSaturation(ServerPlayer player, float amount) {
         ThirstState thirstData = ThirstStorage.get(player);
         FoodData foodData = player.getFoodData();
 
@@ -56,9 +56,9 @@ public abstract class MixinFoodData {
 
     @Redirect(
             method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V", ordinal = 1)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;heal(F)V", ordinal = 1)
     )
-    private void yet_another_thirst$healWithHunger(Player player, float amount) {
+    private void yet_another_thirst$healWithHunger(ServerPlayer player, float amount) {
         ThirstState thirstData = ThirstStorage.get(player);
         boolean shouldHeal = !ThirstConfig.DEHYDRATION_HALTS_HEALTH_REGEN || thirstData.getThirst() > 18;
 
@@ -74,7 +74,7 @@ public abstract class MixinFoodData {
             method = "tick",
             at = @At(value = "HEAD")
     )
-    private void yet_another_thirst$dealWithExhaustionBySaturation(Player player, CallbackInfo ci) {
+    private void yet_another_thirst$dealWithExhaustionBySaturation(ServerPlayer player, CallbackInfo ci) {
         if (exhaustionLevel > 4.0F) {
             ThirstStorage.get(player).setExhaustionRecalculate(true);
         }

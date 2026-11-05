@@ -1,10 +1,12 @@
 package dev.minhnh.yetanotherthirst;
 
-import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
-import net.minecraft.resources.ResourceLocation;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.LootTableReference;
+import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 /**
@@ -17,35 +19,37 @@ public final class FabricLootModifier {
 
     public static void register() {
 
-        LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+        LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
 
             if (!source.isBuiltin()) return;
+            Identifier id = key.identifier();
 
-            String modifiersPath = "loot_modifiers/" + id.getNamespace() + "/" + id.getPath();
-            ResourceLocation modTable = Constants.asResource(modifiersPath);
-
-            // Check if there is a matching loot_modifier secondary table for this loot table
-            // This mirrors the Forge behavior of add_loot_table global loot modifiers
             tryInject(id, tableBuilder,
                     "minecraft", "chests/simple_dungeon",
-                    Constants.asResource("inject/simple_dungeon"));
+                    Constants.asResource("chests/simple_dungeon"));
             tryInject(id, tableBuilder,
-                    "minecraft", "chests/village/village_weaponsmith",
-                    Constants.asResource("inject/village_weaponsmith"));
+                    "minecraft", "chests/abandoned_mineshaft",
+                    Constants.asResource("chests/abandoned_mineshaft"));
             tryInject(id, tableBuilder,
-                    "minecraft", "chests/stronghold_corridor",
-                    Constants.asResource("inject/stronghold_corridor"));
+                    "minecraft", "chests/shipwreck_supply",
+                    Constants.asResource("chests/shipwreck_supply"));
+            tryInject(id, tableBuilder,
+                    "minecraft", "chests/bastion_other",
+                    Constants.asResource("chests/bastion_other"));
+            tryInject(id, tableBuilder,
+                    "minecraft", "chests/nether_bridge",
+                    Constants.asResource("chests/nether_bridge"));
         });
     }
 
-    private static void tryInject(ResourceLocation id, LootTable.Builder tableBuilder,
-                                   String namespace, String path, ResourceLocation injectTable) {
+    private static void tryInject(Identifier id, LootTable.Builder tableBuilder,
+                                   String namespace, String path, Identifier injectTable) {
 
         if (id.getNamespace().equals(namespace) && id.getPath().equals(path)) {
             tableBuilder.withPool(
                     LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1))
-                            .add(LootTableReference.lootTableReference(injectTable)));
+                            .add(NestedLootTable.lootTableReference(ResourceKey.create(Registries.LOOT_TABLE, injectTable))));
         }
     }
 }

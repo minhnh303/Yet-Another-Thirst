@@ -5,148 +5,144 @@ import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public final class NeoForgeNetwork {
 
-    private static final String PROTOCOL_VERSION = "1";
-    private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            Constants.asResource("main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals);
-    private static int packetId;
+    public static final String PROTOCOL_VERSION = "1";
 
-    private NeoForgeNetwork() {
+    public record ThirstSyncPayload(int thirst, int quenched, float exhaustion, boolean enabled) implements CustomPacketPayload {
+        public static final Type<ThirstSyncPayload> TYPE = new Type<>(Constants.asResource("thirst_sync"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ThirstSyncPayload> CODEC = StreamCodec.ofMember(
+                ThirstSyncPayload::write,
+                ThirstSyncPayload::new
+        );
+
+        public ThirstSyncPayload(RegistryFriendlyByteBuf buf) {
+            this(buf.readInt(), buf.readInt(), buf.readFloat(), buf.readBoolean());
+        }
+
+        public void write(RegistryFriendlyByteBuf buf) {
+            buf.writeInt(thirst);
+            buf.writeInt(quenched);
+            buf.writeFloat(exhaustion);
+            buf.writeBoolean(enabled);
+        }
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
     }
 
-    public static void register() {
+    public record DrinkByHandPayload(BlockPos pos) implements CustomPacketPayload {
+        public static final Type<DrinkByHandPayload> TYPE = new Type<>(Constants.asResource("drink_by_hand"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, DrinkByHandPayload> CODEC = StreamCodec.ofMember(
+                DrinkByHandPayload::write,
+                DrinkByHandPayload::new
+        );
 
-        CHANNEL.registerMessage(
-                packetId++,
-                ThirstSyncPacket.class,
-                ThirstSyncPacket::encode,
-                ThirstSyncPacket::decode,
-                ThirstSyncPacket::handle,
-                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        public DrinkByHandPayload(RegistryFriendlyByteBuf buf) {
+            this(buf.readBlockPos());
+        }
 
-        CHANNEL.registerMessage(
-                packetId++,
-                DrinkByHandPacket.class,
-                DrinkByHandPacket::encode,
-                DrinkByHandPacket::decode,
-                DrinkByHandPacket::handle,
-                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        public void write(RegistryFriendlyByteBuf buf) {
+            buf.writeBlockPos(pos);
+        }
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    private NeoForgeNetwork() {}
+
+    @SubscribeEvent
+    public static void register(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(Constants.MOD_ID).versioned(PROTOCOL_VERSION);
+
+        registrar.playToClient(
+                ThirstSyncPayload.TYPE,
+                ThirstSyncPayload.CODEC,
+                (payload, context) -> context.enqueueWork(() ->
+                        NeoForgeClientPacketHandler.handleThirstSync(
+                                payload.thirst(),
+                                payload.quenched(),
+                                payload.exhaustion(),
+                                payload.enabled()
+                        )
+                )
+        );
+
+        registrar.playToServer(
+                DrinkByHandPayload.TYPE,
+                DrinkByHandPayload.CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    Player p = context.player();
+                    if (p instanceof ServerPlayer player) {
+                        handleDrinkByHand(payload.pos(), player);
+                    }
+                })
+        );
     }
 
     public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ThirstSyncPacket(thirst, quenched, exhaustion, enabled));
+        PacketDistributor.sendToPlayer(player, new ThirstSyncPayload(thirst, quenched, exhaustion, enabled));
     }
 
     public static void sendDrinkByHand(BlockPos pos) {
-
-        CHANNEL.sendToServer(new DrinkByHandPacket(pos));
+        ClientPacketDistributor.sendToServer(new DrinkByHandPayload(pos));
     }
 
-    private record ThirstSyncPacket(int thirst, int quenched, float exhaustion, boolean enabled) {
-
-        private static void encode(ThirstSyncPacket packet, FriendlyByteBuf buffer) {
-
-            buffer.writeInt(packet.thirst);
-            buffer.writeInt(packet.quenched);
-            buffer.writeFloat(packet.exhaustion);
-            buffer.writeBoolean(packet.enabled);
+    private static void handleDrinkByHand(BlockPos pos, ServerPlayer player) {
+        double maxReach = 6.0;
+        if (player.getEyePosition().distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > maxReach * maxReach) {
+            return;
         }
 
-        private static ThirstSyncPacket decode(FriendlyByteBuf buffer) {
-
-            return new ThirstSyncPacket(buffer.readInt(), buffer.readInt(), buffer.readFloat(), buffer.readBoolean());
+        if (!player.isCrouching() && !player.isSecondaryUseActive()) {
+            return;
         }
 
-        private static void handle(ThirstSyncPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
-
-            NetworkEvent.Context context = contextSupplier.get();
-            context.enqueueWork(() -> {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> NeoForgeClientPacketHandler.handleThirstSync(
-                        packet.thirst,
-                        packet.quenched,
-                        packet.exhaustion,
-                        packet.enabled));
-            });
-            context.setPacketHandled(true);
-        }
-    }
-
-    private record DrinkByHandPacket(BlockPos pos) {
-
-        private static void encode(DrinkByHandPacket packet, FriendlyByteBuf buf) {
-            buf.writeBlockPos(packet.pos);
+        boolean handAvailable = ThirstConfig.DRINK_BOTH_HANDS_NEEDED
+                ? player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty()
+                        && player.getItemInHand(net.minecraft.world.InteractionHand.OFF_HAND).isEmpty()
+                : player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty();
+        if (!handAvailable) {
+            return;
         }
 
-        private static DrinkByHandPacket decode(FriendlyByteBuf buf) {
-            return new DrinkByHandPacket(buf.readBlockPos());
+        Level level = player.level();
+        if (!level.getFluidState(pos).is(FluidTags.WATER)) return;
+
+        var state = ThirstStorage.get(player);
+        if (!state.isEnabled() || state.getThirst() >= ThirstConfig.MAX_THIRST) return;
+
+        int purity = WaterPurity.getBlockPurity(level, pos);
+        level.playSound(player, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.GENERIC_DRINK, SoundSource.NEUTRAL, 1.0F, 1.0F);
+
+        boolean shouldDrink = WaterPurity.givePurityEffects(player, purity);
+        if (shouldDrink) {
+            state.drink(ThirstConfig.HAND_DRINKING_THIRST, ThirstConfig.HAND_DRINKING_QUENCHED);
         }
-
-        private static void handle(DrinkByHandPacket packet, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().enqueueWork(() -> {
-                ServerPlayer player = ctx.get().getSender();
-                if (player == null) return;
-
-                // 1. Distance check
-                double maxReach = 6.0;
-                if (player.getEyePosition().distanceToSqr(packet.pos.getX() + 0.5, packet.pos.getY() + 0.5, packet.pos.getZ() + 0.5) > maxReach * maxReach) {
-                    return;
-                }
-
-                // 2. Sneaking check
-                if (!player.isCrouching() && !player.isSecondaryUseActive()) {
-                    return;
-                }
-
-                // 3. Hand availability check
-                boolean handAvailable = ThirstConfig.DRINK_BOTH_HANDS_NEEDED
-                        ? player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty()
-                                && player.getItemInHand(net.minecraft.world.InteractionHand.OFF_HAND).isEmpty()
-                        : player.getItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND).isEmpty();
-                if (!handAvailable) {
-                    return;
-                }
-
-                Level level = player.level();
-                if (!level.getFluidState(packet.pos).is(FluidTags.WATER)) return;
-
-                var state = ThirstStorage.get(player);
-                if (!state.isEnabled() || state.getThirst() >= ThirstConfig.MAX_THIRST) return;
-
-                int purity = WaterPurity.getBlockPurity(level, packet.pos);
-                level.playSound(player, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.GENERIC_DRINK, SoundSource.NEUTRAL, 1.0F, 1.0F);
-
-                boolean shouldDrink = WaterPurity.givePurityEffects(player, purity);
-                if (shouldDrink) {
-                    state.drink(ThirstConfig.HAND_DRINKING_THIRST, ThirstConfig.HAND_DRINKING_QUENCHED);
-                }
-                ModAdvancements.award(player, ModAdvancements.HAND_DRINKING);
-                ThirstStorage.sync(player);
-            });
-            ctx.get().setPacketHandled(true);
-        }
+        ModAdvancements.award(player, ModAdvancements.HAND_DRINKING);
+        ThirstStorage.sync(player);
     }
 }

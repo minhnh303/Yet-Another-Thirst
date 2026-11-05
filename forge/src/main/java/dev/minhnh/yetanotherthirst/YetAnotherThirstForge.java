@@ -1,9 +1,7 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
-import dev.minhnh.yetanotherthirst.core.block.ModBlocks;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
@@ -13,53 +11,54 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(Constants.MOD_ID)
 public class YetAnotherThirstForge {
 
-    public YetAnotherThirstForge() {
+    public YetAnotherThirstForge(FMLJavaModLoadingContext context) {
 
-        var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        var modBusGroup = context.getModBusGroup();
 
         ConfigMigration.run();
 
-        ModLoadingContext ctx = ModLoadingContext.get();
         String dir = Constants.CONFIG_DIR + "/";
-        ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfigCommon.SPEC, dir + "common.toml");
-        ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfigItems.SPEC, dir + "items.toml");
-        ctx.registerConfig(ModConfig.Type.COMMON, ForgeConfigCompat.SPEC, dir + "compat.toml");
-        ctx.registerConfig(ModConfig.Type.CLIENT, ForgeClientConfig.SPEC, dir + "client.toml");
+        context.registerConfig(ModConfig.Type.COMMON, ForgeConfigCommon.SPEC, dir + "common.toml");
+        context.registerConfig(ModConfig.Type.COMMON, ForgeConfigItems.SPEC, dir + "items.toml");
+        context.registerConfig(ModConfig.Type.COMMON, ForgeConfigCompat.SPEC, dir + "compat.toml");
+        context.registerConfig(ModConfig.Type.CLIENT, ForgeClientConfig.SPEC, dir + "client.toml");
 
-        modBus.addListener(YetAnotherThirstForge::onConfigLoading);
-        modBus.addListener(YetAnotherThirstForge::onConfigReloading);
-        modBus.addListener(YetAnotherThirstForge::onCommonSetup);
+        ModConfigEvent.Loading.getBus(modBusGroup).addListener(YetAnotherThirstForge::onConfigLoading);
+        ModConfigEvent.Reloading.getBus(modBusGroup).addListener(YetAnotherThirstForge::onConfigReloading);
+        FMLCommonSetupEvent.getBus(modBusGroup).addListener(YetAnotherThirstForge::onCommonSetup);
 
         // Bind Forge RegistryObjects into loader-agnostic ModItems before registration fires
         ForgeItems.bindToCommon();
         ForgeEffects.bindToCommon();
 
         // Register DeferredRegisters onto the mod event bus
-        ModBlocks.BLOCKS.register(modBus);
-        ModBlocks.BLOCK_ENTITIES.register(modBus);
-        ForgeItems.ITEMS.register(modBus);
-        ForgeEffects.EFFECTS.register(modBus);
-        ForgeCreativeTab.TABS.register(modBus);
-        ForgeLootModifier.SERIALIZERS.register(modBus);
-        dev.minhnh.yetanotherthirst.screen.ModMenuTypes.MENU_TYPES.register(modBus);
+        ForgeItems.ITEMS.register(modBusGroup);
+        ForgeEffects.EFFECTS.register(modBusGroup);
+        ForgeCreativeTab.TABS.register(modBusGroup);
+        ForgeLootModifier.SERIALIZERS.register(modBusGroup);
+        ForgeLootModifier.LOOT_CONDITION_TYPES.register(modBusGroup);
 
         ForgeNetwork.register();
         CommonClass.init();
     }
 
     private static void onCommonSetup(FMLCommonSetupEvent event) {
-        ThirstConfig.COMPAT_TOMBSTONE = ModList.get().isLoaded("tombstone");
-        ThirstConfig.COMPAT_VAMPIRISM = ModList.get().isLoaded("vampirism");
-        ThirstConfig.COMPAT_FARMERS_DELIGHT = ModList.get().isLoaded("farmersdelight");
-        ThirstConfig.COMPAT_LETS_DO_BAKERY = ModList.get().isLoaded("bakery");
-        ThirstConfig.COMPAT_LETS_DO_BREWERY = ModList.get().isLoaded("brewery");
-        ThirstConfig.COMPAT_LETS_DO_FARM_AND_CHARM = ModList.get().isLoaded("farm_and_charm");
-        ThirstConfig.COMPAT_APPLESKIN = ModList.get().isLoaded("appleskin");
-        ThirstConfig.COMPAT_JADE = ModList.get().isLoaded("jade");
-        ThirstConfig.COMPAT_TOUGH_AS_NAILS = ModList.get().isLoaded("toughasnails");
-        ThirstConfig.COMPAT_COLD_SWEAT = ModList.get().isLoaded("cold_sweat");
-        ThirstConfig.COMPAT_SUPERNATURAL = ModList.get().isLoaded("supernatural");
-        ThirstConfig.COMPAT_IE_HEATER = ModList.get().isLoaded("immersiveengineering");
+        ForgeConfigCommon.sync();
+        ForgeConfigItems.sync();
+        ForgeConfigCompat.sync();
+
+        ThirstConfig.COMPAT_TOMBSTONE = ModList.isLoaded("tombstone");
+        ThirstConfig.COMPAT_VAMPIRISM = ModList.isLoaded("vampirism");
+        ThirstConfig.COMPAT_FARMERS_DELIGHT = ModList.isLoaded("farmersdelight");
+        ThirstConfig.COMPAT_LETS_DO_BAKERY = ModList.isLoaded("bakery");
+        ThirstConfig.COMPAT_LETS_DO_BREWERY = ModList.isLoaded("brewery");
+        ThirstConfig.COMPAT_LETS_DO_FARM_AND_CHARM = ModList.isLoaded("farm_and_charm");
+        ThirstConfig.COMPAT_APPLESKIN = ModList.isLoaded("appleskin");
+        ThirstConfig.COMPAT_JADE = ModList.isLoaded("jade");
+        ThirstConfig.COMPAT_TOUGH_AS_NAILS = ModList.isLoaded("toughasnails");
+        ThirstConfig.COMPAT_COLD_SWEAT = ModList.isLoaded("cold_sweat");
+        ThirstConfig.COMPAT_SUPERNATURAL = ModList.isLoaded("supernatural");
+        ThirstConfig.COMPAT_IE_HEATER = ModList.isLoaded("immersiveengineering");
     }
 
     private static void onConfigLoading(ModConfigEvent.Loading event) { onConfigEvent(event); }

@@ -1,6 +1,6 @@
 plugins {
     id 'multiloader-common'
-    id 'fabric-loom' version '1.8.9'
+    id 'net.fabricmc.fabric-loom' version '1.19.3'
 }
 
 base {
@@ -30,20 +30,12 @@ loom {
             sourceSet sourceSets.main
         }
     }
-    mixin {
-        add sourceSets.main, "yet_another_thirst.refmap.json"
-        useLegacyMixinAp = false
-    }
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered() {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
     compileOnly(project(':common')) {
         capabilities {
@@ -52,21 +44,44 @@ dependencies {
     }
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')
-    compileOnly files(project(':common').file('src/main/resources'))
-    annotationProcessor files(project(':common').file('src/main/resources'))
+    compileOnly files(findProject(':common').file('src/main/resources'))
+    annotationProcessor files(findProject(':common').file('src/main/resources'))
 
     // Jade and AppleSkin API stubs — same JARs used by :common for compilation
     compileOnly 'maven.modrinth:jade:11.13.2+forge'
     compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
-    modCompileOnly 'maven.modrinth:create-fabric:6.0.8.1+build.1744-mc1.20.1'
+    // modCompileOnly 'maven.modrinth:create-fabric:6.0.8.1+build.1744-mc1.20.1'
 
     // javax.annotation (@Nonnull etc.) — provided transitively by Forge, must be explicit for Loom
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
+sourceSets {
+    main {
+        java {
+            exclude 'dev/minhnh/yetanotherthirst/mixin/create/**'
+            exclude 'dev/minhnh/yetanotherthirst/mixin/CompatMixinPlugin.java'
+            exclude 'dev/minhnh/yetanotherthirst/mixin/MixinSimpleCookingSerializer.java'
+            exclude 'dev/minhnh/yetanotherthirst/mixin/MixinRecipeManager.java'
+            exclude 'dev/minhnh/yetanotherthirst/mixin/MixinAbstractFurnaceEntity.java'
+        }
+    }
+}
+
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+    exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
+    exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
+    exclude 'dev/minhnh/yetanotherthirst/screen/AbstractWaterBoilerMenu.java'
+    exclude 'dev/minhnh/yetanotherthirst/screen/WaterBoilerScreen.java'
+    exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
+    exclude 'dev/minhnh/yetanotherthirst/core/block/IWaterBoiler.java'
+    exclude 'dev/minhnh/yetanotherthirst/mixin/create/**'
+    exclude 'dev/minhnh/yetanotherthirst/mixin/CompatMixinPlugin.java'
+    exclude 'dev/minhnh/yetanotherthirst/mixin/MixinSimpleCookingSerializer.java'
+    exclude 'dev/minhnh/yetanotherthirst/mixin/MixinRecipeManager.java'
+    exclude 'dev/minhnh/yetanotherthirst/mixin/MixinAbstractFurnaceEntity.java'
 }
 
 processResources {
@@ -76,7 +91,14 @@ processResources {
 
 tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonJava)
-    from(configurations.commonJava)
+    from(configurations.commonJava) {
+        exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
+        exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
+        exclude 'dev/minhnh/yetanotherthirst/screen/AbstractWaterBoilerMenu.java'
+        exclude 'dev/minhnh/yetanotherthirst/screen/WaterBoilerScreen.java'
+        exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
+        exclude 'dev/minhnh/yetanotherthirst/core/block/IWaterBoiler.java'
+    }
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }

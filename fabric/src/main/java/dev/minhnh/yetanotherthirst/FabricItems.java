@@ -6,9 +6,13 @@ import dev.minhnh.yetanotherthirst.core.item.FilterCoreItem;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+
+import java.util.function.Function;
 
 public final class FabricItems {
 
@@ -26,27 +30,28 @@ public final class FabricItems {
 
     static void register() {
 
-        CLAY_BOWL = reg("clay_bowl", new Item(new Item.Properties().stacksTo(64)));
-        TERRACOTTA_BOWL = reg("terracotta_bowl", new Item(new Item.Properties().stacksTo(64)));
-        TERRACOTTA_WATER_BOWL = reg("terracotta_water_bowl", new DrinkableItem(() -> TERRACOTTA_BOWL));
-        WOODEN_WATER_BOWL = reg("wooden_water_bowl", new DrinkableItem(() -> Items.BOWL));
+        CLAY_BOWL = reg("clay_bowl", props -> new Item(props.stacksTo(64)));
+        TERRACOTTA_BOWL = reg("terracotta_bowl", props -> new Item(props.stacksTo(64)));
+        TERRACOTTA_WATER_BOWL = reg("terracotta_water_bowl", props -> new DrinkableItem(props, () -> TERRACOTTA_BOWL));
+        WOODEN_WATER_BOWL = reg("wooden_water_bowl", props -> new DrinkableItem(props, () -> Items.BOWL));
 
         if (dev.minhnh.yetanotherthirst.platform.Services.PLATFORM.isModLoaded("create")) {
-            FILTER_FRAME = reg("filter_frame", new BlockItem(ModBlocks.FILTER_FRAME, new Item.Properties()));
-            FABRIC_FILTER_CORE = reg("fabric_filter_core", new FilterCoreItem(new Item.Properties().stacksTo(64)));
-            SAND_FILTER_CORE = reg("sand_filter_core", new FilterCoreItem(new Item.Properties().stacksTo(64)));
-            CARBON_FILTER_CORE = reg("carbon_filter_core", new FilterCoreItem(new Item.Properties().stacksTo(64)));
-            CLOGGED_FABRIC_FILTER = reg("clogged_fabric_filter", new Item(new Item.Properties().stacksTo(64)));
-            CLOGGED_SAND_FILTER = reg("clogged_sand_filter", new Item(new Item.Properties().stacksTo(64)));
-            CLOGGED_CARBON_FILTER = reg("clogged_carbon_filter", new Item(new Item.Properties().stacksTo(64)));
+            FILTER_FRAME = reg("filter_frame", props -> new BlockItem(ModBlocks.FILTER_FRAME, props.useBlockDescriptionPrefix()));
+            FABRIC_FILTER_CORE = reg("fabric_filter_core", FilterCoreItem::new);
+            SAND_FILTER_CORE = reg("sand_filter_core", FilterCoreItem::new);
+            CARBON_FILTER_CORE = reg("carbon_filter_core", FilterCoreItem::new);
+            CLOGGED_FABRIC_FILTER = reg("clogged_fabric_filter", props -> new Item(props.stacksTo(64)));
+            CLOGGED_SAND_FILTER = reg("clogged_sand_filter", props -> new Item(props.stacksTo(64)));
+            CLOGGED_CARBON_FILTER = reg("clogged_carbon_filter", props -> new Item(props.stacksTo(64)));
         }
 
         bindToCommon();
     }
 
-    private static <T extends Item> T reg(String name, T item) {
-
-        return Registry.register(BuiltInRegistries.ITEM, Constants.asResource(name), item);
+    private static <T extends Item> T reg(String name, Function<Item.Properties, T> factory) {
+        ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Constants.asResource(name));
+        Item.Properties props = new Item.Properties().setId(key);
+        return Registry.register(BuiltInRegistries.ITEM, key, factory.apply(props));
     }
 
     static void bindToCommon() {

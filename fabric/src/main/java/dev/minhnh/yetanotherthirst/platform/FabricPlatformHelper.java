@@ -44,7 +44,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public CompoundTag loadPersistentData(Player player, String key) {
 
         CompoundTag root = FabricPlayerDataStore.get(player);
-        return root.getCompound(key);
+        return root.getCompoundOrEmpty(key);
     }
 
     @Override

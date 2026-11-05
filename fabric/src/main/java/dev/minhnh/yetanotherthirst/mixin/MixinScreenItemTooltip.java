@@ -5,10 +5,10 @@ import dev.minhnh.yetanotherthirst.client.TooltipStackTracker;
 import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,26 +17,28 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.List;
 
-@Mixin(GuiGraphics.class)
+@Mixin(GuiGraphicsExtractor.class)
 public abstract class MixinScreenItemTooltip {
 
     @Shadow
-    abstract void renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner);
+    abstract void setTooltipForNextFrameInternal(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, Identifier background, boolean isMouseOver);
 
     @Redirect(
-        method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V",
+        method = "setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrameInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Z)V"
         )
     )
     private void yat_appendThirstComponent(
-        GuiGraphics guiGraphics,
+        GuiGraphicsExtractor guiGraphics,
         Font font,
         List<ClientTooltipComponent> components,
         int x,
         int y,
-        ClientTooltipPositioner positioner
+        ClientTooltipPositioner positioner,
+        Identifier background,
+        boolean isMouseOver
     ) {
         ItemStack stack = TooltipStackTracker.get();
         if (stack != null && !stack.isEmpty() && ThirstCompat.showsAppleSkinThirstTooltip()) {
@@ -72,7 +74,7 @@ public abstract class MixinScreenItemTooltip {
                     components.add(insertIndex, ClientTooltipComponent.create(new ThirstTooltipComponent(thirstValue)));
                 });
         }
-        this.renderTooltipInternal(font, components, x, y, positioner);
+        this.setTooltipForNextFrameInternal(font, components, x, y, positioner, background, isMouseOver);
         TooltipStackTracker.clear();
     }
 
@@ -105,7 +107,7 @@ public abstract class MixinScreenItemTooltip {
         if (stack == null || stack.isEmpty()) {
             return "";
         }
-        ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+        Identifier id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
         if (id == null) {
             return "";
         }

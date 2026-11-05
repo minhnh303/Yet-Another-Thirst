@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "ingredient": "yet_another_thirst:terracotta_water_bowl",
+  "result": {
+    "id": "yet_another_thirst:terracotta_water_bowl",
+    "components": {
+      "minecraft:custom_data": {
+        "Purity": 3
+      }
+    }
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

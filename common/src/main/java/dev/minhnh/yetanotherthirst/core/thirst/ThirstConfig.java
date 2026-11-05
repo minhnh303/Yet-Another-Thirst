@@ -61,7 +61,7 @@ public final class ThirstConfig {
     public static int CARBON_FILTER_MAX_PURITY = 3;
 
     // Water Boiler Config
-    public static int WATER_BOILER_CAPACITY = 2000;
+    public static int WATER_BOILER_CAPACITY = 16000;
     public static int WATER_BOILER_BOIL_TIME = 200;
     public static int WATER_BOILER_ENERGY_CONSUMPTION = 32;
 
@@ -197,11 +197,11 @@ public final class ThirstConfig {
     }
 
     public static class EffectCondition {
-        public final net.minecraft.resources.ResourceLocation effectId;
+        public final net.minecraft.resources.Identifier effectId;
         public final String operator;
         public final int amplifier;
 
-        public EffectCondition(net.minecraft.resources.ResourceLocation effectId, String operator, int amplifier) {
+        public EffectCondition(net.minecraft.resources.Identifier effectId, String operator, int amplifier) {
             this.effectId = effectId;
             this.operator = operator;
             this.amplifier = amplifier;
@@ -225,27 +225,19 @@ public final class ThirstConfig {
                 }
             }
 
-            net.minecraft.resources.ResourceLocation effectId;
+            net.minecraft.resources.Identifier effectId;
             int amplifier = 0;
             if (operator != null) {
                 String idPart = input.substring(0, opIndex).trim();
                 String valPart = input.substring(opIndex + operator.length()).trim();
-                try {
-                    effectId = new net.minecraft.resources.ResourceLocation(idPart);
-                } catch (Exception e) {
-                    effectId = null;
-                }
+                effectId = net.minecraft.resources.Identifier.tryParse(idPart);
                 try {
                     amplifier = Integer.parseInt(valPart);
                 } catch (NumberFormatException e) {
                     amplifier = 0;
                 }
             } else {
-                try {
-                    effectId = new net.minecraft.resources.ResourceLocation(input);
-                } catch (Exception e) {
-                    effectId = null;
-                }
+                effectId = net.minecraft.resources.Identifier.tryParse(input);
                 operator = ">=";
                 amplifier = 0;
             }

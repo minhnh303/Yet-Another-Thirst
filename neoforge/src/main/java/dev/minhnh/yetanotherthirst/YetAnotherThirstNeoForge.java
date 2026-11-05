@@ -1,49 +1,43 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
-import dev.minhnh.yetanotherthirst.core.block.ModBlocks;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import dev.minhnh.yetanotherthirst.platform.NeoForgePlatformHelper;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod(Constants.MOD_ID)
 public class YetAnotherThirstNeoForge {
 
-    public YetAnotherThirstNeoForge() {
-
-        var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public YetAnotherThirstNeoForge(IEventBus modBus, ModContainer modContainer) {
 
         ConfigMigration.run();
 
-        ModLoadingContext ctx = ModLoadingContext.get();
         String dir = Constants.CONFIG_DIR + "/";
-        ctx.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigCommon.SPEC, dir + "common.toml");
-        ctx.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigItems.SPEC, dir + "items.toml");
-        ctx.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigCompat.SPEC, dir + "compat.toml");
-        ctx.registerConfig(ModConfig.Type.CLIENT, NeoForgeClientConfig.SPEC, dir + "client.toml");
+        modContainer.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigCommon.SPEC, dir + "common.toml");
+        modContainer.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigItems.SPEC, dir + "items.toml");
+        modContainer.registerConfig(ModConfig.Type.COMMON, NeoForgeConfigCompat.SPEC, dir + "compat.toml");
+        modContainer.registerConfig(ModConfig.Type.CLIENT, NeoForgeClientConfig.SPEC, dir + "client.toml");
 
         modBus.addListener(YetAnotherThirstNeoForge::onConfigLoading);
         modBus.addListener(YetAnotherThirstNeoForge::onConfigReloading);
         modBus.addListener(YetAnotherThirstNeoForge::onCommonSetup);
 
-        // Bind NeoForge RegistryObjects into loader-agnostic ModItems before registration fires
+        // Bind NeoForge DeferredItems/DeferredHolders into loader-agnostic ModItems/ModEffects
         NeoForgeItems.bindToCommon();
         NeoForgeEffects.bindToCommon();
 
         // Register DeferredRegisters onto the mod event bus
-        ModBlocks.BLOCKS.register(modBus);
-        ModBlocks.BLOCK_ENTITIES.register(modBus);
+        NeoForgePlatformHelper.ATTACHMENT_TYPES.register(modBus);
         NeoForgeItems.ITEMS.register(modBus);
         NeoForgeEffects.EFFECTS.register(modBus);
         NeoForgeCreativeTab.TABS.register(modBus);
         NeoForgeLootModifier.SERIALIZERS.register(modBus);
-        dev.minhnh.yetanotherthirst.screen.ModMenuTypes.MENU_TYPES.register(modBus);
 
-        NeoForgeNetwork.register();
         CommonClass.init();
     }
 
@@ -60,6 +54,7 @@ public class YetAnotherThirstNeoForge {
         ThirstConfig.COMPAT_COLD_SWEAT = ModList.get().isLoaded("cold_sweat");
         ThirstConfig.COMPAT_SUPERNATURAL = ModList.get().isLoaded("supernatural");
         ThirstConfig.COMPAT_IE_HEATER = ModList.get().isLoaded("immersiveengineering");
+        ThirstConfig.COMPAT_ENVIRONMENTZ = ModList.get().isLoaded("environmentz");
     }
 
     private static void onConfigLoading(ModConfigEvent.Loading event) { onConfigEvent(event); }

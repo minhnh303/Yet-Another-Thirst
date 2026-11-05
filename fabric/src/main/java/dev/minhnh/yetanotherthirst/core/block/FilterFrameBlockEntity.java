@@ -6,13 +6,18 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class FilterFrameBlockEntity extends AbstractFilterFrameBlockEntity {
 
@@ -42,11 +47,11 @@ public class FilterFrameBlockEntity extends AbstractFilterFrameBlockEntity {
         @Override
         public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
             if (resource.getFluid() != Fluids.WATER) return 0;
-            // Capture purity from NBT before stripping it; track worst-case across inserts
-            CompoundTag tag = resource.getNbt();
-            int purity = (tag != null && tag.contains("Purity")) ? tag.getInt("Purity") : WaterPurity.MIN_PURITY;
+            // Capture purity from DataComponents before stripping it; track worst-case across inserts
+            CustomData customData = resource.get(DataComponents.CUSTOM_DATA);
+            int purity = customData != null ? customData.copyTag().getIntOr("Purity", WaterPurity.MIN_PURITY) : WaterPurity.MIN_PURITY;
             pendingInsertPurity = Math.min(pendingInsertPurity, purity);
-            // Always insert as plain water so the stored variant never has NBT.
+            // Always insert as plain water so the stored variant never has components.
             // This prevents variant mismatch when filter() writes tagged water back via updateStorageFromFields().
             return super.insert(FluidVariant.of(Fluids.WATER), maxAmount, transaction);
         }
@@ -84,8 +89,8 @@ public class FilterFrameBlockEntity extends AbstractFilterFrameBlockEntity {
             if (variant.isBlank() || amount == 0) {
                 outputPurity = 0;
             } else {
-                CompoundTag tag = variant.getNbt();
-                outputPurity = (tag != null && tag.contains("Purity")) ? tag.getInt("Purity") : ThirstConfig.DEFAULT_PURITY;
+                CustomData customData = variant.get(DataComponents.CUSTOM_DATA);
+                outputPurity = customData != null ? customData.copyTag().getIntOr("Purity", ThirstConfig.DEFAULT_PURITY) : ThirstConfig.DEFAULT_PURITY;
             }
             setChanged();
             if (level != null && !level.isClientSide()) {
@@ -108,7 +113,10 @@ public class FilterFrameBlockEntity extends AbstractFilterFrameBlockEntity {
         if (outputAmount > 0) {
             CompoundTag fluidTag = new CompoundTag();
             fluidTag.putInt("Purity", outputPurity);
-            outputStorage.variant = FluidVariant.of(Fluids.WATER, fluidTag);
+            DataComponentPatch patch = DataComponentPatch.builder()
+                    .set(DataComponents.CUSTOM_DATA, CustomData.of(fluidTag))
+                    .build();
+            outputStorage.variant = FluidVariant.of(Fluids.WATER, patch);
             outputStorage.amount = outputAmount * 81L;
         } else {
             outputStorage.variant = FluidVariant.blank();
@@ -211,7 +219,9 @@ public class FilterFrameBlockEntity extends AbstractFilterFrameBlockEntity {
         }
 
         double newLifespan = Math.max(0.0, remainingLifespan - amountToFilter * decayPerMb);
-        core.getOrCreateTag().putDouble("Lifespan", newLifespan);
+        CompoundTag customTag = core.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        customTag.putDouble("Lifespan", newLifespan);
+        core.set(DataComponents.CUSTOM_DATA, CustomData.of(customTag));
         if (newLifespan <= 0) clogFilter(core.getItem());
 
         int outPurity = Math.min(inputPurity + 1, maxP);
@@ -237,37 +247,32 @@ public class FilterFrameBlockEntity extends AbstractFilterFrameBlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        CompoundTag inputTag = tag.getCompound("InputTank");
-        inputAmount = inputTag.getInt("Amount");
-        inputPurity = inputTag.getInt("Purity");
-        CompoundTag outputTag = tag.getCompound("OutputTank");
-        outputAmount = outputTag.getInt("Amount");
-        outputPurity = outputTag.getInt("Purity");
-        CompoundTag inv = tag.getCompound("Inventory");
-        if (inv.contains("Item")) {
-            inventory.setItem(0, ItemStack.of(inv.getCompound("Item")));
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        ValueInput inputTag = input.childOrEmpty("InputTank");
+        inputAmount = inputTag.getIntOr("Amount", 0);
+        inputPurity = inputTag.getIntOr("Purity", 0);
+        ValueInput outputTag = input.childOrEmpty("OutputTank");
+        outputAmount = outputTag.getIntOr("Amount", 0);
+        outputPurity = outputTag.getIntOr("Purity", 0);
+        ValueInput inv = input.childOrEmpty("Inventory");
+        inv.read("Item", ItemStack.CODEC).ifPresent(s -> inventory.setItem(0, s));
         updateStorageFromFields();
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        CompoundTag inputTag = new CompoundTag();
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ValueOutput inputTag = output.child("InputTank");
         inputTag.putInt("Amount", inputAmount);
         inputTag.putInt("Purity", inputPurity);
-        tag.put("InputTank", inputTag);
-        CompoundTag outputTag = new CompoundTag();
+        ValueOutput outputTag = output.child("OutputTank");
         outputTag.putInt("Amount", outputAmount);
         outputTag.putInt("Purity", outputPurity);
-        tag.put("OutputTank", outputTag);
-        CompoundTag inv = new CompoundTag();
+        ValueOutput inv = output.child("Inventory");
         ItemStack core = inventory.getItem(0);
         if (!core.isEmpty()) {
-            inv.put("Item", core.save(new CompoundTag()));
+            inv.store("Item", ItemStack.CODEC, core);
         }
-        tag.put("Inventory", inv);
     }
 }

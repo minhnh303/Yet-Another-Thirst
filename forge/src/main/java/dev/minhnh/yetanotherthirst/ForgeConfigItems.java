@@ -3,7 +3,7 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -68,8 +68,8 @@ public final class ForgeConfigItems {
 
         builder.push("filter");
         FILTER_BASE_SPEED = builder
-                .comment("Base throughput speed of the Sand Filter Frame block in mB/tick (default: 1)")
-                .defineInRange("filterBaseSpeed", 1, 1, 1000);
+                .comment("Base throughput speed of the Sand Filter Frame block in mB/tick (default: 5)")
+                .defineInRange("filterBaseSpeed", 5, 1, 1000);
         DIRTY_WATER_DECAY_MULTIPLIER = builder
                 .comment("Durability consumption multiplier for dirty water (default: 4.0)")
                 .defineInRange("dirtyWaterDecayMultiplier", 4.0, 0.0, 100.0);
@@ -188,7 +188,7 @@ public final class ForgeConfigItems {
 
     private static Optional<Item> resolveItem(String id) {
         try {
-            ResourceLocation location = new ResourceLocation(id);
+            Identifier location = Identifier.parse(id);
             Item item = ForgeRegistries.ITEMS.getValue(location);
             if (item != null && (item != Items.AIR || "minecraft:air".equals(id))) {
                 return Optional.of(item);

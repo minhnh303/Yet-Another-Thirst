@@ -54,7 +54,7 @@ public final class ThirstTicker {
         Difficulty difficulty = player.level().getDifficulty();
         boolean depletionPaused = ThirstCompat.pausesDepletion(player);
 
-        if (!depletionPaused && ThirstConfig.DEPLETES_WHEN_NAUSEA && player.hasEffect(MobEffects.CONFUSION)) {
+        if (!depletionPaused && ThirstConfig.DEPLETES_WHEN_NAUSEA && player.hasEffect(MobEffects.NAUSEA)) {
             state.addExhaustion(0.06F * exhaustionModifier(player));
         }
 
@@ -91,9 +91,9 @@ public final class ThirstTicker {
         }
 
         if (!ThirstConfig.REGEN_THIRST_EFFECTS.isEmpty() && player.tickCount % ThirstConfig.REGEN_THIRST_INTERVAL == 0) {
-            net.minecraft.core.Registry<net.minecraft.world.effect.MobEffect> effectsRegistry = player.level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.MOB_EFFECT);
+            net.minecraft.core.Registry<net.minecraft.world.effect.MobEffect> effectsRegistry = player.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.MOB_EFFECT);
             for (var effectInstance : player.getActiveEffects()) {
-                net.minecraft.resources.ResourceLocation effectId = ThirstCompat.effectId(effectsRegistry, effectInstance.getEffect());
+                net.minecraft.resources.Identifier effectId = ThirstCompat.effectId(effectsRegistry, effectInstance.getEffect());
                 if (effectId != null) {
                     for (var condition : ThirstConfig.REGEN_THIRST_EFFECTS) {
                         if (condition.effectId.equals(effectId) && condition.matches(effectInstance.getAmplifier())) {
@@ -113,7 +113,7 @@ public final class ThirstTicker {
 
     private static void updateFoodExhaustion(ServerPlayer player, ThirstState state) {
 
-        float hungerExhaustion = player.getFoodData().getExhaustionLevel();
+        float hungerExhaustion = ((dev.minhnh.yetanotherthirst.mixin.FoodDataAccessor) player.getFoodData()).getExhaustionLevel();
         float previous = state.getPreviousFoodExhaustion();
         float normalized = hungerExhaustion < previous
                 ? (state.isExhaustionRecalculate() ? hungerExhaustion + ThirstConfig.EXHAUSTION_LIMIT : hungerExhaustion)
@@ -180,8 +180,8 @@ public final class ThirstTicker {
 
         try {
             return new DamageSource(player.level().registryAccess()
-                    .registryOrThrow(Registries.DAMAGE_TYPE)
-                    .getHolderOrThrow(DEHYDRATE_KEY));
+                    .lookupOrThrow(Registries.DAMAGE_TYPE)
+                    .getOrThrow(DEHYDRATE_KEY));
         } catch (Exception e) {
             return player.damageSources().starve();
         }
@@ -204,7 +204,7 @@ public final class ThirstTicker {
             return ThirstConfig.THIRST_DEPLETION_MODIFIER;
         }
 
-        if (player.level().dimensionType().ultraWarm()) {
+        if (player.level().dimensionType().attributes().applyModifier(net.minecraft.world.attribute.EnvironmentAttributes.WATER_EVAPORATES, false)) {
             return ThirstConfig.NETHER_THIRST_DEPLETION_MODIFIER;
         }
 
@@ -214,7 +214,7 @@ public final class ThirstTicker {
 
         Biome biome = player.level().getBiome(player.getOnPos()).value();
 
-        float humidity = biome.getPrecipitationAt(player.getOnPos()) == Biome.Precipitation.NONE ? 1.1F : 1.2F;
+        float humidity = biome.hasPrecipitation() ? 1.2F : 1.1F;
 
         float baseTemp = biome.getBaseTemperature();
         float tempFactor;
@@ -239,7 +239,7 @@ public final class ThirstTicker {
             return 1.0F;
         }
 
-        int levels = EnchantmentHelper.getDamageProtection(player.getArmorSlots(), player.damageSources().onFire()) / 2;
+        int levels = (int) (EnchantmentHelper.getDamageProtection(player.level(), player, player.damageSources().onFire()) / 2.0F);
         levels = Math.min(levels, 12);
         return 1.0F - levels * 0.0625F * 0.75F;
     }

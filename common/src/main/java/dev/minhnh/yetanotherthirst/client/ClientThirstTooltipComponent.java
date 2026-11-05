@@ -1,15 +1,15 @@
 package dev.minhnh.yetanotherthirst.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.minhnh.yetanotherthirst.Constants;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 
 public final class ClientThirstTooltipComponent implements ClientTooltipComponent {
-    private static final ResourceLocation THIRST_ICONS = Constants.THIRST_ICONS;
+    private static final Identifier THIRST_ICONS = Constants.THIRST_ICONS;
     private final ThirstValue value;
 
     public ClientThirstTooltipComponent(ThirstTooltipComponent component) {
@@ -17,7 +17,7 @@ public final class ClientThirstTooltipComponent implements ClientTooltipComponen
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         return value.quenched() > 0 ? 18 : 10;
     }
 
@@ -29,35 +29,30 @@ public final class ClientThirstTooltipComponent implements ClientTooltipComponen
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
+    public void extractImage(Font font, int x, int y, int width, int height, GuiGraphicsExtractor extractor) {
         // Row 1: Thirst restored (Row 1, u=0/9/18, v=0, size 9x9)
         int thirst = value.thirst();
         for (int i = 0; i < (thirst + 1) / 2; i++) {
             int dx = x + i * 8;
             if (i * 2 + 1 < thirst) {
-                guiGraphics.blit(THIRST_ICONS, dx, y, 18, 0, 9, 9, 36, 25);
+                extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, dx, y, 18.0F, 0.0F, 9, 9, 36, 25);
             } else {
-                guiGraphics.blit(THIRST_ICONS, dx, y, 9, 0, 9, 9, 36, 25);
+                extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, dx, y, 9.0F, 0.0F, 9, 9, 36, 25);
             }
         }
 
-        // Row 2: Quenched restored (Row 3, u=0/7/14, v=18, size 7x7, tinted yellow)
+        // Row 2: Quenched restored (Row 3, u=0/7/14, v=18, size 7x7)
         int quenched = value.quenched();
         if (quenched > 0) {
             for (int i = 0; i < (quenched + 1) / 2; i++) {
                 int dx = x + i * 6;
                 int dy = y + 10;
                 if (i * 2 + 1 < quenched) {
-                    guiGraphics.blit(THIRST_ICONS, dx, dy, 0, 18, 7, 7, 36, 25);
+                    extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, dx, dy, 0.0F, 18.0F, 7, 7, 36, 25);
                 } else {
-                    guiGraphics.blit(THIRST_ICONS, dx, dy, 7, 18, 7, 7, 36, 25);
+                    extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, dx, dy, 7.0F, 18.0F, 7, 7, 36, 25);
                 }
             }
         }
-
-        RenderSystem.disableBlend();
     }
 }

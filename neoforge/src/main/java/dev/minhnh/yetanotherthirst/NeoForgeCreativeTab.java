@@ -7,27 +7,21 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class NeoForgeCreativeTab {
 
     static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Constants.MOD_ID);
 
-    static final RegistryObject<CreativeModeTab> THIRST_TAB = TABS.register("thirst",
+    static final DeferredHolder<CreativeModeTab, CreativeModeTab> THIRST_TAB = TABS.register("thirst",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.yet_another_thirst"))
                     .icon(() -> new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get()))
                     .displayItems((params, output) -> {
-                        if (NeoForgeItems.FILTER_FRAME != null) {
-                            output.accept(new ItemStack(NeoForgeItems.FILTER_FRAME.get()));
-                        }
-                        if (NeoForgeItems.WATER_BOILER != null) {
-                            output.accept(new ItemStack(NeoForgeItems.WATER_BOILER.get()));
-                        }
                         if (ModItems.FABRIC_FILTER_CORE.get() != Items.AIR) {
                             output.accept(new ItemStack(ModItems.FABRIC_FILTER_CORE.get()));
                             output.accept(new ItemStack(ModItems.SAND_FILTER_CORE.get()));
@@ -46,7 +40,7 @@ public final class NeoForgeCreativeTab {
                         }
                         for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
                             output.accept(WaterPurity.addPurity(
-                                     PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER), p));
+                                    PotionContents.createItemStack(Items.POTION, Potions.WATER), p));
                         }
                         for (int p = WaterPurity.MIN_PURITY; p <= WaterPurity.MAX_PURITY; p++) {
                             output.accept(WaterPurity.addPurity(new ItemStack(Items.WATER_BUCKET), p));

@@ -10,8 +10,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -32,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractFilterFrameBlock extends BaseEntityBlock {
 
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public static final EnumProperty<FilterCoreType> CORE_TYPE = EnumProperty.create("core", FilterCoreType.class);
     public static final BooleanProperty REVERSED = BooleanProperty.create("reversed");
     private static final VoxelShape SHAPE = box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
@@ -48,13 +47,13 @@ public abstract class AbstractFilterFrameBlock extends BaseEntityBlock {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+    public VoxelShape getCollisionShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, CollisionContext context) {
+        return SHAPE;
     }
 
     @Override
@@ -73,12 +72,26 @@ public abstract class AbstractFilterFrameBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof AbstractFilterFrameBlockEntity filter)) return InteractionResult.PASS;
 
-        ItemStack held = player.getItemInHand(hand);
+        ItemStack extracted = filter.removeFilterCore();
+        if (!extracted.isEmpty()) {
+            if (!player.getInventory().add(extracted)) player.drop(extracted, false);
+            level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.PASS;
+    }
+
+    @Override
+    protected InteractionResult useItemOn(ItemStack held, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof AbstractFilterFrameBlockEntity filter)) return InteractionResult.PASS;
+
         ItemStack existing = filter.getFilterCore();
 
         if (existing.isEmpty()) {
@@ -88,7 +101,7 @@ public abstract class AbstractFilterFrameBlock extends BaseEntityBlock {
                 filter.setFilterCore(toInsert);
                 if (!player.getAbilities().instabuild) held.shrink(1);
                 level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
-                return InteractionResult.CONSUME;
+                return InteractionResult.SUCCESS;
             }
         } else {
             boolean existingClogged = AbstractFilterFrameBlockEntity.isClogged(existing);
@@ -102,13 +115,13 @@ public abstract class AbstractFilterFrameBlock extends BaseEntityBlock {
                 if (!player.getAbilities().instabuild) held.shrink(1);
                 if (!player.getInventory().add(clogged)) player.drop(clogged, false);
                 level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
-                return InteractionResult.CONSUME;
-            } else if (held.isEmpty() || existingClogged) {
+                return InteractionResult.SUCCESS;
+            } else if (existingClogged) {
                 ItemStack extracted = filter.removeFilterCore();
                 if (!extracted.isEmpty()) {
                     if (!player.getInventory().add(extracted)) player.drop(extracted, false);
                     level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    return InteractionResult.CONSUME;
+                    return InteractionResult.SUCCESS;
                 }
             }
         }
@@ -116,14 +129,8 @@ public abstract class AbstractFilterFrameBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof AbstractFilterFrameBlockEntity filter) {
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), filter.getFilterCore());
-            }
-            super.onRemove(state, level, pos, newState, isMoving);
-        }
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override

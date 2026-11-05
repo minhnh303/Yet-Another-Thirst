@@ -4,12 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.minhnh.yetanotherthirst.Constants;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec2;
 import snownee.jade.api.ui.Element;
 
 public final class ThirstElement extends Element {
-    private static final ResourceLocation THIRST_ICONS = Constants.THIRST_ICONS;
+    private static final Identifier THIRST_ICONS = Constants.THIRST_ICONS;
     private final ThirstValue value;
 
     public ThirstElement(ThirstValue value) {

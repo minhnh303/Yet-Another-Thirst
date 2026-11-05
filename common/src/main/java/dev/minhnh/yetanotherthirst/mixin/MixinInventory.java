@@ -18,7 +18,7 @@ public class MixinInventory {
 
     @Inject(method = "setItem", at = @At("HEAD"))
     private void onSetItem(int slot, ItemStack stack, CallbackInfo ci) {
-        if (this.player != null && !this.player.level().isClientSide) {
+        if (this.player != null && !this.player.level().isClientSide()) {
             WaterPurity.verifyItemStackPurity(stack);
         }
     }

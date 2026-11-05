@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": "yet_another_thirst:terracotta_water_bowl",
+  "result": {
+    "id": "yet_another_thirst:terracotta_water_bowl",
+    "components": {
+      "minecraft:custom_data": {
+        "Purity": 2
+      }
+    }
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

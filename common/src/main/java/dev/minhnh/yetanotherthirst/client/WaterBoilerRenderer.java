@@ -10,13 +10,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class WaterBoilerRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
-    private static final ResourceLocation WHITE_TEXTURE = new ResourceLocation("textures/misc/white.png");
+    private static final Identifier WHITE_TEXTURE = Identifier.fromNamespaceAndPath("minecraft", "textures/misc/white.png");
 
     public WaterBoilerRenderer(BlockEntityRendererProvider.Context context) {
     }

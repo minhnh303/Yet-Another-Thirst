@@ -1,0 +1,32 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "immersiveengineering"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "immersiveengineering"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CWC",
+    "SSS",
+    "PHP"
+  ],
+  "key": {
+    "C": "immersiveengineering:component_iron",
+    "W": "minecraft:cauldron",
+    "H": "immersiveengineering:furnace_heater",
+    "S": "#c:sheetmetals/steel",
+    "P": "immersiveengineering:fluid_pipe"
+  },
+  "result": {
+    "id": "yet_another_thirst:water_boiler"
+  }
+}

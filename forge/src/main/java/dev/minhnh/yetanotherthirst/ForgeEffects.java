@@ -17,8 +17,8 @@ public final class ForgeEffects {
 
     /** Binds Forge RegistryObjects into the loader-agnostic ModEffects suppliers. */
     static void bindToCommon() {
-        ModEffects.THIRSTY = THIRSTY;
-        ModEffects.HYDRATION = HYDRATION;
+        ModEffects.THIRSTY = () -> THIRSTY.getHolder().orElseThrow();
+        ModEffects.HYDRATION = () -> HYDRATION.getHolder().orElseThrow();
     }
 
     private ForgeEffects() {

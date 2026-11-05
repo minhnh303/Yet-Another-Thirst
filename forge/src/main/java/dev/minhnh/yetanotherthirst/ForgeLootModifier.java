@@ -1,20 +1,21 @@
 package dev.minhnh.yetanotherthirst;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
+import net.minecraftforge.common.loot.LootTableIdCondition;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-
-import javax.annotation.Nonnull;
 
 /**
  * Appends items from a secondary loot table into the primary loot pool.
@@ -22,32 +23,37 @@ import javax.annotation.Nonnull;
  */
 public final class ForgeLootModifier extends LootModifier {
 
-    static final DeferredRegister<Codec<? extends IGlobalLootModifier>> SERIALIZERS =
+    static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> SERIALIZERS =
             DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, Constants.MOD_ID);
 
-    static final RegistryObject<Codec<ForgeLootModifier>> SERIALIZER =
-            SERIALIZERS.register("add_loot_table", () -> RecordCodecBuilder.create(inst ->
+    static final RegistryObject<MapCodec<ForgeLootModifier>> SERIALIZER =
+            SERIALIZERS.register("add_loot_table", () -> RecordCodecBuilder.mapCodec(inst ->
                     codecStart(inst)
-                            .and(ResourceLocation.CODEC.fieldOf("lootTable").forGetter(m -> m.lootTable))
+                            .and(Identifier.CODEC.fieldOf("lootTable").forGetter(m -> m.lootTable))
                             .apply(inst, ForgeLootModifier::new)));
 
-    private final ResourceLocation lootTable;
+    static final DeferredRegister<MapCodec<? extends LootItemCondition>> LOOT_CONDITION_TYPES =
+            DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, "neoforge");
 
-    private ForgeLootModifier(LootItemCondition[] conditions, ResourceLocation lootTable) {
+    static final RegistryObject<MapCodec<LootTableIdCondition>> NEOFORGE_LOOT_TABLE_ID =
+            LOOT_CONDITION_TYPES.register("loot_table_id", () -> LootTableIdCondition.CODEC);
+
+    private final Identifier lootTable;
+
+    private ForgeLootModifier(LootItemCondition[] conditions, Identifier lootTable) {
         super(conditions);
         this.lootTable = lootTable;
     }
 
-    @Nonnull
     @Override
-    protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        LootTable table = context.getLevel().getServer().getLootData().getLootTable(lootTable);
-        table.getRandomItems(context, generatedLoot::add);
+    protected ObjectArrayList<ItemStack> doApply(LootTable table, ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
+        LootTable extraTable = context.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, this.lootTable));
+        extraTable.getRandomItems(context, generatedLoot::add);
         return generatedLoot;
     }
 
     @Override
-    public Codec<? extends IGlobalLootModifier> codec() {
+    public MapCodec<? extends IGlobalLootModifier> codec() {
         return SERIALIZER.get();
     }
 }

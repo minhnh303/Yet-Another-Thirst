@@ -7,7 +7,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
@@ -16,8 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-
-import io.netty.buffer.Unpooled;
 
 @Environment(EnvType.CLIENT)
 public final class FabricHandDrinkClient {
@@ -58,9 +55,6 @@ public final class FabricHandDrinkClient {
     }
 
     private static void sendDrinkByHand(BlockPos pos) {
-
-        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        buf.writeBlockPos(pos);
-        ClientPlayNetworking.send(FabricNetwork.DRINK_BY_HAND, buf);
+        ClientPlayNetworking.send(new FabricNetwork.DrinkByHandPayload(pos));
     }
 }

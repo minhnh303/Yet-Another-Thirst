@@ -6,14 +6,11 @@
   "refmap": "yet_another_thirst.refmap.json",
   "mixins": [
     "MixinServerPlayer",
-    "FabricItemFinishMixin",
-    "MixinSimpleCookingSerializer",
-    "MixinRecipeManager",
-    "MixinAbstractFurnaceEntity"
+    "FabricItemFinishMixin"
   ],
   "client": [
     "MixinScreenItemTooltip",
-    "MixinGui"
+    "MixinHud"
   ],
   "injectors": {
     "defaultRequire": 1

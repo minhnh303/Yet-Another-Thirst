@@ -92,7 +92,7 @@ jar {
                 'Implementation-Version': project.jar.archiveVersion,
                 'Implementation-Vendor' : mod_author,
                 'Built-On-Minecraft'    : minecraft_version,
-                'MixinConfigs'          : "${mod_id}.mixins.json,${mod_id}.compat.mixins.json"
+                'MixinConfigs'          : "${mod_id}.mixins.json"
         ])
     }
 }
@@ -112,6 +112,7 @@ processResources {
             "forge_version"                : forge_version,
             "forge_loader_version_range"   : forge_loader_version_range,
             "neoforge_version"             : neoforge_version,
+            "neoform_version"              : neoform_version,
             "neoforge_loader_version_range": neoforge_loader_version_range,
             "fabric_loader_version"        : fabric_loader_version,
             "fabric_api_version"           : fabric_api_version,
@@ -123,7 +124,7 @@ processResources {
         key, value -> [(key): value instanceof String ? value.replace("\n", "\\\\n") : value]
     }
 
-    filesMatching(['META-INF/mods.toml']) {
+    filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
         expand expandProps
     }
 

@@ -6,6 +6,9 @@ import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.core.cauldron.CauldronInteractions;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,8 +27,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractCauldronBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -35,9 +39,12 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 
 @SuppressWarnings("null")
 public final class WaterPurity {
@@ -56,13 +63,17 @@ public final class WaterPurity {
 
     private WaterPurity() {}
 
+    private static Map<Item, CauldronInteraction> getDispatcherItems(CauldronInteraction.Dispatcher dispatcher) {
+        return ((dev.minhnh.yetanotherthirst.mixin.CauldronInteractionDispatcherAccessor) dispatcher).yet_another_thirst$getItems();
+    }
+
     /** Called from common setup after item registration is complete. */
     public static void init() {
         CONTAINERS.clear();
         CONTAINERS.add(new ContainerWithPurity(
                 new ItemStack(Items.GLASS_BOTTLE),
-                PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER))
-                .setEqualsFilled(stack -> stack.is(Items.POTION) && PotionUtils.getPotion(stack) == Potions.WATER));
+                PotionContents.createItemStack(Items.POTION, Potions.WATER))
+                .setEqualsFilled(stack -> stack.is(Items.POTION) && stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(Potions.WATER)));
         CONTAINERS.add(new ContainerWithPurity(
                 new ItemStack(ModItems.TERRACOTTA_BOWL.get()),
                 new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get())));
@@ -78,27 +89,29 @@ public final class WaterPurity {
     }
 
     public static void registerCauldronInteractions() {
-        // ── Glass bottle from full cauldron ───────────────────────────────────
-        CauldronInteraction.WATER.remove(Items.GLASS_BOTTLE);
-        CauldronInteraction.WATER.put(Items.GLASS_BOTTLE, (blockState, level, pos, player, hand, itemStack) -> {
+        Map<Item, CauldronInteraction> water = getDispatcherItems(CauldronInteractions.WATER);
+        Map<Item, CauldronInteraction> empty = getDispatcherItems(CauldronInteractions.EMPTY);
+
+        // Glass bottle from full cauldron
+        water.remove(Items.GLASS_BOTTLE);
+        water.put(Items.GLASS_BOTTLE, (blockState, level, pos, player, hand, itemStack) -> {
             if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
-                ItemStack result = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER);
+                ItemStack result = PotionContents.createItemStack(Items.POTION, Potions.WATER);
                 WaterPurity.addPurity(result, level, pos);
                 player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
-                // Retrieve the updated block state (in case it was updated to the default purity) before lowering level
                 LayeredCauldronBlock.lowerFillLevel(level.getBlockState(pos), level, pos);
                 level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         });
 
-        // ── Bucket from full cauldron ─────────────────────────────────────────
-        CauldronInteraction.WATER.remove(Items.BUCKET);
-        CauldronInteraction.WATER.put(Items.BUCKET, (blockState, level, pos, player, hand, itemStack) -> {
+        // Bucket from full cauldron
+        water.remove(Items.BUCKET);
+        water.put(Items.BUCKET, (blockState, level, pos, player, hand, itemStack) -> {
             if (!blockState.getValue(LayeredCauldronBlock.LEVEL).equals(3)) return InteractionResult.PASS;
             if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
@@ -110,89 +123,81 @@ public final class WaterPurity {
                 level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         });
 
-        // ── Bowl from full cauldron ───────────────────────────────────────────
-        CauldronInteraction.WATER.put(Items.BOWL, (blockState, level, pos, player, hand, itemStack) -> {
+        // Bowl from full cauldron
+        water.put(Items.BOWL, (blockState, level, pos, player, hand, itemStack) -> {
             if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
                 ItemStack result = WaterPurity.addPurity(new ItemStack(ModItems.WOODEN_WATER_BOWL.get()), level, pos);
                 player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
-                // Retrieve the updated block state (in case it was updated to the default purity) before lowering level
                 LayeredCauldronBlock.lowerFillLevel(level.getBlockState(pos), level, pos);
                 level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         });
 
-        // ── Terracotta bowl from full cauldron ─────────────────────────────────
-        CauldronInteraction.WATER.put(ModItems.TERRACOTTA_BOWL.get(), (blockState, level, pos, player, hand, itemStack) -> {
+        // Terracotta bowl from full cauldron
+        water.put(ModItems.TERRACOTTA_BOWL.get(), (blockState, level, pos, player, hand, itemStack) -> {
             if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
                 ItemStack result = WaterPurity.addPurity(new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get()), level, pos);
                 player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
-                // Retrieve the updated block state (in case it was updated to the default purity) before lowering level
                 LayeredCauldronBlock.lowerFillLevel(level.getBlockState(pos), level, pos);
                 level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         });
 
-        // ── Filling cauldron from water bucket ────────────────────────────────
-        CauldronInteraction.EMPTY.put(Items.WATER_BUCKET, (blockState, level, pos, player, hand, itemStack) -> {
-            return fillCauldron(blockState, level, pos, player, hand, itemStack, 3, getPurity(itemStack), new ItemStack(Items.BUCKET));
-        });
-        CauldronInteraction.WATER.put(Items.WATER_BUCKET, (blockState, level, pos, player, hand, itemStack) -> {
-            return fillCauldron(blockState, level, pos, player, hand, itemStack, 3, getPurity(itemStack), new ItemStack(Items.BUCKET));
-        });
+        // Filling cauldron from water bucket
+        empty.put(Items.WATER_BUCKET, (blockState, level, pos, player, hand, itemStack) ->
+            fillCauldron(blockState, level, pos, player, hand, itemStack, 3, getPurity(itemStack), new ItemStack(Items.BUCKET)));
+        water.put(Items.WATER_BUCKET, (blockState, level, pos, player, hand, itemStack) ->
+            fillCauldron(blockState, level, pos, player, hand, itemStack, 3, getPurity(itemStack), new ItemStack(Items.BUCKET)));
 
-        // ── Filling cauldron from water bottle ────────────────────────────────
-        CauldronInteraction.EMPTY.put(Items.POTION, (blockState, level, pos, player, hand, itemStack) -> {
-            if (PotionUtils.getPotion(itemStack) != Potions.WATER) return InteractionResult.PASS;
+        // Filling cauldron from water bottle
+        empty.put(Items.POTION, (blockState, level, pos, player, hand, itemStack) -> {
+            if (!isWaterBottle(itemStack)) return InteractionResult.PASS;
             return fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(Items.GLASS_BOTTLE));
         });
-        CauldronInteraction.WATER.put(Items.POTION, (blockState, level, pos, player, hand, itemStack) -> {
-            if (PotionUtils.getPotion(itemStack) != Potions.WATER) return InteractionResult.PASS;
+        water.put(Items.POTION, (blockState, level, pos, player, hand, itemStack) -> {
+            if (!isWaterBottle(itemStack)) return InteractionResult.PASS;
             return fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(Items.GLASS_BOTTLE));
         });
 
-        // ── Filling cauldron from terracotta water bowl ───────────────────────
-        CauldronInteraction.EMPTY.put(ModItems.TERRACOTTA_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) -> {
-            return fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(ModItems.TERRACOTTA_BOWL.get()));
-        });
-        CauldronInteraction.WATER.put(ModItems.TERRACOTTA_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) -> {
-            return fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(ModItems.TERRACOTTA_BOWL.get()));
-        });
+        // Filling cauldron from terracotta water bowl
+        empty.put(ModItems.TERRACOTTA_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) ->
+            fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(ModItems.TERRACOTTA_BOWL.get())));
+        water.put(ModItems.TERRACOTTA_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) ->
+            fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(ModItems.TERRACOTTA_BOWL.get())));
 
-        // ── Filling cauldron from wooden water bowl ───────────────────────────
-        CauldronInteraction.EMPTY.put(ModItems.WOODEN_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) -> {
-            return fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(Items.BOWL));
-        });
-        CauldronInteraction.WATER.put(ModItems.WOODEN_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) -> {
-            return fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(Items.BOWL));
-        });
+        // Filling cauldron from wooden water bowl
+        empty.put(ModItems.WOODEN_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) ->
+            fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(Items.BOWL)));
+        water.put(ModItems.WOODEN_WATER_BOWL.get(), (blockState, level, pos, player, hand, itemStack) ->
+            fillCauldron(blockState, level, pos, player, hand, itemStack, 1, getPurity(itemStack), new ItemStack(Items.BOWL)));
 
-        // ── Washing clogged fabric filter in water cauldron ──────────────────
-        CauldronInteraction.WATER.put(ModItems.CLOGGED_FABRIC_FILTER.get(), (blockState, level, pos, player, hand, itemStack) -> {
+        // Washing clogged fabric filter in water cauldron
+        water.put(ModItems.CLOGGED_FABRIC_FILTER.get(), (blockState, level, pos, player, hand, itemStack) -> {
             if (!level.isClientSide()) {
                 ItemStack result = new ItemStack(ModItems.FABRIC_FILTER_CORE.get());
                 player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, result));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
                 LayeredCauldronBlock.lowerFillLevel(blockState, level, pos);
-                level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_LEATHER.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
                     ModAdvancements.award(sp, ModAdvancements.WASH_FILTER);
                 }
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         });
     }
 
@@ -233,7 +238,7 @@ public final class WaterPurity {
             level.gameEvent(null, GameEvent.FLUID_PLACE, pos);
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     public static boolean isWaterFilledContainer(ItemStack stack) {
@@ -243,7 +248,7 @@ public final class WaterPurity {
     }
 
     public static boolean isWaterBottle(ItemStack stack) {
-        return stack.is(Items.POTION) && PotionUtils.getPotion(stack) == Potions.WATER;
+        return stack.is(Items.POTION) && stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(Potions.WATER);
     }
 
     public static boolean isEmptyWaterContainer(ItemStack stack) {
@@ -265,22 +270,25 @@ public final class WaterPurity {
     }
 
     public static boolean hasPurity(ItemStack stack) {
-        return isWaterFilledContainer(stack) && stack.hasTag() && Objects.requireNonNull(stack.getTag()).contains("Purity");
+        if (!isWaterFilledContainer(stack)) return false;
+        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+        return customData != null && customData.copyTag().contains("Purity");
     }
 
     public static int getPurity(ItemStack stack) {
         if (!isWaterFilledContainer(stack) || !hasPurity(stack)) {
             return ThirstConfig.DEFAULT_PURITY;
         }
-        return Objects.requireNonNull(stack.getTag()).getInt("Purity");
+        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+        if (customData == null) return ThirstConfig.DEFAULT_PURITY;
+        return customData.copyTag().getIntOr("Purity", ThirstConfig.DEFAULT_PURITY);
     }
 
     public static ItemStack addPurity(ItemStack stack, int purity) {
         if (!isWaterFilledContainer(stack)) {
             return stack;
         }
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.putInt("Purity", purity);
+        CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putInt("Purity", purity));
         return stack;
     }
 
@@ -294,18 +302,33 @@ public final class WaterPurity {
         }
     }
 
-
     public static boolean waterBottleTagsMatchForStacking(ItemStack first, ItemStack second) {
         if (!isWaterBottle(first) || !isWaterBottle(second)) return false;
-        return getPurity(first) == getPurity(second)
-                && Objects.equals(waterBottleTagWithoutPurity(first), waterBottleTagWithoutPurity(second));
+        if (getPurity(first) != getPurity(second)) return false;
+
+        if (!Objects.equals(waterBottleTagWithoutPurity(first), waterBottleTagWithoutPurity(second))) {
+            return false;
+        }
+
+        var comp1 = first.getComponents();
+        var comp2 = second.getComponents();
+        Set<DataComponentType<?>> keys = new HashSet<>(comp1.keySet());
+        keys.addAll(comp2.keySet());
+        keys.remove(DataComponents.CUSTOM_DATA);
+
+        for (DataComponentType<?> key : keys) {
+            if (!Objects.equals(comp1.get(key), comp2.get(key))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static CompoundTag waterBottleTagWithoutPurity(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
-        if (tag == null) return null;
+        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+        if (customData == null) return null;
 
-        CompoundTag normalized = tag.copy();
+        CompoundTag normalized = customData.copyTag();
         normalized.remove("Purity");
         return normalized.isEmpty() ? null : normalized;
     }
@@ -399,7 +422,7 @@ public final class WaterPurity {
         if (entity instanceof ServerPlayer sp) {
             boolean debuffed = false;
             if (chance < nauseaChance) {
-                sp.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 20 * 5, 0));
+                sp.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 20 * 5, 0));
                 sp.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20 * 30, 0));
                 sp.addEffect(new MobEffectInstance(ModEffects.THIRSTY.get(), 20 * 30, 0));
                 debuffed = true;

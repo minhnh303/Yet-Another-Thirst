@@ -1,27 +1,27 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class NeoForgeConfigCompat {
 
-    static final ForgeConfigSpec SPEC;
+    static final ModConfigSpec SPEC;
 
     @SuppressWarnings("unused")
-    private static final ForgeConfigSpec.IntValue CONFIG_VERSION;
-    private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
-    private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
-    private static final ForgeConfigSpec.EnumValue<ThirstConfig.ToughAsNailsMode> TOUGH_AS_NAILS_MODE;
-    private static final ForgeConfigSpec.BooleanValue COLD_SWEAT_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS;
-    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_HOT_BODY_TEMPERATURE;
-    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_BURNING_BODY_TEMPERATURE;
-    private static final ForgeConfigSpec.DoubleValue COLD_SWEAT_MAX_DEHYDRATION_MODIFIER;
-    private static final ForgeConfigSpec.BooleanValue SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST;
-    private static final ForgeConfigSpec.BooleanValue VAMPIRISM_VAMPIRE_SUSPENDS_THIRST;
+    private static final ModConfigSpec.IntValue CONFIG_VERSION;
+    private static final ModConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
+    private static final ModConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
+    private static final ModConfigSpec.EnumValue<ThirstConfig.ToughAsNailsMode> TOUGH_AS_NAILS_MODE;
+    private static final ModConfigSpec.BooleanValue COLD_SWEAT_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue COLD_SWEAT_REPLACES_ENVIRONMENT_MODIFIERS;
+    private static final ModConfigSpec.DoubleValue COLD_SWEAT_HOT_BODY_TEMPERATURE;
+    private static final ModConfigSpec.DoubleValue COLD_SWEAT_BURNING_BODY_TEMPERATURE;
+    private static final ModConfigSpec.DoubleValue COLD_SWEAT_MAX_DEHYDRATION_MODIFIER;
+    private static final ModConfigSpec.BooleanValue SUPERNATURAL_VAMPIRE_SUSPENDS_THIRST;
+    private static final ModConfigSpec.BooleanValue VAMPIRISM_VAMPIRE_SUSPENDS_THIRST;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         CONFIG_VERSION = builder
                 .comment("Config file version — do not modify")

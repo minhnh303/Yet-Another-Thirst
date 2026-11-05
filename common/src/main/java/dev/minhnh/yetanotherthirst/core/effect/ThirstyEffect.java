@@ -4,6 +4,7 @@ import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -12,13 +13,11 @@ import net.minecraft.world.entity.LivingEntity;
 public class ThirstyEffect extends MobEffect {
 
     public ThirstyEffect() {
-
         super(MobEffectCategory.HARMFUL, 0xb15b2a);
     }
 
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
-
+    public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
         if (entity instanceof ServerPlayer player
                 && !ThirstCompat.usesExternalThirst(player)
                 && !ThirstCompat.suspendsThirst(player)
@@ -28,11 +27,11 @@ public class ThirstyEffect extends MobEffect {
                 state.addExhaustion(ThirstConfig.THIRSTY_EFFECT_EXHAUSTION_PER_TICK * (amplifier + 1));
             }
         }
+        return true;
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
-
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return true;
     }
 }

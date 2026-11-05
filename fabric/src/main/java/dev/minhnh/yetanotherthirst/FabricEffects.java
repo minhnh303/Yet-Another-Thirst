@@ -3,14 +3,15 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.effect.HydrationEffect;
 import dev.minhnh.yetanotherthirst.core.effect.ModEffects;
 import dev.minhnh.yetanotherthirst.core.effect.ThirstyEffect;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 
 public final class FabricEffects {
 
-    static MobEffect THIRSTY;
-    static MobEffect HYDRATION;
+    static Holder<MobEffect> THIRSTY;
+    static Holder<MobEffect> HYDRATION;
 
     static void register() {
 
@@ -20,9 +21,9 @@ public final class FabricEffects {
         bindToCommon();
     }
 
-    private static <T extends MobEffect> T reg(String name, T effect) {
+    private static <T extends MobEffect> Holder<T> reg(String name, T effect) {
 
-        return Registry.register(BuiltInRegistries.MOB_EFFECT, Constants.asResource(name), effect);
+        return Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, Constants.asResource(name), effect);
     }
 
     static void bindToCommon() {

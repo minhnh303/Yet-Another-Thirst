@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import java.util.List;
 
 public class WaterBoilerScreen extends AbstractContainerScreen<AbstractWaterBoilerMenu> {
 
-    private static final ResourceLocation TEXTURE =
-            new ResourceLocation(Constants.MOD_ID, "textures/gui/water_boiler.png");
+    private static final Identifier TEXTURE =
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/water_boiler.png");
 
     public WaterBoilerScreen(AbstractWaterBoilerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);

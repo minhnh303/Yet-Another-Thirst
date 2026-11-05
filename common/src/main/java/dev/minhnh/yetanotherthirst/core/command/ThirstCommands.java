@@ -25,7 +25,7 @@ public final class ThirstCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
         dispatcher.register(Commands.literal("thirst")
-                .requires(source -> source.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("query")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(context -> query(context.getSource(), EntityArgument.getPlayer(context, "player")))))
@@ -75,7 +75,7 @@ public final class ThirstCommands {
         }
 
         String names = players.stream()
-                .map(player -> player.getGameProfile().getName())
+                .map(player -> player.getName().getString())
                 .collect(Collectors.joining(", "));
         String key = enabled ? "command.yet_another_thirst.enable" : "command.yet_another_thirst.disable";
         source.sendSuccess(() -> Component.translatable(key, names), false);

@@ -8,7 +8,7 @@ import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -200,7 +200,7 @@ public final class FabricConfig {
         ThirstConfig.SAND_FILTER_MAX_PURITY = getInt(itemsJson, "sandFilterMaxPurity", 2);
         ThirstConfig.CARBON_FILTER_DURABILITY = getInt(itemsJson, "carbonFilterDurability", 250000);
         ThirstConfig.CARBON_FILTER_MAX_PURITY = getInt(itemsJson, "carbonFilterMaxPurity", 3);
-        ThirstConfig.WATER_BOILER_CAPACITY = getInt(itemsJson, "waterBoilerCapacity", 2000);
+        ThirstConfig.WATER_BOILER_CAPACITY = getInt(itemsJson, "waterBoilerCapacity", 16000);
         ThirstConfig.WATER_BOILER_BOIL_TIME = getInt(itemsJson, "waterBoilerBoilTime", 200);
         ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION = getInt(itemsJson, "waterBoilerEnergyConsumption", 32);
 
@@ -222,7 +222,7 @@ public final class FabricConfig {
                 getTemperatureTiers(compatJson, "environmentzTemperatureTiers", defaultEnvironmentzTemperatureTiers()));
         ThirstConfig.ENVIRONMENTZ_SHOW_TEMPERATURE_TEXT = getBool(compatJson, "environmentzShowTemperatureText", true);
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_TYPE = getString(compatJson, "environmentzTemperatureTextType", "PLAYER");
-        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT = getString(compatJson, "environmentzTemperatureTextUnit", "°C");
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT = getString(compatJson, "environmentzTemperatureTextUnit", "");
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_X_OFFSET = getInt(compatJson, "environmentzTemperatureTextXOffset", 0);
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_Y_OFFSET = getInt(compatJson, "environmentzTemperatureTextYOffset", 0);
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR = getInt(compatJson, "environmentzTemperatureTextColor", 0xFFFFFF);
@@ -352,16 +352,17 @@ public final class FabricConfig {
 
     private static Optional<Item> resolveItem(String id) {
         try {
-            var loc = new ResourceLocation(id);
-            var item = BuiltInRegistries.ITEM.get(loc);
-            if (item != Items.AIR || "minecraft:air".equals(id)) return Optional.of(item);
+            var loc = Identifier.parse(id);
+            return BuiltInRegistries.ITEM.get(loc)
+                    .map(net.minecraft.core.Holder.Reference::value)
+                    .filter(item -> item != Items.AIR || "minecraft:air".equals(id));
         } catch (Exception ignored) {}
         return Optional.empty();
     }
 
     private static Optional<TagKey<Item>> resolveTag(String id) {
         try {
-            return Optional.of(TagKey.create(net.minecraft.core.registries.Registries.ITEM, new ResourceLocation(id)));
+            return Optional.of(TagKey.create(net.minecraft.core.registries.Registries.ITEM, Identifier.parse(id)));
         } catch (Exception ignored) {}
         return Optional.empty();
     }

@@ -1,24 +1,32 @@
 plugins {
     id 'multiloader-common'
-    id 'net.neoforged.moddev.legacyforge'
+    id 'net.neoforged.moddev'
 }
 
-legacyForge {
-    mcpVersion = minecraft_version
+neoForge {
+    neoFormVersion = neoform_version
+    addModdingDependenciesTo(sourceSets.main)
     if (file("src/main/resources/META-INF/accesstransformer.cfg").exists()) {
         accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
-    }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
     }
 }
 
 dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly 'org.spongepowered:mixin:0.8.5'
-    compileOnly 'maven.modrinth:jade:11.13.2+forge'
-    compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
+}
+
+sourceSets {
+    main {
+        java {
+            exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
+            exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
+            exclude 'dev/minhnh/yetanotherthirst/screen/AbstractWaterBoilerMenu.java'
+            exclude 'dev/minhnh/yetanotherthirst/screen/WaterBoilerScreen.java'
+            exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
+            exclude 'dev/minhnh/yetanotherthirst/core/block/IWaterBoiler.java'
+        }
+    }
 }
 
 configurations {

@@ -4,28 +4,30 @@ plugins {
 }
 
 legacyForge {
-    version = "${minecraft_version}-${forge_version}"
+    enable {
+        forgeVersion = "${minecraft_version}-${forge_version}"
+        obfuscateJar = false
+    }
 
     validateAccessTransformers = true
 
-    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = findProject(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
-        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
-    }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
+        accessTransformers = [at]
     }
     runs {
         client {
             client()
+            systemProperties.set(['mixin.env.remapRefMap': 'false'])
         }
         data {
             data()
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            systemProperties.set(['mixin.env.remapRefMap': 'false'])
         }
         server {
             server()
+            systemProperties.set(['mixin.env.remapRefMap': 'false'])
         }
     }
 
@@ -36,29 +38,69 @@ legacyForge {
     }
 
     mixin {
-        add sourceSets.main, "yet_another_thirst.refmap.json"
         config "yet_another_thirst.mixins.json"
-        config "yet_another_thirst.compat.mixins.json"
     }
 }
 
-sourceSets.main.resources.srcDir 'src/generated/resources'
+tasks.named('createMinecraftArtifacts') {
+    additionalResults.empty()
+}
+
+configurations.named('modDevRuntimeDependencies') {
+    dependencies.removeIf { it instanceof FileCollectionDependency }
+}
+
+dependencies.components.withModule('net.minecraftforge:forge') {
+    withVariant('modDevApiElements') {
+        withCapabilities {
+            removeCapability('net.minecraftforge', 'forge')
+        }
+    }
+}
+
+def forgeExcludes = [
+        'dev/minhnh/yetanotherthirst/core/block/**',
+        'dev/minhnh/yetanotherthirst/screen/**',
+        'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java',
+        'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java',
+        'dev/minhnh/yetanotherthirst/compat/ThirstElement.java',
+        'dev/minhnh/yetanotherthirst/compat/FluidPurityHelper.java',
+        'dev/minhnh/yetanotherthirst/compat/ie/**',
+        'dev/minhnh/yetanotherthirst/mixin/create/**',
+        'dev/minhnh/yetanotherthirst/mixin/ie/**',
+        'dev/minhnh/yetanotherthirst/mixin/CompatMixinPlugin.java',
+        'dev/minhnh/yetanotherthirst/mixin/MixinAbstractFurnaceEntity.java',
+        'dev/minhnh/yetanotherthirst/mixin/MixinFluidBucketWrapper.java',
+        'dev/minhnh/yetanotherthirst/mixin/MixinFluidTank.java',
+        'dev/minhnh/yetanotherthirst/mixin/MixinFluidView.java'
+]
+
+sourceSets {
+    main {
+        resources.srcDir 'src/generated/resources'
+        java {
+            exclude forgeExcludes
+        }
+    }
+}
+
+tasks.named('compileJava', JavaCompile) {
+    exclude forgeExcludes
+}
+
+tasks.named('javadoc', Javadoc) {
+    failOnError = false
+    exclude forgeExcludes
+}
+
+tasks.named('sourcesJar', Jar) {
+    exclude forgeExcludes
+}
 
 dependencies {
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly project(":common")
-    compileOnly 'maven.modrinth:jade:11.13.2+forge'
-    compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
-    // Optional mod compat — Create and ImmersiveEngineering fluid contamination
-    compileOnly "com.simibubi.create:create-1.20.1:6.0.8-291:all"
-    compileOnly "net.createmod.ponder:Ponder-Forge-1.20.1:1.0.91"
-    compileOnly "maven.modrinth:immersiveengineering:10.2.0-183"
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(layout.buildDirectory.dir("mixin")) {
-        include "yet_another_thirst.refmap.json"
-    }
-    finalizedBy('reobfJar')
 }

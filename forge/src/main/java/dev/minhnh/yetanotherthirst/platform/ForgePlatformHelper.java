@@ -1,7 +1,8 @@
 package dev.minhnh.yetanotherthirst.platform;
 
-import dev.minhnh.yetanotherthirst.ForgeNetwork;
 import dev.minhnh.yetanotherthirst.Constants;
+import dev.minhnh.yetanotherthirst.ForgeHandDrinkClient;
+import dev.minhnh.yetanotherthirst.ForgeNetwork;
 import dev.minhnh.yetanotherthirst.platform.services.IPlatformHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,48 +14,44 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public String getPlatformName() {
-
         return "Forge";
     }
 
     @Override
     public boolean isModLoaded(String modId) {
-
-        return ModList.get().isLoaded(modId);
+        return ModList.isLoaded(modId);
     }
 
     @Override
     public boolean isDevelopmentEnvironment() {
-
         return !FMLLoader.isProduction();
     }
 
     @Override
     public CompoundTag loadThirstData(Player player) {
-
-        return player.getPersistentData().getCompound(Constants.MOD_ID);
+        return player.getPersistentData().getCompoundOrEmpty(Constants.MOD_ID);
     }
 
     @Override
     public void saveThirstData(Player player, CompoundTag tag) {
-
         player.getPersistentData().put(Constants.MOD_ID, tag);
     }
 
     @Override
     public CompoundTag loadPersistentData(Player player, String key) {
-
-        return player.getPersistentData().getCompound(key);
+        return player.getPersistentData().getCompoundOrEmpty(key);
     }
 
     @Override
     public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-
         ForgeNetwork.sendToPlayer(player, thirst, quenched, exhaustion, enabled);
     }
 
     @Override
     public boolean tryHandDrink() {
-        return net.minecraftforge.fml.DistExecutor.unsafeCallWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> dev.minhnh.yetanotherthirst.ForgeHandDrinkClient::tryDrink);
+        if (FMLLoader.getDist().isClient()) {
+            return ForgeHandDrinkClient.tryDrink();
+        }
+        return false;
     }
 }

@@ -14,15 +14,11 @@
     ],
     "client": [
       "dev.minhnh.yetanotherthirst.YetAnotherThirstFabricClient"
-    ],
-    "jade": [
-      "dev.minhnh.yetanotherthirst.compat.JadeCompatPlugin"
     ]
   },
   "mixins": [
     "yet_another_thirst.mixins.json",
-    "yet_another_thirst.fabric.mixins.json",
-    "yet_another_thirst.compat.mixins.json"
+    "yet_another_thirst.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",

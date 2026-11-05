@@ -1,6 +1,5 @@
 package dev.minhnh.yetanotherthirst.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.minhnh.yetanotherthirst.Constants;
 import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
@@ -9,10 +8,12 @@ import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nonnull;
@@ -21,7 +22,7 @@ import java.util.Optional;
 public final class ThirstHudRenderer {
 
     @Nonnull
-    private static final ResourceLocation THIRST_ICONS = Constants.THIRST_ICONS;
+    private static final Identifier THIRST_ICONS = Constants.THIRST_ICONS;
     private static final RandomSource RANDOM = RandomSource.create();
 
     private ThirstHudRenderer() {
@@ -34,7 +35,7 @@ public final class ThirstHudRenderer {
      */
     public static boolean shouldRender(Minecraft minecraft) {
         LocalPlayer player = minecraft.player;
-        if (player == null || !player.isAlive() || minecraft.options.hideGui) {
+        if (player == null || !player.isAlive() || player.isCreative() || player.isSpectator() || minecraft.gui.hud.isHidden()) {
             return false;
         }
         if (ThirstCompat.hidesThirstHud(player)) {
@@ -49,7 +50,7 @@ public final class ThirstHudRenderer {
         return ThirstStorage.get(player).isEnabled();
     }
 
-    public static boolean render(GuiGraphics guiGraphics, int width, int height, int rightHeight) {
+    public static boolean render(GuiGraphicsExtractor extractor, int width, int height, int rightHeight) {
 
         Minecraft minecraft = Minecraft.getInstance();
         if (!shouldRender(minecraft)) {
@@ -58,8 +59,6 @@ public final class ThirstHudRenderer {
         LocalPlayer player = minecraft.player;
         ThirstState state = ThirstStorage.get(player);
 
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int left = width / 2 + 91 + ThirstConfig.HUD_X_OFFSET;
         int top = height - rightHeight + ThirstConfig.HUD_Y_OFFSET;
         int level = state.getThirst();
@@ -70,7 +69,7 @@ public final class ThirstHudRenderer {
         if (exhaustion > 0.0F) {
             float ratio = Math.min(1.0F, exhaustion / ThirstConfig.EXHAUSTION_LIMIT);
             int exhaustionWidth = (int) (ratio * 81.0F);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.75F);
+            int exhaustionColor = 0xC0FFFFFF; // 75% alpha
             for (int i = 0; i < 10; ++i) {
                 int x = left - i * 8 - 9;
                 int xLeft = x;
@@ -80,10 +79,9 @@ public final class ThirstHudRenderer {
                 if (iLeft < iRight) {
                     int w = iRight - iLeft;
                     int u = iLeft - xLeft;
-                    guiGraphics.blit(THIRST_ICONS, iLeft, top, 27 + u, 9, w, 9, 36, 25);
+                    extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, iLeft, top, (float) (27 + u), 9.0F, w, 9, 36, 25, exhaustionColor);
                 }
             }
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         }
 
         // 2. Draw backgrounds
@@ -95,13 +93,13 @@ public final class ThirstHudRenderer {
                 if (quenched <= 0 && player.tickCount % (level * 3 + 1) == 0) {
                     y = top + RANDOM.nextInt(3) - 1;
                 }
-                guiGraphics.blit(THIRST_ICONS, x, y, 0, 0, 9, 9, 36, 25);
+                extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, y, 0.0F, 0.0F, 9, 9, 36, 25);
             }
         }
 
         // 3. Draw thirst droplets
-        boolean isPoisoned = player.hasEffect(net.minecraft.world.effect.MobEffects.CONFUSION)
-                || player.hasEffect(net.minecraft.world.effect.MobEffects.POISON);
+        boolean isPoisoned = player.hasEffect(MobEffects.NAUSEA)
+                || player.hasEffect(MobEffects.POISON);
 
         for (int i = 0; i < 10; ++i) {
             int index = i * 2 + 1;
@@ -112,9 +110,9 @@ public final class ThirstHudRenderer {
             }
 
             if (index < level) {
-                guiGraphics.blit(THIRST_ICONS, x, y, isPoisoned ? 27 : 18, 0, 9, 9, 36, 25);
+                extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, y, isPoisoned ? 27.0F : 18.0F, 0.0F, 9, 9, 36, 25);
             } else if (index == level) {
-                guiGraphics.blit(THIRST_ICONS, x, y, 9, 0, 9, 9, 36, 25);
+                extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, y, 9.0F, 0.0F, 9, 9, 36, 25);
             }
         }
 
@@ -125,24 +123,23 @@ public final class ThirstHudRenderer {
             int slotMax = i * 2 + 2;
             if (quenched > slotMin) {
                 if (quenched >= slotMax) {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 0, 9, 9, 9, 36, 25);
+                    extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, top, 0.0F, 9.0F, 9, 9, 36, 25);
                 } else {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 9, 9, 9, 9, 36, 25);
+                    extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, top, 9.0F, 9.0F, 9, 9, 36, 25);
                 }
             }
         }
 
         // 5. Draw item preview overlays (thirst and quenched)
-        renderHeldItemPreview(guiGraphics, player, state, left, top);
+        renderHeldItemPreview(extractor, player, state, left, top);
 
         // 6. Draw EnvironmentZ temperature text next to thermometer icon
-        renderEnvironmentzTemperature(guiGraphics, minecraft, player, width, height);
+        renderEnvironmentzTemperature(extractor, minecraft, player, width, height);
 
-        RenderSystem.disableBlend();
         return true;
     }
 
-    private static void renderEnvironmentzTemperature(GuiGraphics guiGraphics, Minecraft minecraft, LocalPlayer player, int width, int height) {
+    private static void renderEnvironmentzTemperature(GuiGraphicsExtractor extractor, Minecraft minecraft, LocalPlayer player, int width, int height) {
         if (!ThirstConfig.COMPAT_ENVIRONMENTZ
                 || !ThirstConfig.ENVIRONMENTZ_SHOW_TEMPERATURE_TEXT
                 || !ThirstCompat.isEnvironmentzThermometerVisible()) {
@@ -166,10 +163,10 @@ public final class ThirstHudRenderer {
         int textX = iconX + 18 + ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_X_OFFSET;
         int textY = iconY + 11 + ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_Y_OFFSET;
 
-        guiGraphics.drawString(minecraft.font, text, textX, textY, ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR, true);
+        extractor.text(minecraft.font, text, textX, textY, ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR, true);
     }
 
-    private static void renderHeldItemPreview(GuiGraphics guiGraphics, LocalPlayer player, ThirstState state, int left, int top) {
+    private static void renderHeldItemPreview(GuiGraphicsExtractor extractor, LocalPlayer player, ThirstState state, int left, int top) {
 
         if (!ThirstCompat.showsAppleSkinHudPreview()) {
             return;
@@ -203,10 +200,11 @@ public final class ThirstHudRenderer {
         int previewQuenched = Math.min(currentQuenched + quenchedRestored + overflow, previewThirst);
 
         float alpha = 0.3F + 0.2F * (float) Math.sin(player.tickCount / 3.0);
+        int alphaInt = Math.max(0, Math.min(255, (int) (alpha * 255.0F)));
+        int color = (alphaInt << 24) | 0x00FFFFFF;
 
         // Preview thirst level increase
         if (previewThirst > currentThirst) {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
             for (int i = 0; i < 10; ++i) {
                 int index = i * 2 + 1;
                 if (index <= currentThirst) {
@@ -214,16 +212,15 @@ public final class ThirstHudRenderer {
                 }
                 int x = left - i * 8 - 9;
                 if (index < previewThirst) {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 18, 0, 9, 9, 36, 25);
+                    extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, top, 18.0F, 0.0F, 9, 9, 36, 25, color);
                 } else if (index == previewThirst) {
-                    guiGraphics.blit(THIRST_ICONS, x, top, 9, 0, 9, 9, 36, 25);
+                    extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, top, 9.0F, 0.0F, 9, 9, 36, 25, color);
                 }
             }
         }
 
         // Preview quenched level increase
         if (previewQuenched > currentQuenched) {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
             for (int i = 0; i < 10; ++i) {
                 int x = left - i * 8 - 9;
                 int slotMin = i * 2;
@@ -235,14 +232,12 @@ public final class ThirstHudRenderer {
 
                 if (previewQuenched > slotMin) {
                     if (previewQuenched >= slotMax) {
-                        guiGraphics.blit(THIRST_ICONS, x, top, 0, 9, 9, 9, 36, 25);
+                        extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, top, 0.0F, 9.0F, 9, 9, 36, 25, color);
                     } else {
-                        guiGraphics.blit(THIRST_ICONS, x, top, 9, 9, 9, 9, 36, 25);
+                        extractor.blit(RenderPipelines.GUI_TEXTURED, THIRST_ICONS, x, top, 9.0F, 9.0F, 9, 9, 36, 25, color);
                     }
                 }
             }
         }
-
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

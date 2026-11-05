@@ -9,7 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -34,9 +34,9 @@ public final class ThirstCompat {
         }
 
         if (!ThirstConfig.SUSPENDED_THIRST_EFFECTS.isEmpty()) {
-            Registry<MobEffect> effects = entity.level().registryAccess().registryOrThrow(Registries.MOB_EFFECT);
+            Registry<MobEffect> effects = entity.level().registryAccess().lookupOrThrow(Registries.MOB_EFFECT);
             for (var effectInstance : entity.getActiveEffects()) {
-                ResourceLocation effectId = effectId(effects, effectInstance.getEffect());
+                Identifier effectId = effectId(effects, effectInstance.getEffect());
                 if (effectId != null) {
                     for (var condition : ThirstConfig.SUSPENDED_THIRST_EFFECTS) {
                         if (condition.effectId.equals(effectId) && condition.matches(effectInstance.getAmplifier())) {
@@ -95,7 +95,7 @@ public final class ThirstCompat {
 
         if (entity instanceof Player player) {
             CompoundTag persistent = Services.PLATFORM.loadPersistentData(player, "PlayerPersisted");
-            return persistent.getBoolean("isVampire");
+            return persistent.getBooleanOr("isVampire", false);
         }
         return false;
     }
@@ -329,9 +329,9 @@ public final class ThirstCompat {
             return false;
         }
 
-        Registry<MobEffect> effects = entity.level().registryAccess().registryOrThrow(Registries.MOB_EFFECT);
+        Registry<MobEffect> effects = entity.level().registryAccess().lookupOrThrow(Registries.MOB_EFFECT);
         for (var effectInstance : entity.getActiveEffects()) {
-            ResourceLocation effectId = effectId(effects, effectInstance.getEffect());
+            Identifier effectId = effectId(effects, effectInstance.getEffect());
             if (effectId != null) {
                 for (var condition : ThirstConfig.PAUSE_DEPLETION_EFFECTS) {
                     if (condition.effectId.equals(effectId) && condition.matches(effectInstance.getAmplifier())) {
@@ -343,9 +343,8 @@ public final class ThirstCompat {
         return false;
     }
 
-    public static ResourceLocation effectId(Registry<MobEffect> effects, MobEffect effect) {
-
-        return effects.getResourceKey(effect).map(ResourceKey::location).orElse(null);
+    public static Identifier effectId(Registry<MobEffect> effects, net.minecraft.core.Holder<MobEffect> effect) {
+        return effect.unwrapKey().map(ResourceKey::identifier).orElse(null);
     }
 
     private static final class Vampirism {

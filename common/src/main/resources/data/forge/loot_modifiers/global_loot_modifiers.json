@@ -1,10 +1,11 @@
 {
   "replace": false,
   "entries": [
-    "yet_another_thirst:add_loot_simple_dungeon",
-    "yet_another_thirst:add_loot_abandoned_mineshaft",
-    "yet_another_thirst:add_loot_shipwreck_supply",
-    "yet_another_thirst:add_loot_bastion_other",
-    "yet_another_thirst:add_loot_nether_bridge"
+    "yet_another_thirst:abandoned_mineshaft",
+    "yet_another_thirst:buried_treasure",
+    "yet_another_thirst:desert_pyramid",
+    "yet_another_thirst:simple_dungeon",
+    "yet_another_thirst:spawn_bonus_chest"
   ]
 }
+
