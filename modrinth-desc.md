@@ -100,6 +100,7 @@ Yet Another Thirst is designed to be the ultimate modpack-friendly hydration mod
 * **AppleSkin:** Visually previews how much thirst and hydration saturation a drink will restore directly on your HUD when holding it.
 * **Jade:** Adds an in-world tooltip when looking at water blocks or cauldrons, showing their current purity level before you harvest.
 * **Cold Sweat:** Seamlessly links with core body and ambient temperature. Your thirst rate adapts dynamically based on how hot or cold your body is.
+* **EnvironmentZ (Fabric):** Links with EnvironmentZ's hot/cold environmental exposure state. Being overheated speeds up dehydration, while being chilled slows it down.
 * **Farmer's Delight & Beverage Mods:** 
   * Water bottles stack up to **64** to fit better in food-focused packs.
   * Consuming stews, meals, teas, or alcoholic beverages from mods like *Farmer's Delight*, *Respite*, and *Brewin' & Chewin'* provides long-lasting hydration.
@@ -129,7 +130,7 @@ Manage player thirst easily with commands (requires operator permission):
 
 ## ⚙️ Fully Configurable
 
-Almost every aspect of Yet Another Thirst can be customized in the `config/yet_another_thirst/common.toml` config file:
+Almost every aspect of Yet Another Thirst can be customized in the `config/yetanotherthirst/common.toml` config file:
 * Adjust exhaustion rates, damage intervals, and sprint thresholds.
 * Change purity levels of world-harvested water.
 * Customize which foods/drinks restore thirst and by how much.
@@ -145,6 +146,7 @@ The default configuration ships **pre-tuned** for all supported companion mods s
 | **AppleSkin** | Thirst & quenched preview enabled immediately after installation. |
 | **Jade** | Water purity tooltips active on all water blocks and cauldrons out of the box. |
 | **Cold Sweat** | Body-temperature-based thirst scaling enabled with sensible thresholds. |
+| **EnvironmentZ** | Hot/cold environmental exposure scales thirst depletion out of the box (Fabric only). |
 | **Farmer's Delight** | Water bottles stack to 64; stews/meals grant hydration by default. |
 | **Respite / Brewin' & Chewin'** | Teas and brews restore thirst without any extra configuration. |
 | **Let's Do (Bakery, Brewery, Farm & Charm)** | Stuffed / Saturated / Satiation / Sustenance / Feast buffs auto-pause thirst drain. |
@@ -153,6 +155,90 @@ The default configuration ships **pre-tuned** for all supported companion mods s
 | **Tough As Nails** | Coexistence mode pre-configured; YAT auto-disables if TAN is detected. |
 
 > Simply drop the relevant mods into your `mods/` folder — no extra config editing required.
+
+---
+
+### 📊 Supported Integrations Matrix by Mod Loader
+
+Detailed compatibility and integration breakdown across mod loaders and Minecraft versions:
+
+#### 📌 Legend
+* **✅ Supported:** Fully supported and integrated out of the box.
+* **🔨 In Progress:** Currently under active development / testing (unreleased).
+* **⏳ Pending Port:** Awaiting upstream companion mod update/port to this version.
+* **❌ N/A:** Not available or unsupported on this mod loader / version.
+
+#### 🔹 NeoForge
+
+| Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
+| :--- | :---: | :---: | :---: | :--- |
+| **AppleSkin** | ✅ | ✅ | 🔨 | — |
+| **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
+| **Create** | ✅ | ✅ | ⏳ | 26.2: Pending Create port to Minecraft 26.2 |
+| **Immersive Engineering** | ✅ | ✅ | ⏳ | 26.2: Pending Immersive Engineering port to Minecraft 26.2 |
+| **Cold Sweat** | ✅ | ✅ | 🔨 | — |
+| **Tough As Nails** | ✅ | ✅ | 🔨 | — |
+| **Vampirism** | ✅ | ✅ | 🔨 | — |
+| **Supernatural** | ✅ | ✅ | 🔨 | — |
+| **Corail Tombstone** | ✅ | ✅ | 🔨 | — |
+| **Farmer's Delight** | ✅ | ✅ | 🔨 | — |
+| **Farmer's Respite** | ✅ | ✅ | 🔨 | — |
+| **Brewin' & Chewin'** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Bakery** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Brewery** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Farm & Charm** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Beachparty** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] HerbalBrews** | ✅ | ✅ | 🔨 | — |
+| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | 🔨 | — |
+| **EnvironmentZ** | ❌ | ❌ | ❌ | Not supported on NeoForge (Fabric exclusive) |
+
+#### 🔹 Forge
+
+| Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
+| :--- | :---: | :---: | :---: | :--- |
+| **AppleSkin** | ✅ | ✅ | 🔨 | — |
+| **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
+| **Create** | ✅ | ✅ | ⏳ | 26.2: Pending Create port to Minecraft 26.2 |
+| **Immersive Engineering** | ✅ | ✅ | ⏳ | 26.2: Pending Immersive Engineering port to Minecraft 26.2 |
+| **Cold Sweat** | ✅ | ✅ | 🔨 | — |
+| **Tough As Nails** | ✅ | ✅ | 🔨 | — |
+| **Vampirism** | ✅ | ✅ | 🔨 | — |
+| **Supernatural** | ✅ | ✅ | 🔨 | — |
+| **Corail Tombstone** | ✅ | ✅ | 🔨 | — |
+| **Farmer's Delight** | ✅ | ✅ | 🔨 | — |
+| **Farmer's Respite** | ✅ | ✅ | 🔨 | — |
+| **Brewin' & Chewin'** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Bakery** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Brewery** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Farm & Charm** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Beachparty** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] HerbalBrews** | ✅ | ✅ | 🔨 | — |
+| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | 🔨 | — |
+| **EnvironmentZ** | ❌ | ❌ | ❌ | Not supported on Forge (Fabric exclusive) |
+
+#### 🔹 Fabric
+
+| Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
+| :--- | :---: | :---: | :---: | :--- |
+| **AppleSkin** | ✅ | ✅ | 🔨 | — |
+| **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
+| **EnvironmentZ** | ✅ | ✅ | 🔨 | — |
+| **Create** *(Create: Fabric)* | ✅ | ❌ | ❌ | 1.21+ & 26.2: Create: Fabric is only maintained up to 1.20.1 |
+| **Immersive Engineering** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
+| **Cold Sweat** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
+| **Tough As Nails** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
+| **Vampirism** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
+| **Supernatural** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
+| **Corail Tombstone** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
+| **Farmer's Delight** *(Refabricated)* | ✅ | ✅ | 🔨 | — |
+| **Farmer's Respite** | ✅ | ✅ | 🔨 | — |
+| **Brewin' & Chewin'** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Bakery** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Brewery** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Farm & Charm** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Beachparty** | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] HerbalBrews** | ✅ | ✅ | 🔨 | — |
+| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | 🔨 | — |
 
 ---
 
