@@ -115,6 +115,7 @@ processResources {
             "neoform_version"              : neoform_version,
             "neoforge_loader_version_range": neoforge_loader_version_range,
             "fabric_loader_version"        : fabric_loader_version,
+            "fabric_loader_version_range"  : fabric_loader_version_range,
             "fabric_api_version"           : fabric_api_version,
             'credits'                      : credits,
             'java_version'                 : java_version

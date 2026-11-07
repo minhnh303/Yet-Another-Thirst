@@ -47,7 +47,17 @@ tasks.named('createMinecraftArtifacts') {
 }
 
 configurations.named('modDevRuntimeDependencies') {
-    dependencies.removeIf { it instanceof FileCollectionDependency }
+    dependencies.removeIf { dep ->
+        if (dep instanceof FileCollectionDependency) {
+            try {
+                dep.files.files
+                return false
+            } catch (Exception e) {
+                return true
+            }
+        }
+        return false
+    }
 }
 
 dependencies.components.withModule('net.minecraftforge:forge') {
@@ -97,10 +107,36 @@ tasks.named('sourcesJar', Jar) {
     exclude forgeExcludes
 }
 
+def createClientExtra = tasks.register('createClientExtra', Jar) {
+    archiveFileName = 'client-extra.jar'
+    destinationDirectory = layout.buildDirectory
+    from(zipTree(file("${System.getProperty('user.home')}/.gradle/caches/neoformruntime/artifacts/minecraft_${minecraft_version}_client.jar"))) {
+        include 'assets/**'
+        include 'data/**'
+    }
+}
+
 dependencies {
     compileOnly project(":common")
+    runtimeOnly files(createClientExtra)
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+tasks.named('classes') {
+    doLast {
+        copy {
+            from sourceSets.main.output.classesDirs
+            into sourceSets.main.output.resourcesDir
+        }
+    }
+}
+
+tasks.matching { it.name in ['runServer', 'runClient', 'runData'] }.configureEach {
+    classpathProvider.setFrom(classpathProvider.filter { file ->
+        !file.absolutePath.contains("/forge/build/classes/")
+    })
+}
+

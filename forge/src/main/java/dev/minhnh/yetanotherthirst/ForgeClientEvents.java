@@ -17,7 +17,7 @@ public final class ForgeClientEvents {
 
     @SubscribeEvent
     public static void onAddGuiOverlayLayers(AddGuiOverlayLayersEvent event) {
-        event.getLayeredDraw().addAbove(ForgeLayeredDraw.HOTBAR_AND_DECOS, ForgeLayeredDraw.HEALTH_BAR, Constants.asResource("thirst"), (guiGraphics, deltaTracker) -> {
+        event.getLayeredDraw().addAbove(ForgeLayeredDraw.HOTBAR_AND_DECOS, Constants.asResource("thirst"), ForgeLayeredDraw.HEALTH_BAR, (guiGraphics, deltaTracker) -> {
             Minecraft mc = Minecraft.getInstance();
             if (ThirstHudRenderer.shouldRender(mc)) {
                 ThirstHudRenderer.render(guiGraphics, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 49);

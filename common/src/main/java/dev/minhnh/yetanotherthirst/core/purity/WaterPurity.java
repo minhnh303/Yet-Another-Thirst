@@ -71,18 +71,20 @@ public final class WaterPurity {
     public static void init() {
         CONTAINERS.clear();
         CONTAINERS.add(new ContainerWithPurity(
-                new ItemStack(Items.GLASS_BOTTLE),
-                PotionContents.createItemStack(Items.POTION, Potions.WATER))
+                Items.GLASS_BOTTLE,
+                () -> PotionContents.createItemStack(Items.POTION, Potions.WATER),
+                Items.POTION)
                 .setEqualsFilled(stack -> stack.is(Items.POTION) && stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(Potions.WATER)));
         CONTAINERS.add(new ContainerWithPurity(
-                new ItemStack(ModItems.TERRACOTTA_BOWL.get()),
-                new ItemStack(ModItems.TERRACOTTA_WATER_BOWL.get())));
+                ModItems.TERRACOTTA_BOWL.get(),
+                ModItems.TERRACOTTA_WATER_BOWL.get()));
         CONTAINERS.add(new ContainerWithPurity(
-                new ItemStack(Items.BOWL),
-                new ItemStack(ModItems.WOODEN_WATER_BOWL.get())));
+                Items.BOWL,
+                ModItems.WOODEN_WATER_BOWL.get()));
         CONTAINERS.add(new ContainerWithPurity(
-                new ItemStack(Items.BUCKET),
-                new ItemStack(Items.WATER_BUCKET), false)
+                Items.BUCKET,
+                Items.WATER_BUCKET,
+                false)
                 .canHarvestRunningWater(false));
 
         registerCauldronInteractions();

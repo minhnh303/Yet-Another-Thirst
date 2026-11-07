@@ -13,11 +13,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
-@OnlyIn(Dist.CLIENT)
 public final class NeoForgeHandDrinkClient {
 
     private NeoForgeHandDrinkClient() {}

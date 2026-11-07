@@ -1,12 +1,12 @@
 modLoader = "javafml"
-loaderVersion = "${neoforge_loader_version_range}"
+loaderVersion = "[4,)"
 license = "${license}"
 
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
-logoFile = "${mod_id}.png"
+iconFile = "${mod_id}.png"
 credits = "${credits}"
 authors = "${mod_author}"
 description = '''${description}'''
@@ -17,7 +17,7 @@ config = "yet_another_thirst.mixins.json"
 [[dependencies.${mod_id}]]
 modId = "neoforge"
 type = "required"
-versionRange = "[${neoforge_version},)"
+versionRange = "${neoforge_loader_version_range}"
 ordering = "NONE"
 side = "BOTH"
 

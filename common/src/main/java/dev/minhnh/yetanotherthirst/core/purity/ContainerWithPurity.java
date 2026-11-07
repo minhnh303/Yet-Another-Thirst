@@ -1,29 +1,54 @@
 package dev.minhnh.yetanotherthirst.core.purity;
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public final class ContainerWithPurity {
 
-    private final ItemStack emptyItem;
-    private final ItemStack filledItem;
+    private final ItemLike emptyItem;
+    private final Supplier<ItemStack> filledItemSupplier;
     private final boolean drinkable;
     private boolean harvestRunningWater = true;
     private Predicate<ItemStack> equalsFilledPredicate;
 
-    public ContainerWithPurity(ItemStack emptyItem, ItemStack filledItem, boolean drinkable) {
+    public ContainerWithPurity(ItemLike emptyItem, Supplier<ItemStack> filledItemSupplier, ItemLike filledItem, boolean drinkable) {
         this.emptyItem = emptyItem;
-        this.filledItem = filledItem;
+        this.filledItemSupplier = filledItemSupplier;
         this.drinkable = drinkable;
-        this.equalsFilledPredicate = stack -> ItemStack.isSameItem(stack, filledItem);
+        this.equalsFilledPredicate = stack -> filledItem != null && stack.is(filledItem.asItem());
     }
 
-    public ContainerWithPurity(ItemStack emptyItem, ItemStack filledItem) {
+    public ContainerWithPurity(ItemLike emptyItem, Supplier<ItemStack> filledItemSupplier, ItemLike filledItem) {
+        this(emptyItem, filledItemSupplier, filledItem, true);
+    }
+
+    public ContainerWithPurity(ItemLike emptyItem, ItemLike filledItem, boolean drinkable) {
+        this(emptyItem, () -> new ItemStack(filledItem), filledItem, drinkable);
+    }
+
+    public ContainerWithPurity(ItemLike emptyItem, ItemLike filledItem) {
         this(emptyItem, filledItem, true);
     }
 
     /** Static-only container: drinkable but cannot be filled from the world. */
+    public ContainerWithPurity(Supplier<ItemStack> filledItemSupplier, ItemLike filledItem) {
+        this(null, filledItemSupplier, filledItem, true);
+    }
+
+    @Deprecated
+    public ContainerWithPurity(ItemStack emptyItem, ItemStack filledItem, boolean drinkable) {
+        this(emptyItem.getItem(), filledItem::copy, filledItem.getItem(), drinkable);
+    }
+
+    @Deprecated
+    public ContainerWithPurity(ItemStack emptyItem, ItemStack filledItem) {
+        this(emptyItem, filledItem, true);
+    }
+
+    @Deprecated
     public ContainerWithPurity(ItemStack filledItem) {
         this(ItemStack.EMPTY, filledItem, true);
     }
@@ -39,7 +64,7 @@ public final class ContainerWithPurity {
     }
 
     public boolean equalsEmpty(ItemStack stack) {
-        return !emptyItem.isEmpty() && ItemStack.isSameItem(stack, emptyItem);
+        return emptyItem != null && stack.is(emptyItem.asItem());
     }
 
     public boolean equalsFilled(ItemStack stack) {
@@ -55,6 +80,6 @@ public final class ContainerWithPurity {
     }
 
     public ItemStack getFilledItem() {
-        return filledItem;
+        return filledItemSupplier.get();
     }
 }

@@ -1,4 +1,8 @@
 {
+  "forge:condition": {
+    "type": "forge:mod_loaded",
+    "modid": "immersiveengineering"
+  },
   "neoforge:conditions": [
     {
       "type": "neoforge:mod_loaded",

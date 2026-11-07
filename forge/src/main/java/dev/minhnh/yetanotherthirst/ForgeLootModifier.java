@@ -35,8 +35,24 @@ public final class ForgeLootModifier extends LootModifier {
     static final DeferredRegister<MapCodec<? extends LootItemCondition>> LOOT_CONDITION_TYPES =
             DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, "neoforge");
 
-    static final RegistryObject<MapCodec<LootTableIdCondition>> NEOFORGE_LOOT_TABLE_ID =
-            LOOT_CONDITION_TYPES.register("loot_table_id", () -> LootTableIdCondition.CODEC);
+    static final RegistryObject<MapCodec<NeoForgeLootTableIdCondition>> NEOFORGE_LOOT_TABLE_ID =
+            LOOT_CONDITION_TYPES.register("loot_table_id", () -> NeoForgeLootTableIdCondition.CODEC);
+
+    public record NeoForgeLootTableIdCondition(Identifier id) implements LootItemCondition {
+        public static final MapCodec<NeoForgeLootTableIdCondition> CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
+                Identifier.CODEC.fieldOf("loot_table_id").forGetter(NeoForgeLootTableIdCondition::id)
+        ).apply(b, NeoForgeLootTableIdCondition::new));
+
+        @Override
+        public MapCodec<NeoForgeLootTableIdCondition> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public boolean test(LootContext ctx) {
+            return new LootTableIdCondition(this.id).test(ctx);
+        }
+    }
 
     private final Identifier lootTable;
 
