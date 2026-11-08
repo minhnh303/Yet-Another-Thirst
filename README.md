@@ -125,7 +125,7 @@ Available on Forge and NeoForge:
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| **AppleSkin** | ✅ | ✅ | 🔨 | — |
+| **AppleSkin** | ✅ | ✅ | ⏳ | 26.2: Pending AppleSkin port to Minecraft 26.2 |
 | **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
 | **Create** | ✅ | ✅ | ⏳ | 26.2: Pending Create port to Minecraft 26.2 |
 | **Immersive Engineering** | ✅ | ✅ | ⏳ | 26.2: Pending Immersive Engineering port to Minecraft 26.2 |
@@ -149,43 +149,43 @@ Available on Forge and NeoForge:
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| **AppleSkin** | ✅ | ✅ | 🔨 | — |
-| **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
-| **Create** | ✅ | ✅ | ⏳ | 26.2: Pending Create port to Minecraft 26.2 |
-| **Immersive Engineering** | ✅ | ✅ | ⏳ | 26.2: Pending Immersive Engineering port to Minecraft 26.2 |
-| **Cold Sweat** | ✅ | ✅ | 🔨 | — |
-| **Tough As Nails** | ✅ | ✅ | 🔨 | — |
-| **Vampirism** | ✅ | ✅ | 🔨 | — |
-| **Supernatural** | ✅ | ✅ | 🔨 | — |
-| **Corail Tombstone** | ✅ | ✅ | 🔨 | — |
-| **Farmer's Delight** | ✅ | ✅ | 🔨 | — |
-| **Farmer's Respite** | ✅ | ✅ | 🔨 | — |
-| **Brewin' & Chewin'** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Bakery** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Brewery** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Farm & Charm** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Beachparty** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] HerbalBrews** | ✅ | ✅ | 🔨 | — |
-| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | 🔨 | — |
+| **AppleSkin** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Dropped Forge upstream (NeoForge & Fabric only) |
+| **Jade** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Dropped Forge upstream (NeoForge & Fabric only) |
+| **Create** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Create targets NeoForge exclusively |
+| **Immersive Engineering** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Transitioned to NeoForge |
+| **Cold Sweat** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Transitioned to NeoForge |
+| **Tough As Nails** | ✅ | ❌ | ❌ | 1.21+ & 26.2: NeoForge & Fabric only |
+| **Vampirism** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Transitioned to NeoForge |
+| **Supernatural** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Transitioned to NeoForge |
+| **Corail Tombstone** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Transitioned to NeoForge |
+| **Farmer's Delight** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Upstream maintained on NeoForge/Fabric |
+| **Farmer's Respite** | ✅ | ❌ | ❌ | 1.21+ & 26.2: NeoForge only |
+| **Brewin' & Chewin'** | ✅ | ❌ | ❌ | 1.21+ & 26.2: NeoForge only |
+| **[Let's Do] Bakery** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Architectury NeoForge/Fabric only |
+| **[Let's Do] Brewery** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Architectury NeoForge/Fabric only |
+| **[Let's Do] Farm & Charm** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Architectury NeoForge/Fabric only |
+| **[Let's Do] Beachparty** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Architectury NeoForge/Fabric only |
+| **[Let's Do] HerbalBrews** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Architectury NeoForge/Fabric only |
+| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ❌ | ❌ | 1.21+ & 26.2: Upstream maintained on NeoForge/Fabric |
 | **EnvironmentZ** | ❌ | ❌ | ❌ | Not supported on Forge (Fabric exclusive) |
 
 #### Fabric
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| **AppleSkin** | ✅ | ✅ | 🔨 | — |
+| **AppleSkin** | ✅ | ✅ | ⏳ | 26.2: Pending AppleSkin port to Minecraft 26.2 |
 | **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
 | **EnvironmentZ** | ✅ | ✅ | 🔨 | — |
 | **Create** *(Create: Fabric)* | ✅ | ❌ | ❌ | 1.21+ & 26.2: Create: Fabric is only maintained up to 1.20.1 |
 | **Immersive Engineering** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
-| **Cold Sweat** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
+| **Cold Sweat** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
 | **Tough As Nails** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
-| **Vampirism** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
-| **Supernatural** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
-| **Corail Tombstone** | ❌ | ✅ | ⏳ | 1.20.1: No official Fabric port; 26.2: Pending upstream port |
+| **Vampirism** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
+| **Supernatural** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
+| **Corail Tombstone** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
 | **Farmer's Delight** *(Refabricated)* | ✅ | ✅ | 🔨 | — |
-| **Farmer's Respite** | ✅ | ✅ | 🔨 | — |
-| **Brewin' & Chewin'** | ✅ | ✅ | 🔨 | — |
+| **Farmer's Respite** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Unofficial 1.21 port is NeoForge exclusive |
+| **Brewin' & Chewin'** | ✅ | ❌ | ❌ | 1.21+ & 26.2: NeoForge exclusive |
 | **[Let's Do] Bakery** | ✅ | ✅ | 🔨 | — |
 | **[Let's Do] Brewery** | ✅ | ✅ | 🔨 | — |
 | **[Let's Do] Farm & Charm** | ✅ | ✅ | 🔨 | — |
