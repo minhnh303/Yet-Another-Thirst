@@ -172,24 +172,24 @@ Detailed compatibility and integration breakdown across mod loaders and Minecraf
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| **AppleSkin** | ✅ | ✅ | ⏳ | 26.2: Pending AppleSkin port to Minecraft 26.2 |
-| **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
+| **AppleSkin** | ✅ | ✅ | 🔨 | — |
+| **Jade** | ✅ | ✅ | 🔨 | — |
 | **Create** | ✅ | ✅ | ⏳ | 26.2: Pending Create port to Minecraft 26.2 |
 | **Immersive Engineering** | ✅ | ✅ | ⏳ | 26.2: Pending Immersive Engineering port to Minecraft 26.2 |
-| **Cold Sweat** | ✅ | ✅ | 🔨 | — |
-| **Tough As Nails** | ✅ | ✅ | 🔨 | — |
-| **Vampirism** | ✅ | ✅ | 🔨 | — |
-| **Supernatural** | ✅ | ✅ | 🔨 | — |
-| **Corail Tombstone** | ✅ | ✅ | 🔨 | — |
-| **Farmer's Delight** | ✅ | ✅ | 🔨 | — |
-| **Farmer's Respite** | ✅ | ✅ | 🔨 | — |
-| **Brewin' & Chewin'** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Bakery** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Brewery** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Farm & Charm** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Beachparty** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] HerbalBrews** | ✅ | ✅ | 🔨 | — |
-| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | 🔨 | — |
+| **Cold Sweat** | ✅ | ✅ | ⏳ | 26.2: Pending Cold Sweat port to Minecraft 26.2 |
+| **Tough As Nails** | ✅ | ✅ | ⏳ | 26.2: Pending Tough As Nails port to Minecraft 26.2 |
+| **Vampirism** | ✅ | ✅ | ⏳ | 26.2: Pending Vampirism port to Minecraft 26.2 |
+| **Supernatural** | ✅ | ✅ | ⏳ | 26.2: Pending Supernatural port to Minecraft 26.2 |
+| **Corail Tombstone** | ✅ | ✅ | ⏳ | 26.2: Pending Corail Tombstone port to Minecraft 26.2 |
+| **Farmer's Delight** | ✅ | ✅ | ⏳ | 26.2: Pending Farmer's Delight port to Minecraft 26.2 |
+| **Farmer's Respite** | ✅ | ✅ | ⏳ | 26.2: Pending Farmer's Respite port to Minecraft 26.2 |
+| **Brewin' & Chewin'** | ✅ | ✅ | ⏳ | 26.2: Pending Brewin' & Chewin' port to Minecraft 26.2 |
+| **[Let's Do] Bakery** | ✅ | ✅ | ⏳ | 26.2: Pending Bakery port to Minecraft 26.2 |
+| **[Let's Do] Brewery** | ✅ | ✅ | ⏳ | 26.2: Pending Brewery port to Minecraft 26.2 |
+| **[Let's Do] Farm & Charm** | ✅ | ✅ | ⏳ | 26.2: Pending Farm & Charm port to Minecraft 26.2 |
+| **[Let's Do] Beachparty** | ✅ | ✅ | ⏳ | 26.2: Pending Beachparty port to Minecraft 26.2 |
+| **[Let's Do] HerbalBrews** | ✅ | ✅ | ⏳ | 26.2: Pending HerbalBrews port to Minecraft 26.2 |
+| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | ⏳ | 26.2: Pending addon ports to Minecraft 26.2 |
 | **EnvironmentZ** | ❌ | ❌ | ❌ | Not supported on NeoForge (Fabric exclusive) |
 
 #### 🔹 Forge
@@ -220,9 +220,9 @@ Detailed compatibility and integration breakdown across mod loaders and Minecraf
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| **AppleSkin** | ✅ | ✅ | ⏳ | 26.2: Pending AppleSkin port to Minecraft 26.2 |
-| **Jade** | ✅ | ✅ | ⏳ | 26.2: Pending Jade port to Minecraft 26.2 |
-| **EnvironmentZ** | ✅ | ✅ | 🔨 | — |
+| **AppleSkin** | ✅ | ✅ | 🔨 | — |
+| **Jade** | ✅ | ✅ | 🔨 | — |
+| **EnvironmentZ** | ✅ | ✅ | ⏳ | 26.2: Pending EnvironmentZ port to Minecraft 26.2 |
 | **Create** *(Create: Fabric)* | ✅ | ❌ | ❌ | 1.21+ & 26.2: Create: Fabric is only maintained up to 1.20.1 |
 | **Immersive Engineering** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
 | **Cold Sweat** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
@@ -230,15 +230,15 @@ Detailed compatibility and integration breakdown across mod loaders and Minecraf
 | **Vampirism** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
 | **Supernatural** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
 | **Corail Tombstone** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
-| **Farmer's Delight** *(Refabricated)* | ✅ | ✅ | 🔨 | — |
+| **Farmer's Delight** *(Refabricated)* | ✅ | ✅ | ⏳ | 26.2: Pending Farmer's Delight port to Minecraft 26.2 |
 | **Farmer's Respite** | ✅ | ❌ | ❌ | 1.21+ & 26.2: Unofficial 1.21 port is NeoForge exclusive |
 | **Brewin' & Chewin'** | ✅ | ❌ | ❌ | 1.21+ & 26.2: NeoForge exclusive |
-| **[Let's Do] Bakery** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Brewery** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Farm & Charm** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] Beachparty** | ✅ | ✅ | 🔨 | — |
-| **[Let's Do] HerbalBrews** | ✅ | ✅ | 🔨 | — |
-| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | 🔨 | — |
+| **[Let's Do] Bakery** | ✅ | ✅ | ⏳ | 26.2: Pending Bakery port to Minecraft 26.2 |
+| **[Let's Do] Brewery** | ✅ | ✅ | ⏳ | 26.2: Pending Brewery port to Minecraft 26.2 |
+| **[Let's Do] Farm & Charm** | ✅ | ✅ | ⏳ | 26.2: Pending Farm & Charm port to Minecraft 26.2 |
+| **[Let's Do] Beachparty** | ✅ | ✅ | ⏳ | 26.2: Pending Beachparty port to Minecraft 26.2 |
+| **[Let's Do] HerbalBrews** | ✅ | ✅ | ⏳ | 26.2: Pending HerbalBrews port to Minecraft 26.2 |
+| **Delight Addons** *(Collector's Reap, Fruits Delight, Delightful, Crock Pot, Hearth & Harvest, Vanilla Delight)* | ✅ | ✅ | ⏳ | 26.2: Pending addon ports to Minecraft 26.2 |
 
 ---
 
