@@ -49,8 +49,8 @@ public final class ForgeGameEvents {
     // ── Tick / player state ───────────────────────────────────────────────────
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent.Post event) {
-        if (event.player() instanceof ServerPlayer player) {
+    public static void onServerTick(TickEvent.ServerTickEvent.Post event) {
+        for (ServerPlayer player : event.server().getPlayerList().getPlayers()) {
             ThirstEvents.onPlayerTick(player);
         }
     }

@@ -34,7 +34,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public final class NeoForgeGameEvents {
@@ -51,8 +51,8 @@ public final class NeoForgeGameEvents {
     // ── Tick / player state ───────────────────────────────────────────────────
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Post event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
+    public static void onServerTick(ServerTickEvent.Post event) {
+        for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
             ThirstEvents.onPlayerTick(player);
         }
     }
