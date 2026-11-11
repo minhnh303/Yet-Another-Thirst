@@ -1,5 +1,7 @@
 package dev.minhnh.yetanotherthirst.core.thirst;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -8,6 +10,15 @@ import net.minecraft.util.Mth;
  * Immutable player thirst state snapshot.
  */
 public record ThirstData(int thirst, int quenched, float exhaustion, boolean enabled) {
+
+    public static final Codec<ThirstData> CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                    Codec.INT.optionalFieldOf("thirst", ThirstConfig.DEFAULT_THIRST).forGetter(ThirstData::thirst),
+                    Codec.INT.optionalFieldOf("quenched", ThirstConfig.DEFAULT_QUENCHED).forGetter(ThirstData::quenched),
+                    Codec.FLOAT.optionalFieldOf("exhaustion", 0.0F).forGetter(ThirstData::exhaustion),
+                    Codec.BOOL.optionalFieldOf("enabled", true).forGetter(ThirstData::enabled)
+            ).apply(instance, ThirstData::new)
+    );
 
     public static final ThirstData DEFAULT = new ThirstData(
             ThirstConfig.DEFAULT_THIRST,

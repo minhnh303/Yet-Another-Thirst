@@ -3,6 +3,8 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -82,6 +84,17 @@ class ThirstDataTest {
         CompoundTag tag = original.save();
         ThirstData loaded = ThirstData.load(tag);
         assertEquals(original, loaded);
+    }
+
+    @Test
+    @DisplayName("Codec serialization and deserialization roundtrip")
+    void testCodecRoundtrip() {
+        ThirstData original = new ThirstData(16, 9, 3.25F, true);
+        Tag tag = ThirstData.CODEC.encodeStart(NbtOps.INSTANCE, original)
+                .getOrThrow(false, msg -> fail("Failed to encode ThirstData: " + msg));
+        ThirstData decoded = ThirstData.CODEC.parse(NbtOps.INSTANCE, tag)
+                .getOrThrow(false, msg -> fail("Failed to decode ThirstData: " + msg));
+        assertEquals(original, decoded);
     }
 
     @Test
