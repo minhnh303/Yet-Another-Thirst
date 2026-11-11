@@ -95,6 +95,15 @@ public final class NeoForgeGameEvents {
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
 
         ItemStack held = event.getItemStack();
+        if (held.is(net.minecraft.world.item.Items.BUCKET)) {
+            var bucketResult = WaterPurity.useEmptyBucketOnWater(event.getEntity(), event.getLevel(), event.getHand());
+            if (bucketResult != null) {
+                event.getEntity().setItemInHand(event.getHand(), bucketResult.getObject());
+                event.setCancellationResult(bucketResult.getResult());
+                event.setCanceled(true);
+            }
+            return;
+        }
         if (!WaterPurity.canHarvestRunningWater(held)) return;
 
         var player = event.getEntity();

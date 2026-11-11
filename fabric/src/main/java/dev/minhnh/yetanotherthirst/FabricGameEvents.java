@@ -57,29 +57,8 @@ public final class FabricGameEvents {
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack held = player.getItemInHand(hand);
             if (held.is(net.minecraft.world.item.Items.BUCKET)) {
-                var eyePos = player.getEyePosition();
-                var pos = world.clip(new net.minecraft.world.level.ClipContext(
-                        eyePos,
-                        eyePos.add(player.getLookAngle().scale(player.isCreative() ? 5.0 : 4.5)),
-                        net.minecraft.world.level.ClipContext.Block.OUTLINE,
-                        net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY,
-                        player));
-                if (pos.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
-                    var fluidState = world.getFluidState(pos.getBlockPos());
-                    if (fluidState.is(FluidTags.WATER) && fluidState.isSource()) {
-                        var blockState = world.getBlockState(pos.getBlockPos());
-                        if (blockState.getBlock() instanceof net.minecraft.world.level.block.BucketPickup pickup) {
-                            ItemStack filled = pickup.pickupBlock(null, world, pos.getBlockPos(), blockState);
-                            if (!filled.isEmpty()) {
-                                WaterPurity.addPurity(filled, world, pos.getBlockPos());
-                                world.gameEvent(player, GameEvent.FLUID_PICKUP, pos.getBlockPos());
-                                player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, filled));
-                                return InteractionResultHolder.success(filled);
-                            }
-                        }
-                    }
-                }
-                return InteractionResultHolder.pass(held);
+                InteractionResultHolder<ItemStack> bucketResult = WaterPurity.useEmptyBucketOnWater(player, world, hand);
+                return bucketResult != null ? bucketResult : InteractionResultHolder.pass(held);
             }
 
             ContainerWithPurity container = WaterPurity.getContainerForEmpty(held);
