@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,13 +18,13 @@ public final class FabricNetwork {
         // Client→Server: hand drinking — registered in FabricGameEvents
     }
 
-    public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-
+    public static void sendToPlayer(ServerPlayer player, ThirstData data) {
         FriendlyByteBuf buf = PacketByteBufs.create();
-        buf.writeInt(thirst);
-        buf.writeInt(quenched);
-        buf.writeFloat(exhaustion);
-        buf.writeBoolean(enabled);
+        data.write(buf);
         ServerPlayNetworking.send(player, THIRST_SYNC, buf);
+    }
+
+    public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+        sendToPlayer(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 }

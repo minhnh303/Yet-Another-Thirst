@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.minhnh.yetanotherthirst.Constants;
 import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
@@ -46,7 +47,7 @@ public final class ThirstHudRenderer {
             return false;
         }
 
-        return ThirstStorage.get(player).isEnabled();
+        return ThirstStorage.getData(player).enabled();
     }
 
     public static boolean render(GuiGraphics guiGraphics, int width, int height, int rightHeight) {
@@ -56,17 +57,17 @@ public final class ThirstHudRenderer {
             return false;
         }
         LocalPlayer player = minecraft.player;
-        ThirstState state = ThirstStorage.get(player);
+        ThirstData data = ThirstStorage.getData(player);
 
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int left = width / 2 + 91 + ThirstConfig.HUD_X_OFFSET;
         int top = height - rightHeight + ThirstConfig.HUD_Y_OFFSET;
-        int level = state.getThirst();
-        int quenched = state.getQuenched();
+        int level = data.thirst();
+        int quenched = data.quenched();
 
         // 1. Draw exhaustion progress over background (Row 2, u=27, v=9)
-        float exhaustion = state.getExhaustion();
+        float exhaustion = data.exhaustion();
         if (exhaustion > 0.0F) {
             float ratio = Math.min(1.0F, exhaustion / ThirstConfig.EXHAUSTION_LIMIT);
             int exhaustionWidth = (int) (ratio * 81.0F);
@@ -133,7 +134,7 @@ public final class ThirstHudRenderer {
         }
 
         // 5. Draw item preview overlays (thirst and quenched)
-        renderHeldItemPreview(guiGraphics, player, state, left, top);
+        renderHeldItemPreview(guiGraphics, player, data, left, top);
 
         // 6. Draw EnvironmentZ temperature text next to thermometer icon
         renderEnvironmentzTemperature(guiGraphics, minecraft, player, width, height);
@@ -169,7 +170,7 @@ public final class ThirstHudRenderer {
         guiGraphics.drawString(minecraft.font, text, textX, textY, ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR, true);
     }
 
-    private static void renderHeldItemPreview(GuiGraphics guiGraphics, LocalPlayer player, ThirstState state, int left, int top) {
+    private static void renderHeldItemPreview(GuiGraphics guiGraphics, LocalPlayer player, ThirstData data, int left, int top) {
 
         if (!ThirstCompat.showsAppleSkinHudPreview()) {
             return;
@@ -189,8 +190,8 @@ public final class ThirstHudRenderer {
             return;
         }
 
-        int currentThirst = state.getThirst();
-        int currentQuenched = state.getQuenched();
+        int currentThirst = data.thirst();
+        int currentQuenched = data.quenched();
 
         int overflow = Math.max(currentThirst + thirstRestored - ThirstConfig.MAX_THIRST, 0);
         if (!ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED) {

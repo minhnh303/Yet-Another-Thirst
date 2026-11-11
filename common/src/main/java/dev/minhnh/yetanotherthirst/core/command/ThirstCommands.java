@@ -48,29 +48,24 @@ public final class ThirstCommands {
     }
 
     private static int query(CommandSourceStack source, ServerPlayer player) {
-
-        ThirstState state = ThirstStorage.get(player);
-        source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.query", state.getThirst(), state.getQuenched()), false);
+        var data = ThirstStorage.getData(player);
+        source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.query", data.thirst(), data.quenched()), false);
         if (ThirstConfig.COMPAT_ENVIRONMENTZ) {
             source.sendSuccess(() -> ThirstCompat.environmentzDebugInfo(player), false);
         }
-        return state.getThirst();
+        return data.thirst();
     }
 
     private static int set(CommandSourceStack source, ServerPlayer player, int thirst, int quenched) {
-
-        ThirstState state = ThirstStorage.get(player);
-        state.setThirst(thirst);
-        state.setQuenched(quenched);
+        ThirstStorage.update(player, d -> d.withThirst(thirst).withQuenched(quenched));
         ThirstStorage.sync(player);
         source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.set", thirst, quenched), false);
         return thirst;
     }
 
     private static int enable(CommandSourceStack source, Collection<ServerPlayer> players, boolean enabled) {
-
         for (ServerPlayer player : players) {
-            ThirstStorage.get(player).setEnabled(enabled);
+            ThirstStorage.update(player, d -> d.withEnabled(enabled));
             ThirstStorage.sync(player);
         }
 

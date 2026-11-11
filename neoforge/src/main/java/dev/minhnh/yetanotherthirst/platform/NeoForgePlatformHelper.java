@@ -13,43 +13,41 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public String getPlatformName() {
-
         return "NeoForge";
     }
 
     @Override
     public boolean isModLoaded(String modId) {
-
         return ModList.get().isLoaded(modId);
     }
 
     @Override
     public boolean isDevelopmentEnvironment() {
-
         return !FMLLoader.isProduction();
     }
 
     @Override
     public CompoundTag loadThirstData(Player player) {
-
         return player.getPersistentData().getCompound(Constants.MOD_ID);
     }
 
     @Override
     public void saveThirstData(Player player, CompoundTag tag) {
-
         player.getPersistentData().put(Constants.MOD_ID, tag);
     }
 
     @Override
     public CompoundTag loadPersistentData(Player player, String key) {
-
         return player.getPersistentData().getCompound(key);
     }
 
     @Override
-    public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+    public void sendThirstSync(ServerPlayer player, dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
+        NeoForgeNetwork.sendToPlayer(player, data);
+    }
 
+    @Override
+    public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
         NeoForgeNetwork.sendToPlayer(player, thirst, quenched, exhaustion, enabled);
     }
 

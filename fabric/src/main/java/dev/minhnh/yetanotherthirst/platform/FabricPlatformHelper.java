@@ -12,39 +12,39 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public String getPlatformName() {
-
         return "Fabric";
     }
 
     @Override
     public boolean isModLoaded(String modId) {
-
         return FabricLoader.getInstance().isModLoaded(modId);
     }
 
     @Override
     public boolean isDevelopmentEnvironment() {
-
         return FabricLoader.getInstance().isDevelopmentEnvironment();
     }
 
     @Override
     public CompoundTag loadThirstData(Player player) {
-
         return FabricPlayerDataStore.get(player);
     }
 
     @Override
     public void saveThirstData(Player player, CompoundTag tag) {
-
         FabricPlayerDataStore.put(player, tag);
     }
 
     @Override
     public CompoundTag loadPersistentData(Player player, String key) {
-
         CompoundTag root = FabricPlayerDataStore.get(player);
         return root.getCompound(key);
+    }
+
+    @Override
+    public void sendThirstSync(ServerPlayer player, dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
+
+        FabricNetwork.sendToPlayer(player, data);
     }
 
     @Override

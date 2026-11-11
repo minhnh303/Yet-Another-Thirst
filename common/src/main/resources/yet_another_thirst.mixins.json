@@ -10,7 +10,9 @@
     "MixinItem",
     "MixinItemStack",
     "MixinLayeredCauldronBlock",
-    "MixinAbstractCookingRecipe",
+    "MixinAbstractCookingRecipe"
+  ],
+  "client": [
     "MixinMinecraft"
   ],
   "injectors": {

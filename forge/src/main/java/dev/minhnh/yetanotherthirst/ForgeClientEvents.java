@@ -35,7 +35,7 @@ public final class ForgeClientEvents {
             if (dev.minhnh.yetanotherthirst.screen.ModMenuTypes.WATER_BOILER != null) {
                 net.minecraft.client.gui.screens.MenuScreens.register(
                         dev.minhnh.yetanotherthirst.screen.ModMenuTypes.WATER_BOILER.get(),
-                        dev.minhnh.yetanotherthirst.screen.WaterBoilerScreen::new
+                        dev.minhnh.yetanotherthirst.client.WaterBoilerScreen::new
                 );
             }
         });

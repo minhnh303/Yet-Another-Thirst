@@ -29,6 +29,7 @@ public class YetAnotherThirstNeoForge {
         modBus.addListener(YetAnotherThirstNeoForge::onConfigLoading);
         modBus.addListener(YetAnotherThirstNeoForge::onConfigReloading);
         modBus.addListener(YetAnotherThirstNeoForge::onCommonSetup);
+        modBus.addListener(YetAnotherThirstNeoForge::onRegisterGameTests);
 
         // Bind NeoForge RegistryObjects into loader-agnostic ModItems before registration fires
         NeoForgeItems.bindToCommon();
@@ -78,5 +79,9 @@ public class YetAnotherThirstNeoForge {
         } else if (spec == NeoForgeClientConfig.SPEC) {
             NeoForgeClientConfig.sync();
         }
+    }
+
+    private static void onRegisterGameTests(net.minecraftforge.event.RegisterGameTestsEvent event) {
+        event.register(dev.minhnh.yetanotherthirst.gametest.ThirstGameTests.class);
     }
 }

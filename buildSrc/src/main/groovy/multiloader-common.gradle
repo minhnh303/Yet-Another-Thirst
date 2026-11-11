@@ -153,3 +153,103 @@ tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
     options.charSet = 'UTF-8'
 }
+
+// ── Architectural Seam Checks ──────────────────────────────────────────────
+if (project.name == 'common') {
+    def commonSrcDir = file('src/main/java')
+    def commonClientSrcDir = file('src/client/java')
+
+    def checkLoaderSeam = tasks.register('checkLoaderSeam') {
+        description = 'Verifies that common code does not import loader-specific APIs (Forge, NeoForge, Fabric).'
+        group = 'verification'
+        inputs.dir(commonSrcDir)
+        if (commonClientSrcDir.exists()) {
+            inputs.dir(commonClientSrcDir)
+        }
+
+        doLast {
+            def forbiddenPrefixes = [
+                    'net.minecraftforge.',
+                    'net.neoforged.',
+                    'net.fabricmc.'
+            ]
+            def violations = []
+            def checkDirs = [commonSrcDir]
+            if (commonClientSrcDir.exists()) {
+                checkDirs << commonClientSrcDir
+            }
+
+            checkDirs.each { dir ->
+                fileTree(dir).matching {
+                    include '**/*.java'
+                }.each { File file ->
+                    def relativePath = dir.toPath().relativize(file.toPath()).toString().replace('\\', '/')
+                    file.eachLine('UTF-8') { line, lineNum ->
+                        def trimmed = line.trim()
+                        if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
+                            return
+                        }
+                        for (prefix in forbiddenPrefixes) {
+                            if (trimmed.contains(prefix)) {
+                                violations << "[$relativePath:$lineNum] Loader API forbidden in common: $trimmed"
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!violations.isEmpty()) {
+                throw new GradleException("checkLoaderSeam failed with ${violations.size()} violation(s):\n" + violations.join('\n'))
+            }
+        }
+    }
+
+    def checkClientSeam = tasks.register('checkClientSeam') {
+        description = 'Verifies that main common code does not import client-only packages.'
+        group = 'verification'
+        inputs.dir(commonSrcDir)
+
+        doLast {
+            def forbiddenPrefixes = [
+                    'net.minecraft.client.',
+                    'com.mojang.blaze3d.'
+            ]
+            def violations = []
+
+            fileTree(commonSrcDir).matching {
+                include '**/*.java'
+            }.each { File file ->
+                def relativePath = commonSrcDir.toPath().relativize(file.toPath()).toString().replace('\\', '/')
+                file.eachLine('UTF-8') { line, lineNum ->
+                    def trimmed = line.trim()
+                    if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
+                        return
+                    }
+                    for (prefix in forbiddenPrefixes) {
+                        if (trimmed.contains(prefix)) {
+                            violations << "[$relativePath:$lineNum] Client API forbidden in server-safe common main code: $trimmed"
+                        }
+                    }
+                }
+            }
+
+            if (!violations.isEmpty()) {
+                throw new GradleException("checkClientSeam failed with ${violations.size()} violation(s):\n" + violations.join('\n'))
+            }
+        }
+    }
+
+    def checkSeams = tasks.register('checkSeams') {
+        description = 'Verifies architectural boundary seams in common code.'
+        group = 'verification'
+        dependsOn checkLoaderSeam, checkClientSeam
+    }
+
+    tasks.named('check').configure {
+        dependsOn checkSeams
+    }
+
+    tasks.named('compileJava').configure {
+        dependsOn checkSeams
+    }
+}

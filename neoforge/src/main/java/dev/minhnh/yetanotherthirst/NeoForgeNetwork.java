@@ -3,6 +3,7 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -55,47 +56,37 @@ public final class NeoForgeNetwork {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
     }
 
-    public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+    public static void sendToPlayer(ServerPlayer player, ThirstData data) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ThirstSyncPacket(data));
+    }
 
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ThirstSyncPacket(thirst, quenched, exhaustion, enabled));
+    public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+        sendToPlayer(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 
     public static void sendDrinkByHand(BlockPos pos) {
-
         CHANNEL.sendToServer(new DrinkByHandPacket(pos));
     }
 
-    private record ThirstSyncPacket(int thirst, int quenched, float exhaustion, boolean enabled) {
-
+    private record ThirstSyncPacket(ThirstData data) {
         private static void encode(ThirstSyncPacket packet, FriendlyByteBuf buffer) {
-
-            buffer.writeInt(packet.thirst);
-            buffer.writeInt(packet.quenched);
-            buffer.writeFloat(packet.exhaustion);
-            buffer.writeBoolean(packet.enabled);
+            packet.data.write(buffer);
         }
 
         private static ThirstSyncPacket decode(FriendlyByteBuf buffer) {
-
-            return new ThirstSyncPacket(buffer.readInt(), buffer.readInt(), buffer.readFloat(), buffer.readBoolean());
+            return new ThirstSyncPacket(ThirstData.read(buffer));
         }
 
         private static void handle(ThirstSyncPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
-
             NetworkEvent.Context context = contextSupplier.get();
             context.enqueueWork(() -> {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> NeoForgeClientPacketHandler.handleThirstSync(
-                        packet.thirst,
-                        packet.quenched,
-                        packet.exhaustion,
-                        packet.enabled));
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> NeoForgeClientPacketHandler.handleThirstSync(packet.data));
             });
             context.setPacketHandled(true);
         }
     }
 
     private record DrinkByHandPacket(BlockPos pos) {
-
         private static void encode(DrinkByHandPacket packet, FriendlyByteBuf buf) {
             buf.writeBlockPos(packet.pos);
         }

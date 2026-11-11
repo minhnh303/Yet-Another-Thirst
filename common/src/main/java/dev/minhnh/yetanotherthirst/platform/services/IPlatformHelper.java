@@ -34,17 +34,18 @@ public interface IPlatformHelper {
     void saveThirstData(Player player, CompoundTag tag);
 
     default CompoundTag loadPersistentData(Player player, String key) {
-
         return new CompoundTag();
     }
 
     default ThirstState getThirstState(Player player) {
-
         return dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage.get(player);
     }
 
-    default void syncThirst(Player player) {
+    default dev.minhnh.yetanotherthirst.core.thirst.ThirstData getThirstData(Player player) {
+        return dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage.getData(player);
+    }
 
+    default void syncThirst(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage.sync(serverPlayer);
         }
@@ -52,9 +53,12 @@ public interface IPlatformHelper {
 
     void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled);
 
-    default void sendThirstSync(ServerPlayer player, ThirstState state) {
+    default void sendThirstSync(ServerPlayer player, dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
+        sendThirstSync(player, data.thirst(), data.quenched(), data.exhaustion(), data.enabled());
+    }
 
-        sendThirstSync(player, state.getThirst(), state.getQuenched(), state.getExhaustion(), state.isEnabled());
+    default void sendThirstSync(ServerPlayer player, ThirstState state) {
+        sendThirstSync(player, state.getData());
     }
 
     /**
@@ -63,7 +67,6 @@ public interface IPlatformHelper {
      * @return The name of the environment type.
      */
     default String getEnvironmentName() {
-
         return isDevelopmentEnvironment() ? "development" : "production";
     }
 
