@@ -3,6 +3,7 @@ package dev.minhnh.yetanotherthirst.platform;
 import dev.minhnh.yetanotherthirst.Constants;
 import dev.minhnh.yetanotherthirst.ForgeHandDrinkClient;
 import dev.minhnh.yetanotherthirst.ForgeNetwork;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.platform.services.IPlatformHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,8 +44,13 @@ public class ForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public void sendThirstSync(ServerPlayer player, ThirstData data) {
+        ForgeNetwork.sendToPlayer(player, data);
+    }
+
+    @Override
     public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-        ForgeNetwork.sendToPlayer(player, thirst, quenched, exhaustion, enabled);
+        sendThirstSync(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 
     @Override

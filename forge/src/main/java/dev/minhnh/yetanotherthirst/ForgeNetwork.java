@@ -3,6 +3,7 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -44,8 +45,12 @@ public final class ForgeNetwork {
         // Trigger static initialization of CHANNEL
     }
 
+    public static void sendToPlayer(ServerPlayer player, ThirstData data) {
+        CHANNEL.send(new ThirstSyncPacket(data), PacketDistributor.PLAYER.with(player));
+    }
+
     public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-        CHANNEL.send(new ThirstSyncPacket(thirst, quenched, exhaustion, enabled), PacketDistributor.PLAYER.with(player));
+        sendToPlayer(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 
     public static void sendDrinkByHand(BlockPos pos) {
@@ -54,23 +59,19 @@ public final class ForgeNetwork {
 
     // ── Server → Client: thirst state sync ───────────────────────────────────
 
-    private record ThirstSyncPacket(int thirst, int quenched, float exhaustion, boolean enabled) {
+    private record ThirstSyncPacket(ThirstData data) {
 
         private static void encode(ThirstSyncPacket packet, FriendlyByteBuf buf) {
-            buf.writeInt(packet.thirst);
-            buf.writeInt(packet.quenched);
-            buf.writeFloat(packet.exhaustion);
-            buf.writeBoolean(packet.enabled);
+            packet.data.write(buf);
         }
 
         private static ThirstSyncPacket decode(FriendlyByteBuf buf) {
-            return new ThirstSyncPacket(buf.readInt(), buf.readInt(), buf.readFloat(), buf.readBoolean());
+            return new ThirstSyncPacket(ThirstData.read(buf));
         }
 
         private static void handle(ThirstSyncPacket packet, CustomPayloadEvent.Context ctx) {
             if (FMLEnvironment.dist == Dist.CLIENT) {
-                ForgeClientPacketHandler.handleThirstSync(
-                        packet.thirst, packet.quenched, packet.exhaustion, packet.enabled);
+                ForgeClientPacketHandler.handleThirstSync(packet.data);
             }
             ctx.setPacketHandled(true);
         }

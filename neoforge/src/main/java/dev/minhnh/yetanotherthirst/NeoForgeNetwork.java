@@ -3,6 +3,7 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -26,22 +27,23 @@ public final class NeoForgeNetwork {
 
     public static final String PROTOCOL_VERSION = "1";
 
-    public record ThirstSyncPayload(int thirst, int quenched, float exhaustion, boolean enabled) implements CustomPacketPayload {
+    public record ThirstSyncPayload(ThirstData data) implements CustomPacketPayload {
         public static final Type<ThirstSyncPayload> TYPE = new Type<>(Constants.asResource("thirst_sync"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ThirstSyncPayload> CODEC = StreamCodec.ofMember(
                 ThirstSyncPayload::write,
                 ThirstSyncPayload::new
         );
 
+        public ThirstSyncPayload(int thirst, int quenched, float exhaustion, boolean enabled) {
+            this(new ThirstData(thirst, quenched, exhaustion, enabled));
+        }
+
         public ThirstSyncPayload(RegistryFriendlyByteBuf buf) {
-            this(buf.readInt(), buf.readInt(), buf.readFloat(), buf.readBoolean());
+            this(ThirstData.read(buf));
         }
 
         public void write(RegistryFriendlyByteBuf buf) {
-            buf.writeInt(thirst);
-            buf.writeInt(quenched);
-            buf.writeFloat(exhaustion);
-            buf.writeBoolean(enabled);
+            data.write(buf);
         }
 
         @Override
@@ -81,12 +83,7 @@ public final class NeoForgeNetwork {
                 ThirstSyncPayload.TYPE,
                 ThirstSyncPayload.CODEC,
                 (payload, context) -> context.enqueueWork(() ->
-                        NeoForgeClientPacketHandler.handleThirstSync(
-                                payload.thirst(),
-                                payload.quenched(),
-                                payload.exhaustion(),
-                                payload.enabled()
-                        )
+                        NeoForgeClientPacketHandler.handleThirstSync(payload.data())
                 )
         );
 
@@ -102,8 +99,16 @@ public final class NeoForgeNetwork {
         );
     }
 
+    public static void sendToPlayer(ServerPlayer player, ThirstData data) {
+        // Skip connections that did not negotiate the channel (fake/mock players, mismatched clients)
+        if (player.connection == null || !player.connection.hasChannel(ThirstSyncPayload.TYPE)) {
+            return;
+        }
+        PacketDistributor.sendToPlayer(player, new ThirstSyncPayload(data));
+    }
+
     public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-        PacketDistributor.sendToPlayer(player, new ThirstSyncPayload(thirst, quenched, exhaustion, enabled));
+        sendToPlayer(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 
     public static void sendDrinkByHand(BlockPos pos) {

@@ -23,6 +23,10 @@ neoForge {
         server {
             server()
         }
+        gameTestServer {
+            type = "gameTestServer"
+            gameDirectory = project.file('run-gametest')
+        }
     }
 
     mods {
@@ -35,6 +39,7 @@ neoForge {
 def neoForgeExcludes = [
         'dev/minhnh/yetanotherthirst/core/block/**',
         'dev/minhnh/yetanotherthirst/screen/**',
+        'dev/minhnh/yetanotherthirst/client/WaterBoilerScreen.java',
         'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java',
         'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java',
         'dev/minhnh/yetanotherthirst/compat/ThirstElement.java',

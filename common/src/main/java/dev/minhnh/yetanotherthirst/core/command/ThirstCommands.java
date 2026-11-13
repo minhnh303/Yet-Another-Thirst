@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import dev.minhnh.yetanotherthirst.compat.ThirstCompat;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
-import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -49,19 +49,17 @@ public final class ThirstCommands {
 
     private static int query(CommandSourceStack source, ServerPlayer player) {
 
-        ThirstState state = ThirstStorage.get(player);
-        source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.query", state.getThirst(), state.getQuenched()), false);
+        ThirstData data = ThirstStorage.getData(player);
+        source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.query", data.thirst(), data.quenched()), false);
         if (ThirstConfig.COMPAT_ENVIRONMENTZ) {
             source.sendSuccess(() -> ThirstCompat.environmentzDebugInfo(player), false);
         }
-        return state.getThirst();
+        return data.thirst();
     }
 
     private static int set(CommandSourceStack source, ServerPlayer player, int thirst, int quenched) {
 
-        ThirstState state = ThirstStorage.get(player);
-        state.setThirst(thirst);
-        state.setQuenched(quenched);
+        ThirstStorage.update(player, d -> d.withThirst(thirst).withQuenched(quenched));
         ThirstStorage.sync(player);
         source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.set", thirst, quenched), false);
         return thirst;

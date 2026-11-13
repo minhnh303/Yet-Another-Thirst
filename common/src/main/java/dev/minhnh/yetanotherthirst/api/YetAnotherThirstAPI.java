@@ -1,6 +1,7 @@
 package dev.minhnh.yetanotherthirst.api;
 
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
@@ -9,6 +10,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.function.UnaryOperator;
+
 /**
  * Main API entrypoint for Yet Another Thirst.
  * Provides helper methods to query and manipulate player thirst and water purity.
@@ -16,6 +19,40 @@ import net.minecraft.world.item.ItemStack;
 public final class YetAnotherThirstAPI {
 
     private YetAnotherThirstAPI() {
+    }
+
+    /**
+     * Retrieves an immutable snapshot of a player's persistent thirst values.
+     *
+     * @param player The player to query.
+     * @return The immutable {@link ThirstData} snapshot.
+     */
+    public static ThirstData getThirstData(Player player) {
+        return ThirstStorage.getData(player);
+    }
+
+    /**
+     * Replaces a player's persistent thirst values with the given snapshot and synchronizes.
+     *
+     * @param player The player to modify.
+     * @param data   The new {@link ThirstData} snapshot.
+     */
+    public static void setThirstData(Player player, ThirstData data) {
+        ThirstStorage.setData(player, data);
+        sync(player);
+    }
+
+    /**
+     * Atomically transforms a player's persistent thirst values and synchronizes.
+     *
+     * @param player   The player to modify.
+     * @param operator Pure transformation applied to the current {@link ThirstData}.
+     * @return The updated {@link ThirstData} snapshot.
+     */
+    public static ThirstData updateThirstData(Player player, UnaryOperator<ThirstData> operator) {
+        ThirstData updated = ThirstStorage.update(player, operator);
+        sync(player);
+        return updated;
     }
 
     /**
@@ -35,7 +72,7 @@ public final class YetAnotherThirstAPI {
      * @return The thirst level (0 - 20).
      */
     public static int getThirst(Player player) {
-        return getThirstState(player).getThirst();
+        return getThirstData(player).thirst();
     }
 
     /**
@@ -45,8 +82,7 @@ public final class YetAnotherThirstAPI {
      * @param thirst The thirst level (0 - 20).
      */
     public static void setThirst(Player player, int thirst) {
-        getThirstState(player).setThirst(thirst);
-        sync(player);
+        updateThirstData(player, d -> d.withThirst(thirst));
     }
 
     /**
@@ -56,7 +92,7 @@ public final class YetAnotherThirstAPI {
      * @return The quenched level (0 - 20).
      */
     public static int getQuenched(Player player) {
-        return getThirstState(player).getQuenched();
+        return getThirstData(player).quenched();
     }
 
     /**
@@ -66,8 +102,7 @@ public final class YetAnotherThirstAPI {
      * @param quenched The quenched level (0 - 20).
      */
     public static void setQuenched(Player player, int quenched) {
-        getThirstState(player).setQuenched(quenched);
-        sync(player);
+        updateThirstData(player, d -> d.withQuenched(quenched));
     }
 
     /**
@@ -77,7 +112,7 @@ public final class YetAnotherThirstAPI {
      * @return The current exhaustion value.
      */
     public static float getExhaustion(Player player) {
-        return getThirstState(player).getExhaustion();
+        return getThirstData(player).exhaustion();
     }
 
     /**
@@ -87,8 +122,7 @@ public final class YetAnotherThirstAPI {
      * @param exhaustion The exhaustion value.
      */
     public static void setExhaustion(Player player, float exhaustion) {
-        getThirstState(player).setExhaustion(exhaustion);
-        sync(player);
+        updateThirstData(player, d -> d.withExhaustion(exhaustion));
     }
 
     /**
@@ -98,8 +132,7 @@ public final class YetAnotherThirstAPI {
      * @param amount The exhaustion amount to add.
      */
     public static void addExhaustion(Player player, float amount) {
-        getThirstState(player).addExhaustion(amount);
-        sync(player);
+        updateThirstData(player, d -> d.addExhaustion(amount));
     }
 
     /**
@@ -109,7 +142,7 @@ public final class YetAnotherThirstAPI {
      * @return True if thirst is enabled.
      */
     public static boolean isThirstEnabled(Player player) {
-        return getThirstState(player).isEnabled();
+        return getThirstData(player).enabled();
     }
 
     /**
@@ -131,8 +164,7 @@ public final class YetAnotherThirstAPI {
      * @param quenched The quenched hydration to add.
      */
     public static void drink(Player player, int thirst, int quenched) {
-        getThirstState(player).drink(thirst, quenched);
-        sync(player);
+        updateThirstData(player, d -> d.drink(thirst, quenched));
     }
 
     /**

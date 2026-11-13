@@ -63,8 +63,18 @@ public final class WaterPurity {
 
     private WaterPurity() {}
 
+    @SuppressWarnings("unchecked")
     private static Map<Item, CauldronInteraction> getDispatcherItems(CauldronInteraction.Dispatcher dispatcher) {
-        return ((dev.minhnh.yetanotherthirst.mixin.CauldronInteractionDispatcherAccessor) dispatcher).yet_another_thirst$getItems();
+        if (dispatcher instanceof dev.minhnh.yetanotherthirst.mixin.CauldronInteractionDispatcherAccessor accessor) {
+            return accessor.yet_another_thirst$getItems();
+        }
+        try {
+            java.lang.reflect.Field field = CauldronInteraction.Dispatcher.class.getDeclaredField("items");
+            field.setAccessible(true);
+            return (Map<Item, CauldronInteraction>) field.get(dispatcher);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Failed to access CauldronInteraction.Dispatcher items", e);
+        }
     }
 
     /** Called from common setup after item registration is complete. */

@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst.platform.services;
 
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,6 +44,11 @@ public interface IPlatformHelper {
         return dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage.get(player);
     }
 
+    default ThirstData getThirstData(Player player) {
+
+        return dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage.getData(player);
+    }
+
     default void syncThirst(Player player) {
 
         if (player instanceof ServerPlayer serverPlayer) {
@@ -52,9 +58,14 @@ public interface IPlatformHelper {
 
     void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled);
 
+    default void sendThirstSync(ServerPlayer player, ThirstData data) {
+
+        sendThirstSync(player, data.thirst(), data.quenched(), data.exhaustion(), data.enabled());
+    }
+
     default void sendThirstSync(ServerPlayer player, ThirstState state) {
 
-        sendThirstSync(player, state.getThirst(), state.getQuenched(), state.getExhaustion(), state.isEnabled());
+        sendThirstSync(player, state.getData());
     }
 
     /**

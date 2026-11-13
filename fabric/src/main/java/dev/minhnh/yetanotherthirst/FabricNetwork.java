@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
@@ -10,22 +11,23 @@ import net.minecraft.server.level.ServerPlayer;
 
 public final class FabricNetwork {
 
-    public record ThirstSyncPayload(int thirst, int quenched, float exhaustion, boolean enabled) implements CustomPacketPayload {
+    public record ThirstSyncPayload(ThirstData data) implements CustomPacketPayload {
         public static final Type<ThirstSyncPayload> TYPE = new Type<>(Constants.asResource("thirst_sync"));
         public static final StreamCodec<RegistryFriendlyByteBuf, ThirstSyncPayload> CODEC = StreamCodec.ofMember(
                 ThirstSyncPayload::write,
                 ThirstSyncPayload::new
         );
 
+        public ThirstSyncPayload(int thirst, int quenched, float exhaustion, boolean enabled) {
+            this(new ThirstData(thirst, quenched, exhaustion, enabled));
+        }
+
         public ThirstSyncPayload(RegistryFriendlyByteBuf buf) {
-            this(buf.readInt(), buf.readInt(), buf.readFloat(), buf.readBoolean());
+            this(ThirstData.read(buf));
         }
 
         public void write(RegistryFriendlyByteBuf buf) {
-            buf.writeInt(thirst);
-            buf.writeInt(quenched);
-            buf.writeFloat(exhaustion);
-            buf.writeBoolean(enabled);
+            data.write(buf);
         }
 
         @Override
@@ -62,7 +64,11 @@ public final class FabricNetwork {
         PayloadTypeRegistry.serverboundPlay().register(DrinkByHandPayload.TYPE, DrinkByHandPayload.CODEC);
     }
 
+    public static void sendToPlayer(ServerPlayer player, ThirstData data) {
+        ServerPlayNetworking.send(player, new ThirstSyncPayload(data));
+    }
+
     public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-        ServerPlayNetworking.send(player, new ThirstSyncPayload(thirst, quenched, exhaustion, enabled));
+        sendToPlayer(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 }

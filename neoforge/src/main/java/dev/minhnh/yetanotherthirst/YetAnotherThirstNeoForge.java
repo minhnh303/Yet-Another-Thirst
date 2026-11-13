@@ -1,7 +1,14 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import dev.minhnh.yetanotherthirst.gametest.ThirstGameTests;
 import dev.minhnh.yetanotherthirst.platform.NeoForgePlatformHelper;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.gametest.framework.FunctionGameTestInstance;
+import net.minecraft.gametest.framework.TestEnvironmentDefinition;
+import net.neoforged.neoforge.event.RegisterGameTestsEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
@@ -26,6 +33,8 @@ public class YetAnotherThirstNeoForge {
         modBus.addListener(YetAnotherThirstNeoForge::onConfigLoading);
         modBus.addListener(YetAnotherThirstNeoForge::onConfigReloading);
         modBus.addListener(YetAnotherThirstNeoForge::onCommonSetup);
+        modBus.addListener(YetAnotherThirstNeoForge::onRegister);
+        modBus.addListener(YetAnotherThirstNeoForge::onRegisterGameTests);
 
         // Bind NeoForge DeferredItems/DeferredHolders into loader-agnostic ModItems/ModEffects
         NeoForgeItems.bindToCommon();
@@ -55,6 +64,18 @@ public class YetAnotherThirstNeoForge {
         ThirstConfig.COMPAT_SUPERNATURAL = ModList.get().isLoaded("supernatural");
         ThirstConfig.COMPAT_IE_HEATER = ModList.get().isLoaded("immersiveengineering");
         ThirstConfig.COMPAT_ENVIRONMENTZ = ModList.get().isLoaded("environmentz");
+    }
+
+    private static void onRegister(RegisterEvent event) {
+        event.register(Registries.TEST_FUNCTION, helper -> new ThirstGameTests().load(helper::register));
+    }
+
+    private static void onRegisterGameTests(RegisterGameTestsEvent event) {
+        Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(Constants.asResource("default"));
+        new ThirstGameTests().load((key, function) -> event.registerTest(
+                key.identifier(),
+                new FunctionGameTestInstance(key, ThirstGameTests.testData(environment))
+        ));
     }
 
     private static void onConfigLoading(ModConfigEvent.Loading event) { onConfigEvent(event); }

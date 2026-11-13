@@ -11,6 +11,9 @@ configurations {
     commonJava {
         canBeResolved = true
     }
+    commonClientJava {
+        canBeResolved = true
+    }
     commonResources {
         canBeResolved = true
     }
@@ -23,6 +26,13 @@ loom {
         }
         server {
             server()
+        }
+        gametest {
+            server()
+            name "Game Test"
+            vmArg "-Dfabric-api.gametest"
+            vmArg "-Dfabric-api.gametest.report-path=${project.layout.buildDirectory.get()}/gametest-results.xml"
+            runDir "run-gametest"
         }
     }
     mods {
@@ -43,6 +53,7 @@ dependencies {
         }
     }
     commonJava project(path: ':common', configuration: 'commonJava')
+    commonClientJava project(path: ':common', configuration: 'commonClientJava')
     commonResources project(path: ':common', configuration: 'commonResources')
     compileOnly files(findProject(':common').file('src/main/resources'))
     annotationProcessor files(findProject(':common').file('src/main/resources'))
@@ -71,10 +82,12 @@ sourceSets {
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+    dependsOn(configurations.commonClientJava)
+    source(configurations.commonClientJava)
     exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
     exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
     exclude 'dev/minhnh/yetanotherthirst/screen/AbstractWaterBoilerMenu.java'
-    exclude 'dev/minhnh/yetanotherthirst/screen/WaterBoilerScreen.java'
+    exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerScreen.java'
     exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
     exclude 'dev/minhnh/yetanotherthirst/core/block/IWaterBoiler.java'
     exclude 'dev/minhnh/yetanotherthirst/mixin/create/**'
@@ -92,12 +105,15 @@ processResources {
 tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonJava)
     from(configurations.commonJava) {
+        exclude 'dev/minhnh/yetanotherthirst/screen/AbstractWaterBoilerMenu.java'
+        exclude 'dev/minhnh/yetanotherthirst/core/block/IWaterBoiler.java'
+    }
+    dependsOn(configurations.commonClientJava)
+    from(configurations.commonClientJava) {
         exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
         exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
-        exclude 'dev/minhnh/yetanotherthirst/screen/AbstractWaterBoilerMenu.java'
-        exclude 'dev/minhnh/yetanotherthirst/screen/WaterBoilerScreen.java'
+        exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerScreen.java'
         exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
-        exclude 'dev/minhnh/yetanotherthirst/core/block/IWaterBoiler.java'
     }
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)

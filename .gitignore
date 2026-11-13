@@ -37,6 +37,7 @@ run/
 **/run/
 runs/
 **/runs/
+**/run-gametest/
 logs/
 **/logs/
 *.log

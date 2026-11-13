@@ -14,23 +14,46 @@ neoForge {
 dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly 'org.spongepowered:mixin:0.8.5'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty 'net.bytebuddy.experimental', 'true'
 }
 
 sourceSets {
     main {
         java {
-            exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
-            exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
             exclude 'dev/minhnh/yetanotherthirst/screen/AbstractWaterBoilerMenu.java'
-            exclude 'dev/minhnh/yetanotherthirst/screen/WaterBoilerScreen.java'
-            exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
             exclude 'dev/minhnh/yetanotherthirst/core/block/IWaterBoiler.java'
         }
+    }
+    client {
+        java {
+            srcDir 'src/client/java'
+            exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
+            exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
+            exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerScreen.java'
+            exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
+        }
+        compileClasspath += sourceSets.main.output + configurations.compileClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
     }
 }
 
 configurations {
+    testCompileClasspath.extendsFrom(compileClasspath)
+    testRuntimeClasspath.extendsFrom(runtimeClasspath)
+
     commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonClientJava {
         canBeResolved = false
         canBeConsumed = true
     }
@@ -42,5 +65,25 @@ configurations {
 
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonClientJava sourceSets.client.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.client.output
+}
+
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.client.allSource) {
+        exclude 'dev/minhnh/yetanotherthirst/compat/JadeCompatPlugin.java'
+        exclude 'dev/minhnh/yetanotherthirst/compat/ThirstElement.java'
+        exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerScreen.java'
+        exclude 'dev/minhnh/yetanotherthirst/client/WaterBoilerRenderer.java'
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn tasks.named('compileClientJava')
 }

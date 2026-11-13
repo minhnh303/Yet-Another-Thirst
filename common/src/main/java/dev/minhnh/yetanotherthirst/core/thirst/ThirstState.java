@@ -1,20 +1,46 @@
 package dev.minhnh.yetanotherthirst.core.thirst;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
+
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.UnaryOperator;
 
 public class ThirstState {
 
-    private int thirst = ThirstConfig.DEFAULT_THIRST;
-    private int quenched = ThirstConfig.DEFAULT_QUENCHED;
-    private float exhaustion;
-    private boolean enabled = true;
+    private final AtomicReference<ThirstData> data = new AtomicReference<>(ThirstData.DEFAULT);
     private int damageTimer;
     private int syncTimer;
     private float previousFoodExhaustion;
     private boolean initialSync = true;
     private boolean exhaustionRecalculate;
     private boolean justHealed;
+
+    public ThirstData getData() {
+        return data.get();
+    }
+
+    public void setData(ThirstData newData) {
+        ThirstData next = Objects.requireNonNull(newData, "newData");
+        ThirstData previous = data.getAndSet(next);
+        if (previous.enabled() != next.enabled()) {
+            this.initialSync = true;
+        }
+    }
+
+    public ThirstData updateData(UnaryOperator<ThirstData> operator) {
+        Objects.requireNonNull(operator, "operator");
+        while (true) {
+            ThirstData current = data.get();
+            ThirstData next = Objects.requireNonNull(operator.apply(current), "updated ThirstData");
+            if (data.compareAndSet(current, next)) {
+                if (current.enabled() != next.enabled()) {
+                    this.initialSync = true;
+                }
+                return next;
+            }
+        }
+    }
 
     public boolean isExhaustionRecalculate() {
         return exhaustionRecalculate;
@@ -33,78 +59,63 @@ public class ThirstState {
     }
 
     public int getThirst() {
-
-        return thirst;
+        return getData().thirst();
     }
 
     public void setThirst(int thirst) {
-
-        this.thirst = Mth.clamp(thirst, 0, ThirstConfig.MAX_THIRST);
+        updateData(d -> d.withThirst(thirst));
     }
 
     public int getQuenched() {
-
-        return quenched;
+        return getData().quenched();
     }
 
     public void setQuenched(int quenched) {
-
-        this.quenched = Mth.clamp(quenched, 0, ThirstConfig.MAX_THIRST);
+        updateData(d -> d.withQuenched(quenched));
     }
 
     public float getExhaustion() {
-
-        return exhaustion;
+        return getData().exhaustion();
     }
 
     public void setExhaustion(float exhaustion) {
-
-        this.exhaustion = Math.max(0.0F, exhaustion);
+        updateData(d -> d.withExhaustion(exhaustion));
     }
 
     public boolean isEnabled() {
-
-        return enabled;
+        return getData().enabled();
     }
 
     public void setEnabled(boolean enabled) {
-
-        this.enabled = enabled;
+        updateData(d -> d.withEnabled(enabled));
         this.initialSync = true;
     }
 
     int nextDamageTimer() {
-
         return ++damageTimer;
     }
 
     void resetDamageTimer() {
-
         damageTimer = 0;
     }
 
     int nextSyncTimer() {
-
         return ++syncTimer;
     }
 
     void resetSyncTimer() {
-
         syncTimer = 0;
     }
 
     float getPreviousFoodExhaustion() {
-
         return previousFoodExhaustion;
     }
 
     void setPreviousFoodExhaustion(float previousFoodExhaustion) {
-
         this.previousFoodExhaustion = previousFoodExhaustion;
     }
 
     boolean consumeInitialSync() {
-
         if (!initialSync) {
             return false;
         }
@@ -113,40 +124,19 @@ public class ThirstState {
     }
 
     public void drink(int thirst, int quenched) {
-
-        int overflow = Math.max(this.thirst + thirst - ThirstConfig.MAX_THIRST, 0);
-        int actualQuenched = quenched;
-        if (!ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED) {
-            overflow = 0;
-            if (this.thirst >= ThirstConfig.MAX_THIRST) {
-                actualQuenched = 0;
-            }
-        }
-
-        setThirst(this.thirst + thirst);
-        this.quenched = Math.min(this.quenched + actualQuenched + overflow, this.thirst);
+        updateData(d -> d.drink(thirst, quenched));
     }
 
     public void addExhaustion(float amount) {
-
-        setExhaustion(exhaustion + amount);
+        updateData(d -> d.addExhaustion(amount));
     }
 
     public void depleteOneLevel() {
-
-        exhaustion = Math.max(0.0F, exhaustion - ThirstConfig.EXHAUSTION_LIMIT);
-        if (quenched > 0) {
-            quenched--;
-        } else {
-            thirst = Math.max(thirst - 1, 0);
-        }
+        updateData(ThirstData::depleteOneLevel);
     }
 
     public void reset() {
-
-        thirst = ThirstConfig.DEFAULT_THIRST;
-        quenched = ThirstConfig.DEFAULT_QUENCHED;
-        exhaustion = 0.0F;
+        data.set(ThirstData.DEFAULT);
         damageTimer = 0;
         syncTimer = 0;
         previousFoodExhaustion = 0.0F;
@@ -156,37 +146,17 @@ public class ThirstState {
     }
 
     public void copyFrom(ThirstState other) {
-
-        thirst = other.thirst;
-        quenched = other.quenched;
-        exhaustion = other.exhaustion;
-        enabled = other.enabled;
+        this.data.set(other.getData());
         initialSync = true;
         exhaustionRecalculate = other.exhaustionRecalculate;
         justHealed = other.justHealed;
     }
 
     public CompoundTag save() {
-
-        CompoundTag tag = new CompoundTag();
-        tag.putInt("thirst", thirst);
-        tag.putInt("quenched", quenched);
-        tag.putFloat("exhaustion", exhaustion);
-        tag.putBoolean("enable", enabled);
-        return tag;
+        return data.get().save();
     }
 
     public void load(CompoundTag tag) {
-
-        if (tag.contains("thirst")) {
-            setThirst(tag.getIntOr("thirst", ThirstConfig.DEFAULT_THIRST));
-        }
-        if (tag.contains("quenched")) {
-            setQuenched(tag.getIntOr("quenched", ThirstConfig.DEFAULT_QUENCHED));
-        }
-        if (tag.contains("exhaustion")) {
-            setExhaustion(tag.getFloatOr("exhaustion", 0.0F));
-        }
-        enabled = !tag.contains("enable") || tag.getBooleanOr("enable", true);
+        this.data.set(ThirstData.load(tag));
     }
 }

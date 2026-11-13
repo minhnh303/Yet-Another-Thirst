@@ -5,13 +5,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.UnaryOperator;
 
 public final class ThirstStorage {
 
-    private static final Map<UUID, ThirstState> STATES = new HashMap<>();
+    private static final Map<UUID, ThirstState> STATES = new ConcurrentHashMap<>();
 
     private ThirstStorage() {
     }
@@ -21,13 +22,32 @@ public final class ThirstStorage {
         return STATES.computeIfAbsent(player.getUUID(), uuid -> load(player));
     }
 
+    public static ThirstData getData(Player player) {
+
+        return get(player).getData();
+    }
+
+    public static void setData(Player player, ThirstData data) {
+
+        get(player).setData(data);
+        save(player);
+    }
+
+    public static ThirstData update(Player player, UnaryOperator<ThirstData> operator) {
+
+        ThirstData updated = get(player).updateData(operator);
+        save(player);
+        return updated;
+    }
+
+    public static void applySync(Player player, ThirstData data) {
+
+        get(player).setData(data);
+    }
+
     public static void applySync(Player player, int thirst, int quenched, float exhaustion, boolean enabled) {
 
-        ThirstState state = get(player);
-        state.setThirst(thirst);
-        state.setQuenched(quenched);
-        state.setExhaustion(exhaustion);
-        state.setEnabled(enabled);
+        applySync(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 
     public static void copy(Player oldPlayer, Player newPlayer, boolean resetOnDeath) {
@@ -65,7 +85,7 @@ public final class ThirstStorage {
 
         ThirstState state = get(player);
         save(player);
-        Services.PLATFORM.sendThirstSync(player, state);
+        Services.PLATFORM.sendThirstSync(player, state.getData());
     }
 
     private static ThirstState load(Player player) {
