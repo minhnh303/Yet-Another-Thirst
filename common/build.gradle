@@ -17,10 +17,35 @@ dependencies {
     compileOnly("maven.modrinth:jade:${jade_version}") {
         transitive = false
     }
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    client {
+        java {
+            srcDir 'src/client/java'
+        }
+        compileClasspath += sourceSets.main.output + configurations.compileClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
+    }
 }
 
 configurations {
+    testCompileClasspath.extendsFrom(compileClasspath)
+    testRuntimeClasspath.extendsFrom(runtimeClasspath)
+
     commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonClientJava {
         canBeResolved = false
         canBeConsumed = true
     }
@@ -32,5 +57,20 @@ configurations {
 
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonClientJava sourceSets.client.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.client.output
+}
+
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.client.allSource
+}
+
+tasks.named('check').configure {
+    dependsOn tasks.named('compileClientJava')
 }

@@ -7,10 +7,10 @@ import java.util.function.Supplier;
 /** Loader-agnostic item references. Populated by each loader's item registration. */
 public final class ModItems {
 
-    public static Supplier<Item> CLAY_BOWL;
-    public static Supplier<Item> TERRACOTTA_BOWL;
-    public static Supplier<Item> TERRACOTTA_WATER_BOWL;
-    public static Supplier<Item> WOODEN_WATER_BOWL;
+    public static Supplier<Item> CLAY_BOWL = () -> net.minecraft.world.item.Items.AIR;
+    public static Supplier<Item> TERRACOTTA_BOWL = () -> net.minecraft.world.item.Items.AIR;
+    public static Supplier<Item> TERRACOTTA_WATER_BOWL = () -> net.minecraft.world.item.Items.AIR;
+    public static Supplier<Item> WOODEN_WATER_BOWL = () -> net.minecraft.world.item.Items.AIR;
 
     public static Supplier<Item> FABRIC_FILTER_CORE = () -> net.minecraft.world.item.Items.AIR;
     public static Supplier<Item> SAND_FILTER_CORE = () -> net.minecraft.world.item.Items.AIR;

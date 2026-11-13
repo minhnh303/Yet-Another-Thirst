@@ -1,7 +1,7 @@
 package dev.minhnh.yetanotherthirst;
 
 import dev.minhnh.yetanotherthirst.screen.ModMenuTypes;
-import dev.minhnh.yetanotherthirst.screen.WaterBoilerScreen;
+import dev.minhnh.yetanotherthirst.client.WaterBoilerScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;

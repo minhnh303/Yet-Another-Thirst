@@ -236,8 +236,8 @@ public final class FabricConfig {
     }
 
     public static void reloadThirstValues() {
-        Map<Item, ThirstValue> drinks = parseItemValues(getStringListList(itemsJson, "drinks", defaultItemLists(ThirstValues.defaultDrinks())));
-        Map<Item, ThirstValue> foods = parseItemValues(getStringListList(itemsJson, "foods", defaultItemLists(ThirstValues.defaultFoods())));
+        Map<Item, ThirstValue> drinks = parseItemValues(getStringListList(itemsJson, "drinks", DefaultItemValues.defaultDrinkValues()));
+        Map<Item, ThirstValue> foods = parseItemValues(getStringListList(itemsJson, "foods", DefaultItemValues.defaultFoodValues()));
         Set<Item> blacklist = parseItems(getStringList(itemsJson, "itemsBlacklist",
                 List.of("yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2")));
 
@@ -303,16 +303,6 @@ public final class FabricConfig {
 
     private static String getString(JsonObject obj, String key, String def) {
         return obj.has(key) ? obj.get(key).getAsString() : def;
-    }
-
-    /** Converts a Map<Item,ThirstValue> (from ThirstValues.defaultDrinks/Foods) to the List<List<Object>> format used by parseItemValues. */
-    private static List<List<Object>> defaultItemLists(Map<Item, ThirstValue> map) {
-        List<List<Object>> result = new ArrayList<>();
-        map.forEach((item, value) -> {
-            var key = BuiltInRegistries.ITEM.getKey(item);
-            if (key != null) result.add(List.of(key.toString(), value.thirst(), value.quenched()));
-        });
-        return result;
     }
 
     private static List<String> getStringList(JsonObject obj, String key, List<String> def) {
@@ -448,8 +438,8 @@ public final class FabricConfig {
         var obj = new JsonObject();
         obj.addProperty("configVersion", 1);
         obj.addProperty("waterBottleStackSize", 64);
-        obj.add("drinks", listOfListsToJson(defaultItemLists(ThirstValues.defaultDrinks())));
-        obj.add("foods", listOfListsToJson(defaultItemLists(ThirstValues.defaultFoods())));
+        obj.add("drinks", listOfListsToJson(DefaultItemValues.defaultDrinkValues()));
+        obj.add("foods", listOfListsToJson(DefaultItemValues.defaultFoodValues()));
         obj.add("itemsBlacklist", stringListToJson(List.of(
                 "yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2")));
         obj.addProperty("filterBaseSpeed", 1);

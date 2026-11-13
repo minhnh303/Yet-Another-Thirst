@@ -1,9 +1,10 @@
-package dev.minhnh.yetanotherthirst.screen;
+package dev.minhnh.yetanotherthirst.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.minhnh.yetanotherthirst.Constants;
 import dev.minhnh.yetanotherthirst.Lang;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
+import dev.minhnh.yetanotherthirst.screen.AbstractWaterBoilerMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;

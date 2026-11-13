@@ -32,37 +32,34 @@ public final class NeoForgeNetwork {
         registrar.playToServer(DrinkByHandPacket.TYPE, DrinkByHandPacket.STREAM_CODEC, DrinkByHandPacket::handle);
     }
 
+    public static void sendToPlayer(ServerPlayer player, dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
+        PacketDistributor.sendToPlayer(player, new ThirstSyncPacket(data));
+    }
+
     public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-        PacketDistributor.sendToPlayer(player, new ThirstSyncPacket(thirst, quenched, exhaustion, enabled));
+        sendToPlayer(player, new dev.minhnh.yetanotherthirst.core.thirst.ThirstData(thirst, quenched, exhaustion, enabled));
     }
 
     public static void sendDrinkByHand(BlockPos pos) {
         PacketDistributor.sendToServer(new DrinkByHandPacket(pos));
     }
 
-    private record ThirstSyncPacket(int thirst, int quenched, float exhaustion, boolean enabled) implements CustomPacketPayload {
+    private record ThirstSyncPacket(dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) implements CustomPacketPayload {
 
         private static final Type<ThirstSyncPacket> TYPE = new Type<>(Constants.asResource("thirst_sync"));
         private static final StreamCodec<RegistryFriendlyByteBuf, ThirstSyncPacket> STREAM_CODEC =
                 CustomPacketPayload.codec(ThirstSyncPacket::encode, ThirstSyncPacket::decode);
 
         private static void encode(ThirstSyncPacket packet, FriendlyByteBuf buffer) {
-            buffer.writeInt(packet.thirst);
-            buffer.writeInt(packet.quenched);
-            buffer.writeFloat(packet.exhaustion);
-            buffer.writeBoolean(packet.enabled);
+            packet.data.write(buffer);
         }
 
         private static ThirstSyncPacket decode(FriendlyByteBuf buffer) {
-            return new ThirstSyncPacket(buffer.readInt(), buffer.readInt(), buffer.readFloat(), buffer.readBoolean());
+            return new ThirstSyncPacket(dev.minhnh.yetanotherthirst.core.thirst.ThirstData.read(buffer));
         }
 
         private static void handle(ThirstSyncPacket packet, IPayloadContext context) {
-            context.enqueueWork(() -> NeoForgeClientPacketHandler.handleThirstSync(
-                    packet.thirst,
-                    packet.quenched,
-                    packet.exhaustion,
-                    packet.enabled));
+            context.enqueueWork(() -> NeoForgeClientPacketHandler.handleThirstSync(packet.data));
         }
 
         @Override

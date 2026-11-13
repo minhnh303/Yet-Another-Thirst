@@ -17,6 +17,9 @@
     ],
     "jade": [
       "dev.minhnh.yetanotherthirst.compat.JadeCompatPlugin"
+    ],
+    "fabric-gametest": [
+      "dev.minhnh.yetanotherthirst.gametest.ThirstGameTests"
     ]
   },
   "mixins": [

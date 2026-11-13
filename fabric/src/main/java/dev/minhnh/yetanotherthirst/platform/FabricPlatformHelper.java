@@ -49,8 +49,12 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+    public void sendThirstSync(ServerPlayer player, dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
+        FabricNetwork.sendToPlayer(player, data);
+    }
 
+    @Override
+    public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
         FabricNetwork.sendToPlayer(player, thirst, quenched, exhaustion, enabled);
     }
 

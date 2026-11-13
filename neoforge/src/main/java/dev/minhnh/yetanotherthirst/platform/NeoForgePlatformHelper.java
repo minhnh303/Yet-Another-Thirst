@@ -48,8 +48,12 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+    public void sendThirstSync(ServerPlayer player, dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
+        NeoForgeNetwork.sendToPlayer(player, data);
+    }
 
+    @Override
+    public void sendThirstSync(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
         NeoForgeNetwork.sendToPlayer(player, thirst, quenched, exhaustion, enabled);
     }
 }

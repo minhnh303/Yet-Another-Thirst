@@ -39,6 +39,7 @@ public class YetAnotherThirstForge {
         modBus.addListener(YetAnotherThirstForge::onConfigLoading);
         modBus.addListener(YetAnotherThirstForge::onConfigReloading);
         modBus.addListener(YetAnotherThirstForge::onCommonSetup);
+        modBus.addListener(YetAnotherThirstForge::onRegisterGameTests);
 
         // Bind Forge RegistryObjects into loader-agnostic ModItems before registration fires
         ForgeItems.bindToCommon();
@@ -133,5 +134,9 @@ public class YetAnotherThirstForge {
         } else if (spec == ForgeClientConfig.SPEC) {
             ForgeClientConfig.sync();
         }
+    }
+
+    private static void onRegisterGameTests(net.minecraftforge.event.RegisterGameTestsEvent event) {
+        event.register(dev.minhnh.yetanotherthirst.gametest.ThirstGameTests.class);
     }
 }

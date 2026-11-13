@@ -3,7 +3,7 @@ package dev.minhnh.yetanotherthirst;
 import dev.minhnh.yetanotherthirst.client.WaterBoilerRenderer;
 import dev.minhnh.yetanotherthirst.core.block.ModBlocks;
 import dev.minhnh.yetanotherthirst.screen.ModMenuTypes;
-import dev.minhnh.yetanotherthirst.screen.WaterBoilerScreen;
+import dev.minhnh.yetanotherthirst.client.WaterBoilerScreen;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;

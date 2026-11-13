@@ -7,10 +7,13 @@ base {
 }
 
 configurations {
-    commonJava{
+    commonJava {
         canBeResolved = true
     }
-    commonResources{
+    commonClientJava {
+        canBeResolved = true
+    }
+    commonResources {
         canBeResolved = true
     }
 }
@@ -22,12 +25,15 @@ dependencies {
         }
     }
     commonJava project(path: ':common', configuration: 'commonJava')
+    commonClientJava project(path: ':common', configuration: 'commonClientJava')
     commonResources project(path: ':common', configuration: 'commonResources')
 }
 
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+    dependsOn(configurations.commonClientJava)
+    source(configurations.commonClientJava)
 }
 
 processResources {
@@ -38,11 +44,15 @@ processResources {
 tasks.named('javadoc', Javadoc).configure {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+    dependsOn(configurations.commonClientJava)
+    source(configurations.commonClientJava)
 }
 
 tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonJava)
     from(configurations.commonJava)
+    dependsOn(configurations.commonClientJava)
+    from(configurations.commonClientJava)
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }

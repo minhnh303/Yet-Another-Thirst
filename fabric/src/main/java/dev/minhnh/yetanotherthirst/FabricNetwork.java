@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst;
 
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
@@ -10,7 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 public final class FabricNetwork {
 
     // Server→Client: sync thirst state
-    public record ThirstSyncPayload(int thirst, int quenched, float exhaustion, boolean enabled)
+    public record ThirstSyncPayload(ThirstData data)
             implements CustomPacketPayload {
 
         public static final Type<ThirstSyncPayload> TYPE =
@@ -18,14 +19,8 @@ public final class FabricNetwork {
 
         public static final StreamCodec<FriendlyByteBuf, ThirstSyncPayload> CODEC =
                 StreamCodec.of(
-                        (buf, p) -> {
-                            buf.writeInt(p.thirst());
-                            buf.writeInt(p.quenched());
-                            buf.writeFloat(p.exhaustion());
-                            buf.writeBoolean(p.enabled());
-                        },
-                        buf -> new ThirstSyncPayload(
-                                buf.readInt(), buf.readInt(), buf.readFloat(), buf.readBoolean()));
+                        (buf, p) -> p.data().write(buf),
+                        buf -> new ThirstSyncPayload(ThirstData.read(buf)));
 
         @Override
         public Type<ThirstSyncPayload> type() { return TYPE; }
@@ -54,7 +49,11 @@ public final class FabricNetwork {
         PayloadTypeRegistry.playC2S().register(DrinkByHandPayload.TYPE, DrinkByHandPayload.CODEC);
     }
 
+    public static void sendToPlayer(ServerPlayer player, ThirstData data) {
+        ServerPlayNetworking.send(player, new ThirstSyncPayload(data));
+    }
+
     public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
-        ServerPlayNetworking.send(player, new ThirstSyncPayload(thirst, quenched, exhaustion, enabled));
+        sendToPlayer(player, new ThirstData(thirst, quenched, exhaustion, enabled));
     }
 }

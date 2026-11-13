@@ -23,11 +23,7 @@ public final class FabricClientEvents {
 
         // Register thirst sync packet handler (Server→Client)
         ClientPlayNetworking.registerGlobalReceiver(FabricNetwork.ThirstSyncPayload.TYPE, (payload, context) -> {
-            int thirst = payload.thirst();
-            int quenched = payload.quenched();
-            float exhaustion = payload.exhaustion();
-            boolean enabled = payload.enabled();
-            context.client().execute(() -> FabricClientPacketHandler.handleThirstSync(thirst, quenched, exhaustion, enabled));
+            context.client().execute(() -> FabricClientPacketHandler.handleThirstSync(payload.data()));
         });
     }
 }

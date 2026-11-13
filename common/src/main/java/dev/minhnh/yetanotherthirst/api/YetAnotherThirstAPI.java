@@ -1,6 +1,7 @@
 package dev.minhnh.yetanotherthirst.api;
 
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
+import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * Main API entrypoint for Yet Another Thirst.
@@ -32,6 +34,40 @@ public final class YetAnotherThirstAPI {
      */
     public static ThirstState getThirstState(Player player) {
         return ThirstStorage.get(player);
+    }
+
+    /**
+     * Retrieves the immutable thirst data snapshot of a player.
+     *
+     * @param player The player to query.
+     * @return The ThirstData record.
+     */
+    public static ThirstData getThirstData(Player player) {
+        return ThirstStorage.getData(player);
+    }
+
+    /**
+     * Sets the thirst data of a player and synchronizes the change.
+     *
+     * @param player The player to modify.
+     * @param data   The new ThirstData record.
+     */
+    public static void setThirstData(Player player, ThirstData data) {
+        ThirstStorage.setData(player, data);
+        sync(player);
+    }
+
+    /**
+     * Atomically updates the thirst data of a player and synchronizes the change.
+     *
+     * @param player  The player to modify.
+     * @param updater The function producing the updated ThirstData.
+     * @return The updated ThirstData record.
+     */
+    public static ThirstData updateThirstData(Player player, UnaryOperator<ThirstData> updater) {
+        ThirstData updated = ThirstStorage.update(player, updater);
+        sync(player);
+        return updated;
     }
 
     /**

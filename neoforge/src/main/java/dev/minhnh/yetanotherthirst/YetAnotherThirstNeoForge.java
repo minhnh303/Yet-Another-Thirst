@@ -44,6 +44,7 @@ public class YetAnotherThirstNeoForge {
         modBus.addListener(NeoForgeCommonSetup::onCommonSetup);
         modBus.addListener(NeoForgeCommonSetup::onRegisterCapabilities);
         modBus.addListener(NeoForgeNetwork::register);
+        modBus.addListener(YetAnotherThirstNeoForge::onRegisterGameTests);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener(NeoForgeClientEvents::onRegisterTooltipComponentFactories);
             modBus.addListener(NeoForgeClientEvents::onRegisterGuiLayers);
@@ -155,5 +156,9 @@ public class YetAnotherThirstNeoForge {
         } else if (spec == NeoForgeClientConfig.SPEC) {
             NeoForgeClientConfig.sync();
         }
+    }
+
+    private static void onRegisterGameTests(net.neoforged.neoforge.event.RegisterGameTestsEvent event) {
+        event.register(dev.minhnh.yetanotherthirst.gametest.ThirstGameTests.class);
     }
 }

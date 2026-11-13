@@ -44,9 +44,12 @@ public final class ForgeNetwork {
                 .add();
     }
 
-    public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+    public static void sendToPlayer(ServerPlayer player, dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
+        CHANNEL.send(new ThirstSyncPacket(data), PacketDistributor.PLAYER.with(player));
+    }
 
-        CHANNEL.send(new ThirstSyncPacket(thirst, quenched, exhaustion, enabled), PacketDistributor.PLAYER.with(player));
+    public static void sendToPlayer(ServerPlayer player, int thirst, int quenched, float exhaustion, boolean enabled) {
+        sendToPlayer(player, new dev.minhnh.yetanotherthirst.core.thirst.ThirstData(thirst, quenched, exhaustion, enabled));
     }
 
     public static void sendDrinkByHand(BlockPos pos) {
@@ -56,25 +59,21 @@ public final class ForgeNetwork {
 
     // ── Server → Client: thirst state sync ───────────────────────────────────
 
-    private record ThirstSyncPacket(int thirst, int quenched, float exhaustion, boolean enabled) {
+    private record ThirstSyncPacket(dev.minhnh.yetanotherthirst.core.thirst.ThirstData data) {
 
         private static void encode(ThirstSyncPacket packet, FriendlyByteBuf buf) {
-            buf.writeInt(packet.thirst);
-            buf.writeInt(packet.quenched);
-            buf.writeFloat(packet.exhaustion);
-            buf.writeBoolean(packet.enabled);
+            packet.data.write(buf);
         }
 
         private static ThirstSyncPacket decode(FriendlyByteBuf buf) {
-            return new ThirstSyncPacket(buf.readInt(), buf.readInt(), buf.readFloat(), buf.readBoolean());
+            return new ThirstSyncPacket(dev.minhnh.yetanotherthirst.core.thirst.ThirstData.read(buf));
         }
 
         private static void handle(ThirstSyncPacket packet, CustomPayloadEvent.Context context) {
             if (!context.isClientSide()) return;
             context.enqueueWork(() ->
                     DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                            ForgeClientPacketHandler.handleThirstSync(
-                                    packet.thirst, packet.quenched, packet.exhaustion, packet.enabled)));
+                            ForgeClientPacketHandler.handleThirstSync(packet.data)));
             context.setPacketHandled(true);
         }
     }
