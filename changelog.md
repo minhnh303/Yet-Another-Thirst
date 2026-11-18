@@ -17,9 +17,14 @@
   - **[Let's Do] HerbalBrews** (`herbalbrews`): green/black/hibiscus/lavender/yerba mate/rooibos/oolong teas, coffee, milk coffee, and flasks.
   - **Hearth & Harvest** (`hearthandharvest`): goat/chocolate milk, syrup, fruit juices, beer, root beer, hard cider, mead, moonshine, fruit wines, berries, grapes, jams, pickled vegetables, stews/soups, and pastries.
   - **Crock Pot** (`crockpot`): milk bottle, syrup, avaj, hot cocoa, veg stinger, teas, gazpacho, soups, stews, popsicles, ice cream, fruit medley, and cooked dishes (including `crockpot:stew` for Fabric's *A Cute Little Crock Pot*).
+- **Fabric Purification Recipes**: Added NBT-aware smelting and campfire recipes for water buckets, bottles, and terracotta water bowls at each supported purity level.
 
 ### Fixed
 - **FoodData Mixin Priority**: Set priority to 1100 on `MixinFoodData` to prevent mixin injection conflicts with other mods targeting `FoodData`.
+- **Create Hose Pulley Purity**: Corrected incoming water purity when Create transfers fluid through a Hose Pulley.
+- **Fabric Loot Modifiers**: Prevented Porting Lib-based mods from crashing during Fabric world creation by limiting global loot modifiers to Forge and NeoForge.
+- **Bucket Water Pickup**: Empty buckets now remove source water through vanilla pickup handling, preserve its purity, and correctly trigger bucket criteria and usage statistics on every loader.
+- **Early Item Access**: Initialized shared bowl item references with `AIR` defaults to prevent null access before loader registration completes.
 
 ---
 
