@@ -50,6 +50,7 @@ public class YetAnotherThirstNeoForge {
             modBus.addListener(NeoForgeClientEvents::onRegisterGuiLayers);
             modBus.addListener(NeoForgeClientEvents::onRegisterMenuScreens);
             modBus.addListener(NeoForgeClientEvents::onRegisterRenderers);
+            NeoForgeConfigScreen.register(container);
         }
         registerGameEvents();
 
@@ -140,8 +141,17 @@ public class YetAnotherThirstNeoForge {
         onConfigEvent(event);
     }
 
+    /**
+     * Fired on the config file-watcher thread, also after the in-game config screen saves a file. While a server
+     * runs, the values are pushed on its thread so ticking never sees them change mid-tick.
+     */
     private static void onConfigReloading(ModConfigEvent.Reloading event) {
-        onConfigEvent(event);
+        var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            server.execute(() -> onConfigEvent(event));
+        } else {
+            onConfigEvent(event);
+        }
     }
 
     private static void onConfigEvent(ModConfigEvent event) {
@@ -150,11 +160,22 @@ public class YetAnotherThirstNeoForge {
             NeoForgeConfigCommon.sync();
         } else if (spec == NeoForgeConfigItems.SPEC) {
             NeoForgeConfigItems.sync();
-            NeoForgeConfigItems.reloadThirstValues();
+            reloadItemValuesOnServer();
         } else if (spec == NeoForgeConfigCompat.SPEC) {
             NeoForgeConfigCompat.sync();
         } else if (spec == NeoForgeClientConfig.SPEC) {
             NeoForgeClientConfig.sync();
+        }
+    }
+
+    /**
+     * Config events fire on the loading, render or file-watcher thread; item values are resolved on the
+     * running server thread, where tags are bound. Without a server nothing runs; server start resolves them.
+     */
+    private static void reloadItemValuesOnServer() {
+        var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            server.execute(NeoForgeConfigItems::reloadThirstValues);
         }
     }
 

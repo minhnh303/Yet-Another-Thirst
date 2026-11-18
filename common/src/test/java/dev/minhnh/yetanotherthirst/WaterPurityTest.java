@@ -35,19 +35,19 @@ class WaterPurityTest {
     @DisplayName("Purity components have correct translation keys and colors")
     void testPurityComponents() {
         Component dirty = WaterPurity.purityComponent(0);
-        assertTrue(dirty.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yet_another_thirst.purity.dirty"));
+        assertTrue(dirty.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yat.purity.dirty"));
         assertEquals(TextColor.fromRgb(0xa84825), dirty.getStyle().getColor());
 
         Component slightlyDirty = WaterPurity.purityComponent(1);
-        assertTrue(slightlyDirty.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yet_another_thirst.purity.slightly_dirty"));
+        assertTrue(slightlyDirty.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yat.purity.slightly_dirty"));
         assertEquals(TextColor.fromRgb(0x796c71), slightlyDirty.getStyle().getColor());
 
         Component acceptable = WaterPurity.purityComponent(2);
-        assertTrue(acceptable.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yet_another_thirst.purity.acceptable"));
+        assertTrue(acceptable.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yat.purity.acceptable"));
         assertEquals(TextColor.fromRgb(0x5d829d), acceptable.getStyle().getColor());
 
         Component purified = WaterPurity.purityComponent(3);
-        assertTrue(purified.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yet_another_thirst.purity.purified"));
+        assertTrue(purified.getContents() instanceof TranslatableContents tc && tc.getKey().equals("yat.purity.purified"));
         assertEquals(TextColor.fromRgb(0x21b1ff), purified.getStyle().getColor());
     }
 

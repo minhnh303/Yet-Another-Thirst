@@ -17,7 +17,7 @@ public abstract class AbstractWaterBoilerMenu extends AbstractContainerMenu {
 
     protected AbstractWaterBoilerMenu(@Nullable MenuType<?> menuType, int containerId, ContainerData data) {
         super(menuType, containerId);
-        checkContainerDataCount(data, 4);
+        checkContainerDataCount(data, 6);
         this.data = data;
         addDataSlots(data);
     }
@@ -49,6 +49,16 @@ public abstract class AbstractWaterBoilerMenu extends AbstractContainerMenu {
         int total = data.get(3);
         if (total == 0) total = 200;
         return data.get(2) * 22 / total;
+    }
+
+    /** FE received in the latest powered tick. */
+    public int getEnergyRate() {
+        return data.get(4);
+    }
+
+    /** FE per tick needed to keep the boiler running. */
+    public int getEnergyRequired() {
+        return data.get(5);
     }
 
     public abstract int getInputAmount();

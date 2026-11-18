@@ -7,7 +7,7 @@ Development documentation and technical specifications for the Minecraft 1.21 br
 | Property | Value |
 |---|---|
 | Minecraft Version | 1.21 (`[1.21, 1.21.2)`) |
-| Mod Version | 1.21-1.5.2 |
+| Mod Version | 1.21-1.6.0 |
 | Mod ID | `yet_another_thirst` |
 | Group | `dev.minhnh.yetanotherthirst` |
 | Java Version | 21 |

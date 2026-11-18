@@ -59,7 +59,7 @@ public final class JadeCompatPlugin implements IWailaPlugin {
 
             if (WaterPurity.isWaterDisplayTarget(accessor.getLevel(), accessor.getPosition())) {
                 int purity = WaterPurity.getDisplayPurity(accessor.getLevel(), accessor.getPosition());
-                tooltip.add(Component.translatable("yet_another_thirst.jade.water_purity",
+                tooltip.add(Component.translatable("yat.jade.water_purity",
                         WaterPurity.purityComponent(purity)));
                 if (ThirstConfig.CAN_DRINK_BY_HAND) {
                     tooltip.add(new ThirstElement(new ThirstValue(
@@ -88,7 +88,7 @@ public final class JadeCompatPlugin implements IWailaPlugin {
                         if (customDataOpt == null || customDataOpt.isEmpty()) continue;
                         CompoundTag nbt = customDataOpt.get().copyTag();
                         if (!nbt.contains("Purity")) continue;
-                        tooltip.add(Component.translatable("yet_another_thirst.jade.water_purity",
+                        tooltip.add(Component.translatable("yat.jade.water_purity",
                                 WaterPurity.purityComponent(nbt.getInt("Purity"))));
                         break outer;
                     }
@@ -146,7 +146,7 @@ public final class JadeCompatPlugin implements IWailaPlugin {
             if (purity < WaterPurity.MIN_PURITY || purity > WaterPurity.MAX_PURITY) {
                 return;
             }
-            tooltip.add(Component.translatable("yet_another_thirst.jade.water_purity",
+            tooltip.add(Component.translatable("yat.jade.water_purity",
                     WaterPurity.purityComponent(purity)));
             ThirstValues.get(stack).ifPresent(value -> tooltip.add(new ThirstElement(value)));
         }

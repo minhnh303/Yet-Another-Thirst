@@ -2,11 +2,16 @@
   "schemaVersion": 1,
   "id": "${mod_id}",
   "version": "${version}",
-  "name": "Yet Another Thirst",
-  "description": "A thirst mod for Minecraft.",
-  "authors": ["minhnh"],
-  "license": "MIT",
-  "icon": "assets/yet_another_thirst/icon.png",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": ["${mod_author}"],
+  "contact": {
+    "homepage": "https://github.com/minhnh303/Yet-Another-Thirst",
+    "sources": "https://github.com/minhnh303/Yet-Another-Thirst",
+    "issues": "https://github.com/minhnh303/Yet-Another-Thirst/issues"
+  },
+  "license": "${license}",
+  "icon": "${mod_id}.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -17,6 +22,9 @@
     ],
     "jade": [
       "dev.minhnh.yetanotherthirst.compat.JadeCompatPlugin"
+    ],
+    "modmenu": [
+      "dev.minhnh.yetanotherthirst.FabricModMenuIntegration"
     ],
     "fabric-gametest": [
       "dev.minhnh.yetanotherthirst.gametest.ThirstGameTests"
@@ -32,6 +40,7 @@
     "minecraft": "${fabric_minecraft_version_range}"
   },
   "suggests": {
+    "modmenu": "*",
     "jade": "*",
     "appleskin": "*",
     "toughasnails": "*",
@@ -41,5 +50,13 @@
     "brewery": "*",
     "farm_and_charm": "*",
     "create": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/yet-another-thirst",
+        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/yet-another-thirst"
+      }
+    }
   }
 }

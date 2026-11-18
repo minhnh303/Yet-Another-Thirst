@@ -128,7 +128,8 @@ processResources {
             'fabric_minecraft_version_range': fabric_minecraft_version_range,
             'fabric_loader_version'        : fabric_loader_version,
             'fabric_api_version'           : fabric_api_version,
-            'jade_fabric_version'          : jade_fabric_version
+            'jade_fabric_version'          : jade_fabric_version,
+            'modmenu_version'              : modmenu_version
     ]
 
     var jsonExpandProps = expandProps.collectEntries {
@@ -158,6 +159,21 @@ publishing {
             url System.getenv('local_maven_url')
         }
     }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+configurations {
+    testCompileClasspath.extendsFrom(compileClasspath)
+    testRuntimeClasspath.extendsFrom(runtimeClasspath)
+}
+
+test {
+    useJUnitPlatform()
 }
 
 // ── Architectural Seam Checks ──────────────────────────────────────────────
@@ -307,5 +323,101 @@ if (project.name == 'common') {
 
     tasks.named('compileJava').configure {
         dependsOn checkSeams
+    }
+}
+
+// ── Clean Old Jars & Copy Built Jar to Game Mods Directory ─────────────────
+if (project.name in ['forge', 'neoforge', 'fabric']) {
+    def resolveModsDir = {
+        def loaderKey = "${project.name}ModsDir"
+        def propValue = project.findProperty(loaderKey)?.toString()?.trim()
+        if (propValue) {
+            return propValue
+        }
+        def genericProp = project.findProperty('modsDir')?.toString()?.trim()
+        if (genericProp) {
+            return genericProp
+        }
+        def localPropsFile = rootProject.file('local.properties')
+        if (localPropsFile.exists()) {
+            def props = new Properties()
+            localPropsFile.withInputStream { props.load(it) }
+            def localLoaderVal = props.getProperty(loaderKey)?.trim()
+            if (localLoaderVal) {
+                return localLoaderVal
+            }
+            def localGenericVal = props.getProperty('modsDir')?.trim()
+            if (localGenericVal) {
+                return localGenericVal
+            }
+        }
+        return null
+    }
+
+    def cleanOldJars = tasks.register('cleanOldJars') {
+        description = 'Deletes old jar files from build/libs before building new jars.'
+        group = 'build'
+        doLast {
+            delete fileTree(dir: layout.buildDirectory.dir('libs'), include: '*.jar')
+        }
+    }
+
+    tasks.withType(Jar).configureEach {
+        dependsOn cleanOldJars
+    }
+
+    def copyModToGame = tasks.register('copyModToGame') {
+        description = 'Removes old mod jars from the target game mods directory and copies the newly built jar.'
+        group = 'build'
+
+        onlyIf {
+            resolveModsDir() != null
+        }
+
+        doLast {
+            def rawDir = resolveModsDir()
+            if (rawDir == null) {
+                return
+            }
+            if (rawDir.startsWith('~/') || rawDir == '~') {
+                rawDir = System.getProperty('user.home') + rawDir.substring(1)
+            }
+            def targetDir = file(rawDir)
+            if (!targetDir.exists() || !targetDir.isDirectory()) {
+                throw new GradleException("Target mods directory does not exist: ${targetDir.absolutePath}")
+            }
+
+            delete fileTree(dir: targetDir, include: 'YetAnotherThirst-*.jar')
+
+            def jarTask = project.name == 'fabric'
+                    ? tasks.named('remapJar').get()
+                    : tasks.named('jar').get()
+            def jarFile = jarTask.archiveFile.get().asFile
+
+            copy {
+                from jarFile
+                into targetDir
+            }
+            logger.lifecycle("Copied ${jarFile.name} -> ${targetDir.absolutePath}")
+        }
+    }
+
+    if (project.name == 'fabric') {
+        pluginManager.withPlugin('fabric-loom') {
+            tasks.named('remapJar').configure {
+                dependsOn cleanOldJars
+            }
+            copyModToGame.configure {
+                dependsOn tasks.named('remapJar')
+            }
+        }
+    } else {
+        copyModToGame.configure {
+            dependsOn tasks.named('jar')
+        }
+    }
+
+    tasks.named('build').configure {
+        dependsOn copyModToGame
     }
 }

@@ -23,7 +23,7 @@ public final class ThirstTooltip {
         Optional<ThirstValue> value = ThirstValues.get(stack);
         value.filter(ThirstTooltip::shouldShow)
                 .ifPresent(thirstValue -> tooltip.add(Component.translatable(
-                        "yet_another_thirst.tooltip.thirst_value",
+                        "yat.tooltip.thirst_value",
                         thirstValue.thirst(),
                         thirstValue.quenched()
                 ).withStyle(ChatFormatting.AQUA)));
