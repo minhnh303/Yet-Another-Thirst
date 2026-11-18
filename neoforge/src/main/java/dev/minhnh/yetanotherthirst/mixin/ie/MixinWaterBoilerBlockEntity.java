@@ -45,17 +45,17 @@ public abstract class MixinWaterBoilerBlockEntity implements IEBlockInterfaces.I
 
     private Component getSideConfigComponent(BlockState state, Direction d) {
         if (state.hasProperty(WaterBoilerBlock.FACING) && d == state.getValue(WaterBoilerBlock.FACING)) {
-            return Component.translatable("yet_another_thirst.blockSide.front");
+            return Component.translatable("yat.block_side.front");
         }
         if (state.hasProperty(WaterBoilerBlock.INLET) && state.getValue(WaterBoilerBlock.INLET).getDirection() == d) {
-            return Component.translatable("yet_another_thirst.blockSide.inlet");
+            return Component.translatable("yat.block_side.inlet");
         }
         if (state.hasProperty(WaterBoilerBlock.OUTLET) && state.getValue(WaterBoilerBlock.OUTLET).getDirection() == d) {
-            return Component.translatable("yet_another_thirst.blockSide.outlet");
+            return Component.translatable("yat.block_side.outlet");
         }
         if (state.hasProperty(WaterBoilerBlock.PORT) && state.getValue(WaterBoilerBlock.PORT).getDirection() == d) {
-            return Component.translatable("yet_another_thirst.blockSide.port");
+            return Component.translatable("yat.block_side.port");
         }
-        return Component.translatable("yet_another_thirst.blockSide.none");
+        return Component.translatable("yat.block_side.none");
     }
 }

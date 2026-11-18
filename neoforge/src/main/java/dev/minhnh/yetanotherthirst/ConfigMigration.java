@@ -37,7 +37,7 @@ public final class ConfigMigration {
             migrateSection(old, newFolder.resolve("common.toml"),
                     "general", "effects", "dehydration", "depletion", "purity", "world", "handDrinking");
             migrateSection(old, newFolder.resolve("items.toml"),
-                    "items", "filter");
+                    "items", "filter", "boiler");
             migrateSection(old, newFolder.resolve("compat.toml"),
                     "compatibility");
         } catch (Exception e) {

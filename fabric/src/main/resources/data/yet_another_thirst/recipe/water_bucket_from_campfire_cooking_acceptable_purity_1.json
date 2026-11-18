@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "ingredient": {
+    "fabric:type": "fabric:custom_data",
+    "base": {
+      "item": "minecraft:water_bucket"
+    },
+    "nbt": "{Purity:1}"
+  },
+  "result": {
+    "id": "minecraft:water_bucket",
+    "components": {
+      "minecraft:custom_data": {
+        "Purity": 2
+      }
+    }
+  },
+  "experience": 0.35,
+  "cookingtime": 300
+}

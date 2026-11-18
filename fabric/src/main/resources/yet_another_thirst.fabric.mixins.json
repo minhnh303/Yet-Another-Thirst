@@ -16,6 +16,7 @@
   ],
   "client": [
     "FabricMixinGui",
+    "FabricMixinGuiGraphics",
     "FabricMixinMinecraft"
   ],
   "injectors": {

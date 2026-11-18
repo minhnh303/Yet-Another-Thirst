@@ -73,6 +73,10 @@ dependencies {
         transitive = false
     }
 
+    // Mod Menu API — compile-only; the config screen entrypoint is used only when Mod Menu is installed
+    modCompileOnly "maven.modrinth:modmenu:${modmenu_version}"
+    modLocalRuntime "maven.modrinth:modmenu:${modmenu_version}"
+
     // javax.annotation (@Nonnull etc.) — provided transitively by Forge, must be explicit for Loom
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }

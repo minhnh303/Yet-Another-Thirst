@@ -58,7 +58,14 @@ public final class FabricGameEvents {
             ItemStack held = player.getItemInHand(hand);
             if (held.is(net.minecraft.world.item.Items.BUCKET)) {
                 InteractionResultHolder<ItemStack> bucketResult = WaterPurity.useEmptyBucketOnWater(player, world, hand);
-                return bucketResult != null ? bucketResult : InteractionResultHolder.pass(held);
+                if (bucketResult == null) {
+                    return InteractionResultHolder.pass(held);
+                }
+                // Fabric only forwards the InteractionResult; the resulting stack must be placed in hand here.
+                if (bucketResult.getResult().consumesAction() && bucketResult.getObject() != player.getItemInHand(hand)) {
+                    player.setItemInHand(hand, bucketResult.getObject());
+                }
+                return bucketResult;
             }
 
             ContainerWithPurity container = WaterPurity.getContainerForEmpty(held);

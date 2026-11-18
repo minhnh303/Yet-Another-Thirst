@@ -7,20 +7,48 @@ import dev.minhnh.yetanotherthirst.core.thirst.ThirstData;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstState;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstStorage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+
 public class ThirstGameTests {
 
     public static final String BATCH = Constants.MOD_ID + ".tests";
-    public static final String EMPTY_TEMPLATE = "gametest:empty";
+    /** Empty 8x8x8 structure shipped at data/yet_another_thirst/structure/empty.nbt. */
+    public static final String EMPTY_TEMPLATE = Constants.MOD_ID + ":empty";
+    private static final String TEST_PREFIX = "thirstgametests.";
+    private static final int TIMEOUT_TICKS = 100;
 
-    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
+    /**
+     * Builds test functions directly so the structure id is identical on every loader;
+     * {@code @GameTest} templates are namespaced differently by Fabric, Forge and NeoForge.
+     */
+    @GameTestGenerator
+    public static Collection<TestFunction> generateTests() {
+        return List.of(
+                test("testplayerdrinkmechanics", ThirstGameTests::testPlayerDrinkMechanics),
+                test("testwaterblockpuritycalculation", ThirstGameTests::testWaterBlockPurityCalculation),
+                test("testthirstdepletionunderexhaustion", ThirstGameTests::testThirstDepletionUnderExhaustion),
+                test("testsprintpreventionwhenthirsty", ThirstGameTests::testSprintPreventionWhenThirsty),
+                test("testpurifiedwatersafety", ThirstGameTests::testPurifiedWaterSafety),
+                test("testcauldronwaterpurityblockstate", ThirstGameTests::testCauldronWaterPurityBlockState),
+                test("testthirstcommandsexecution", ThirstGameTests::testThirstCommandsExecution)
+        );
+    }
+
+    private static TestFunction test(String name, Consumer<GameTestHelper> function) {
+        return new TestFunction(BATCH, TEST_PREFIX + name, EMPTY_TEMPLATE, TIMEOUT_TICKS, 0L, true, function);
+    }
+
     public static void testPlayerDrinkMechanics(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         ThirstState state = ThirstStorage.get(player);
@@ -41,7 +69,6 @@ public class ThirstGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
     public static void testWaterBlockPurityCalculation(GameTestHelper helper) {
         BlockPos waterPos = new BlockPos(1, 1, 1);
         helper.setBlock(waterPos, Blocks.WATER.defaultBlockState());
@@ -54,7 +81,6 @@ public class ThirstGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
     public static void testThirstDepletionUnderExhaustion(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         ThirstState state = ThirstStorage.get(player);
@@ -77,7 +103,6 @@ public class ThirstGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
     public static void testSprintPreventionWhenThirsty(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         ThirstStorage.update(player, d -> d.withThirst(ThirstConfig.SPRINT_THRESHOLD).withQuenched(0));
@@ -94,7 +119,6 @@ public class ThirstGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
     public static void testPurifiedWaterSafety(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         // Purity 3 is purified water; should not cause debuffs or cancel drinking
@@ -106,7 +130,6 @@ public class ThirstGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
     public static void testCauldronWaterPurityBlockState(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         BlockState cauldronState = Blocks.WATER_CAULDRON.defaultBlockState()
@@ -123,9 +146,9 @@ public class ThirstGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
     public static void testThirstCommandsExecution(GameTestHelper helper) {
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        // Commands resolve targets through the server player list, so a list-registered ServerPlayer is required.
+        Player player = helper.makeMockServerPlayerInLevel();
         var server = helper.getLevel().getServer();
         var source = player.createCommandSourceStack().withPermission(2);
 

@@ -19,10 +19,28 @@ public final class NeoForgeConfigItems {
 
     static final ModConfigSpec SPEC;
 
+    // Items
     private static final ModConfigSpec.IntValue WATER_BOTTLE_STACKSIZE;
     private static final ModConfigSpec.ConfigValue<List<? extends List<?>>> DRINK_VALUES;
     private static final ModConfigSpec.ConfigValue<List<? extends List<?>>> FOOD_VALUES;
     private static final ModConfigSpec.ConfigValue<List<? extends String>> ITEMS_BLACKLIST;
+
+    // Filter
+    private static final ModConfigSpec.IntValue FILTER_BASE_SPEED;
+    private static final ModConfigSpec.DoubleValue DIRTY_WATER_DECAY_MULTIPLIER;
+    private static final ModConfigSpec.DoubleValue SLIGHTLY_DIRTY_WATER_DECAY_MULTIPLIER;
+    private static final ModConfigSpec.DoubleValue ACCEPTABLE_WATER_DECAY_MULTIPLIER;
+    private static final ModConfigSpec.IntValue FABRIC_FILTER_DURABILITY;
+    private static final ModConfigSpec.IntValue FABRIC_FILTER_MAX_PURITY;
+    private static final ModConfigSpec.IntValue SAND_FILTER_DURABILITY;
+    private static final ModConfigSpec.IntValue SAND_FILTER_MAX_PURITY;
+    private static final ModConfigSpec.IntValue CARBON_FILTER_DURABILITY;
+    private static final ModConfigSpec.IntValue CARBON_FILTER_MAX_PURITY;
+
+    // Boiler
+    private static final ModConfigSpec.IntValue WATER_BOILER_CAPACITY;
+    private static final ModConfigSpec.IntValue WATER_BOILER_BOIL_TIME;
+    private static final ModConfigSpec.IntValue WATER_BOILER_ENERGY_CONSUMPTION;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -42,11 +60,69 @@ public final class NeoForgeConfigItems {
                 .defineList("itemsBlacklist", List.of("yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2"), value -> value instanceof String);
         builder.pop();
 
+        builder.push("filter");
+        FILTER_BASE_SPEED = builder
+                .comment("Base throughput speed of the Filter Frame block in mB/tick (default: 1)")
+                .defineInRange("filterBaseSpeed", 1, 1, 1000);
+        DIRTY_WATER_DECAY_MULTIPLIER = builder
+                .comment("Durability consumption multiplier for dirty water (default: 4.0)")
+                .defineInRange("dirtyWaterDecayMultiplier", 4.0, 0.0, 100.0);
+        SLIGHTLY_DIRTY_WATER_DECAY_MULTIPLIER = builder
+                .comment("Durability consumption multiplier for slightly dirty water (default: 2.0)")
+                .defineInRange("slightlyDirtyWaterDecayMultiplier", 2.0, 0.0, 100.0);
+        ACCEPTABLE_WATER_DECAY_MULTIPLIER = builder
+                .comment("Durability consumption multiplier for acceptable water (default: 1.0)")
+                .defineInRange("acceptableWaterDecayMultiplier", 1.0, 0.0, 100.0);
+        FABRIC_FILTER_DURABILITY = builder
+                .comment("Durability of Fabric Filter Core in mB (default: 10000)")
+                .defineInRange("fabricFilterDurability", 10000, 1, 10000000);
+        FABRIC_FILTER_MAX_PURITY = builder
+                .comment("Maximum water purity output allowed by Fabric Filter Core (0=dirty, 1=slightly dirty, 2=acceptable, 3=purified) (default: 1)")
+                .defineInRange("fabricFilterMaxPurity", 1, 0, 3);
+        SAND_FILTER_DURABILITY = builder
+                .comment("Durability of Sand Filter Core in mB (default: 50000)")
+                .defineInRange("sandFilterDurability", 50000, 1, 10000000);
+        SAND_FILTER_MAX_PURITY = builder
+                .comment("Maximum water purity output allowed by Sand Filter Core (0=dirty, 1=slightly dirty, 2=acceptable, 3=purified) (default: 2)")
+                .defineInRange("sandFilterMaxPurity", 2, 0, 3);
+        CARBON_FILTER_DURABILITY = builder
+                .comment("Durability of Carbon Filter Core in mB (default: 250000)")
+                .defineInRange("carbonFilterDurability", 250000, 1, 10000000);
+        CARBON_FILTER_MAX_PURITY = builder
+                .comment("Maximum water purity output allowed by Carbon Filter Core (0=dirty, 1=slightly dirty, 2=acceptable, 3=purified) (default: 3)")
+                .defineInRange("carbonFilterMaxPurity", 3, 0, 3);
+        builder.pop();
+
+        builder.push("boiler");
+        WATER_BOILER_CAPACITY = builder
+                .comment("Maximum water capacity of the Water Boiler block in mB (default: 2000)")
+                .defineInRange("waterBoilerCapacity", 2000, 1000, 1000000);
+        WATER_BOILER_BOIL_TIME = builder
+                .comment("Ticks required to boil water (default: 200)")
+                .defineInRange("waterBoilerBoilTime", 200, 1, 72000);
+        WATER_BOILER_ENERGY_CONSUMPTION = builder
+                .comment("Energy consumption rate in FE/tick when powered by electricity (default: 32)")
+                .defineInRange("waterBoilerEnergyConsumption", 32, 1, 100000);
+        builder.pop();
+
         SPEC = builder.build();
     }
 
     static void sync() {
         ThirstConfig.WATER_BOTTLE_STACKSIZE = WATER_BOTTLE_STACKSIZE.get();
+        ThirstConfig.FILTER_BASE_SPEED = FILTER_BASE_SPEED.get();
+        ThirstConfig.DIRTY_WATER_DECAY_MULTIPLIER = DIRTY_WATER_DECAY_MULTIPLIER.get().floatValue();
+        ThirstConfig.SLIGHTLY_DIRTY_WATER_DECAY_MULTIPLIER = SLIGHTLY_DIRTY_WATER_DECAY_MULTIPLIER.get().floatValue();
+        ThirstConfig.ACCEPTABLE_WATER_DECAY_MULTIPLIER = ACCEPTABLE_WATER_DECAY_MULTIPLIER.get().floatValue();
+        ThirstConfig.FABRIC_FILTER_DURABILITY = FABRIC_FILTER_DURABILITY.get();
+        ThirstConfig.FABRIC_FILTER_MAX_PURITY = FABRIC_FILTER_MAX_PURITY.get();
+        ThirstConfig.SAND_FILTER_DURABILITY = SAND_FILTER_DURABILITY.get();
+        ThirstConfig.SAND_FILTER_MAX_PURITY = SAND_FILTER_MAX_PURITY.get();
+        ThirstConfig.CARBON_FILTER_DURABILITY = CARBON_FILTER_DURABILITY.get();
+        ThirstConfig.CARBON_FILTER_MAX_PURITY = CARBON_FILTER_MAX_PURITY.get();
+        ThirstConfig.WATER_BOILER_CAPACITY = WATER_BOILER_CAPACITY.get();
+        ThirstConfig.WATER_BOILER_BOIL_TIME = WATER_BOILER_BOIL_TIME.get();
+        ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION = WATER_BOILER_ENERGY_CONSUMPTION.get();
     }
 
     static void reloadThirstValues() {

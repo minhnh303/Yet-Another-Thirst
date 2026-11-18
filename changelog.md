@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.6.0] - 2026-11-19
+
+### Added
+- **In-game Config Screen**: Edit every setting without touching TOML/JSON, from Forge/NeoForge's mod list (Config button) or Mod Menu on Fabric.
+  - Sidebar pages with item icons, search across all pages, per-setting tooltips (description, default, range) and reset buttons.
+  - Toggle switches, sliders with units (ticks/seconds, hearts, %, ×, mB, purity names), validated number fields and steppers.
+  - List editor for drinks, foods, blacklist, effect rules and EnvironmentZ tiers: item/effect icons, Tab-completion from registries, live validation.
+  - Live thirst-bar preview for HUD offsets; unsaved-change badges, Apply/Cancel, and a prompt before leaving with unsaved edits.
+  - Server-side settings are read-only while connected to a remote server; singleplayer changes apply immediately.
+- **Default Item Hydration Support**: Added built-in default thirst and quenched values across Forge, NeoForge, and Fabric for 7 mods:
+  - **Vanilla Delight** (`vanilladelight`): juices, teas, milkshakes, fruit slices, salads, stews, custards, puddings, and pie/cake slices.
+  - **Fruits Delight** (`fruitsdelight`): juices, teas, wines, fruits, popsicles, shaved ice, salads, stews, jellos, jellies, and baked goods.
+  - **Delightful** (`delightful`): teas, lavender/azalea drinks, prickly pear juice, milkshakes, jam jars/jelly bottles, popsicles, ice creams, soups, stews, gummies, and pie slices.
+  - **[Let's Do] Beachparty** (`beachparty`): open coconut, cocktails, milkshakes, popsicles, ice creams, sundaes, and mussel meats (supporting both v1.1.x and v2.0.x).
+  - **[Let's Do] HerbalBrews** (`herbalbrews`): green/black/hibiscus/lavender/yerba mate/rooibos/oolong teas, coffee, milk coffee, and flasks.
+  - **Hearth & Harvest** (`hearthandharvest`): goat/chocolate milk, syrup, fruit juices, beer, root beer, hard cider, mead, moonshine, fruit wines, berries, grapes, jams, pickled vegetables, stews/soups, and pastries.
+  - **Crock Pot** (`crockpot`): milk bottle, syrup, avaj, hot cocoa, veg stinger, teas, gazpacho, soups, stews, popsicles, ice cream, fruit medley, and cooked dishes (including `crockpot:stew` for Fabric's *A Cute Little Crock Pot*).
+
+### Fixed
+- **FoodData Mixin Priority**: Set priority to 1100 on `MixinFoodData` to prevent mixin injection conflicts with other mods targeting `FoodData`.
+
+---
+
 ## [1.5.2] - 2026-08-03
 
 ### Fixed

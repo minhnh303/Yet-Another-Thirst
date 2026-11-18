@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "fabric:type": "fabric:custom_data",
+    "base": {
+      "fabric:type": "fabric:components",
+      "base": {
+        "item": "minecraft:potion"
+      },
+      "components": {
+        "minecraft:potion_contents": {
+          "potion": "minecraft:water"
+        }
+      }
+    },
+    "nbt": "{Purity:1}"
+  },
+  "result": {
+    "id": "minecraft:potion",
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "minecraft:water"
+      },
+      "minecraft:custom_data": {
+        "Purity": 3
+      }
+    }
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}
