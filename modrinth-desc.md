@@ -93,6 +93,13 @@ To help you survive your first night, the mod introduces new crafting options:
 
 ---
 
+## 📦 Required Mods
+
+| Loader | Required | Optional (Config GUI) |
+| :--- | :--- | :--- |
+| Fabric | Fabric Loader, **Fabric API** | **Mod Menu** (needed to open the config GUI from the Mods list; without it, edit `config/yetanotherthirst/*.json` manually) |
+| NeoForge / Forge | None | None (config GUI opens from the Mods list via **Config**) |
+
 ## 🔌 Rich Mod Compatibility & Integrations
 
 Yet Another Thirst is designed to be the ultimate modpack-friendly hydration mod. It features built-in compatibility with:
