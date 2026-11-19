@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.6.0] - 2026-11-19
+
+### Added
+- **In-game Config Screen**: Edit settings without manually changing TOML or JSON files. Open it from the Forge/NeoForge mod list or Fabric Mod Menu.
+  - Category sidebar, setting search, tooltips, reset controls, toggles, sliders, validated number fields, and list editors.
+  - Live thirst-bar preview for HUD offsets, unsaved-change indicators, Apply/Cancel, and a confirmation prompt before discarding changes.
+  - Server-side settings are read-only on remote servers; singleplayer changes apply immediately.
+- **Water Boiler Energy Gauge (Forge & NeoForge)**: Added an energy gauge and `FE/t` tooltip in the Water Boiler GUI showing received vs. required power.
+- **Effect Condition `!=` Operator**: Added support for the `!=` amplifier comparison operator in effect condition configs (`suspendThirstEffects`, `pauseDepletionEffects`, `regenThirstEffects`).
+
+### Changed
+- **Localization & Death Message Keys**: Standardized mod-owned translation keys under the `yat.*` prefix across all supported languages and namespaced the dehydration damage `message_id` (`yet_another_thirst.dehydrate`) to avoid conflicts with other mods.
+- **Fabric Config Saving**: Write Fabric JSON configs atomically and back up unreadable files as `.broken` instead of silently overwriting them with defaults.
+
+### Fixed
+- **Fabric World Creation Crash (#6)**: Keep Forge and NeoForge global loot modifier declarations out of the Fabric jar, preventing Porting Lib mod crashes during world creation.
+- **Held Drink Preview**: Complete a partially filled half droplet when previewing thirst restoration from a held drinkable item.
+- **Water Boiler Hammer Feedback (Forge & NeoForge)**: Display localized action-bar messages when configuring or removing Water Boiler inlet, outlet, and energy ports with a hammer.
+- **Fabric Config Defaults**: Include missing default entries (`suspendThirstEffects`, `pauseDepletionEffects`, `regenThirstEffects`, `itemsBlacklist`) in newly generated Fabric config files, align the default `waterBoilerCapacity` to `2000`, and fix the `environmentzTemperatureTextUnit` fallback default.
+- **Mod Icon**: Bundled `yet_another_thirst.png` and fixed the icon path in `fabric.mod.json` so the mod icon displays properly in mod lists.
+- **Live Config Reload Thread Safety**: Dispatch Forge and NeoForge file-watcher reloads onto the server thread and swap `ThirstValues` maps atomically to avoid races between server ticks and client rendering.
+- **EnvironmentZ Temperature Tier Lookup**: Resolve the highest matching temperature threshold regardless of tier list order.
+
+---
+
 ## [1.5.3] - 2026-10-29
 
 ### Added
@@ -14,14 +39,14 @@
 
 ### Fixed (Forge & NeoForge)
 - **Water Bucket Pickup**: Fixed an issue where filling a bucket from a water source block did not properly remove the block, causing water source duplication when preserving water purity. Bucket pickup sounds and game events are now properly triggered.
-- **FoodData Mixin Priority**: Set priority to 1100 on `MixinFoodData` to prevent mixin injection conflicts with other mods targeting `FoodData`.
+- **Action Hunger Mixin Conflict (#4)**: Set `MixinFoodData` priority to 1100 to avoid equal-priority mixin injection conflicts.
 
 ---
 
 ## [1.5.2] - 2026-08-04
 
 ### Fixed
-- **Player Death Thirst Persistence**: Fixed an issue where disabling thirst mechanics using `/thirst enable false` would reset and re-enable thirst upon player death. Preserved player disabled status across respawns.
+- **Player Death Thirst Persistence (#2)**: Fixed an issue where disabling thirst mechanics using `/thirst enable false` would reset and re-enable thirst upon player death. Preserved player disabled status across respawns.
 
 ---
 

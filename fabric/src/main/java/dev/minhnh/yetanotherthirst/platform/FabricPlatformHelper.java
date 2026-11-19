@@ -61,6 +61,21 @@ public class FabricPlatformHelper implements IPlatformHelper {
         return false;
     }
 
+    @Override
+    public String getModDisplayName(String modId) {
+        if ("minecraft".equals(modId)) {
+            return "Minecraft";
+        }
+        return FabricLoader.getInstance().getModContainer(modId)
+                .map(c -> c.getMetadata().getName())
+                .orElse(modId);
+    }
+
+    @Override
+    public java.nio.file.Path getConfigDirectory() {
+        return dev.minhnh.yetanotherthirst.FabricConfig.getConfigDir();
+    }
+
     private static class ClientWrapper {
         private static boolean tryDrink() {
             return dev.minhnh.yetanotherthirst.FabricHandDrinkClient.tryDrink();

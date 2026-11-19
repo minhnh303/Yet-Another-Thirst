@@ -5,8 +5,8 @@
   "name": "Yet Another Thirst",
   "description": "A thirst mod for Minecraft.",
   "authors": ["minhnh"],
-  "license": "MIT",
-  "icon": "assets/yet_another_thirst/icon.png",
+  "license": "${license}",
+  "icon": "${mod_id}.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -17,6 +17,9 @@
     ],
     "jade": [
       "dev.minhnh.yetanotherthirst.compat.JadeCompatPlugin"
+    ],
+    "modmenu": [
+      "dev.minhnh.yetanotherthirst.compat.ModMenuCompat"
     ],
     "fabric-gametest": [
       "dev.minhnh.yetanotherthirst.gametest.ThirstGameTests"

@@ -49,7 +49,7 @@ public final class ThirstCommands {
 
     private static int query(CommandSourceStack source, ServerPlayer player) {
         var data = ThirstStorage.getData(player);
-        source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.query", data.thirst(), data.quenched()), false);
+        source.sendSuccess(() -> Component.translatable("yat.command.query", data.thirst(), data.quenched()), false);
         if (ThirstConfig.COMPAT_ENVIRONMENTZ) {
             source.sendSuccess(() -> ThirstCompat.environmentzDebugInfo(player), false);
         }
@@ -59,7 +59,7 @@ public final class ThirstCommands {
     private static int set(CommandSourceStack source, ServerPlayer player, int thirst, int quenched) {
         ThirstStorage.update(player, d -> d.withThirst(thirst).withQuenched(quenched));
         ThirstStorage.sync(player);
-        source.sendSuccess(() -> Component.translatable("command.yet_another_thirst.set", thirst, quenched), false);
+        source.sendSuccess(() -> Component.translatable("yat.command.set", thirst, quenched), false);
         return thirst;
     }
 
@@ -72,7 +72,7 @@ public final class ThirstCommands {
         String names = players.stream()
                 .map(player -> player.getGameProfile().getName())
                 .collect(Collectors.joining(", "));
-        String key = enabled ? "command.yet_another_thirst.enable" : "command.yet_another_thirst.disable";
+        String key = enabled ? "yat.command.enable" : "yat.command.disable";
         source.sendSuccess(() -> Component.translatable(key, names), false);
         return players.size();
     }

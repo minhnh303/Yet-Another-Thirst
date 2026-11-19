@@ -12,8 +12,12 @@ import java.util.Set;
 
 public final class ThirstValues {
 
-    private static final Map<Item, ThirstValue> DRINKS = new HashMap<>();
-    private static final Map<Item, ThirstValue> FOODS = new HashMap<>();
+    /**
+     * Immutable snapshots swapped atomically: the client (tooltips/HUD) and the integrated server
+     * read these while a config reload may run on another thread.
+     */
+    private static volatile Map<Item, ThirstValue> drinks = Map.of();
+    private static volatile Map<Item, ThirstValue> foods = Map.of();
 
     static {
         resetToDefaults();
@@ -23,49 +27,46 @@ public final class ThirstValues {
     }
 
     public static Optional<ThirstValue> get(ItemStack stack) {
-
         Item item = stack.getItem();
-        ThirstValue drink = DRINKS.get(item);
+        ThirstValue drink = drinks.get(item);
         if (drink != null) {
             return Optional.of(drink);
         }
-        return Optional.ofNullable(FOODS.get(item));
+        return Optional.ofNullable(foods.get(item));
     }
 
-    public static void registerDrink(Item item, int thirst, int quenched) {
-
-        DRINKS.putIfAbsent(item, new ThirstValue(thirst, quenched));
+    public static synchronized void registerDrink(Item item, int thirst, int quenched) {
+        if (drinks.containsKey(item)) return;
+        Map<Item, ThirstValue> next = new HashMap<>(drinks);
+        next.put(item, new ThirstValue(thirst, quenched));
+        drinks = Map.copyOf(next);
     }
 
-    public static void registerFood(Item item, int thirst, int quenched) {
-
-        FOODS.putIfAbsent(item, new ThirstValue(thirst, quenched));
+    public static synchronized void registerFood(Item item, int thirst, int quenched) {
+        if (foods.containsKey(item)) return;
+        Map<Item, ThirstValue> next = new HashMap<>(foods);
+        next.put(item, new ThirstValue(thirst, quenched));
+        foods = Map.copyOf(next);
     }
 
-    public static void replaceConfiguredValues(Map<Item, ThirstValue> drinks, Map<Item, ThirstValue> foods, Set<Item> blacklist) {
+    public static synchronized void replaceConfiguredValues(Map<Item, ThirstValue> drinks, Map<Item, ThirstValue> foods, Set<Item> blacklist) {
+        ThirstValues.drinks = withoutBlacklisted(drinks, blacklist);
+        ThirstValues.foods = withoutBlacklisted(foods, blacklist);
+    }
 
-        DRINKS.clear();
-        FOODS.clear();
-
-        drinks.forEach((item, value) -> {
+    private static Map<Item, ThirstValue> withoutBlacklisted(Map<Item, ThirstValue> values, Set<Item> blacklist) {
+        Map<Item, ThirstValue> result = new HashMap<>(values.size());
+        values.forEach((item, value) -> {
             if (!blacklist.contains(item)) {
-                DRINKS.put(item, value);
+                result.put(item, value);
             }
         });
-        foods.forEach((item, value) -> {
-            if (!blacklist.contains(item)) {
-                FOODS.put(item, value);
-            }
-        });
+        return Map.copyOf(result);
     }
 
-    public static void resetToDefaults() {
-
-        DRINKS.clear();
-        FOODS.clear();
-
-        defaultDrinks().forEach((item, value) -> DRINKS.put(item, value));
-        defaultFoods().forEach((item, value) -> FOODS.put(item, value));
+    public static synchronized void resetToDefaults() {
+        drinks = Map.copyOf(defaultDrinks());
+        foods = Map.copyOf(defaultFoods());
     }
 
     public static Map<Item, ThirstValue> defaultDrinks() {

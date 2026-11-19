@@ -7,6 +7,8 @@ base {
 }
 
 configurations {
+    testCompileClasspath.extendsFrom(compileClasspath)
+    testRuntimeClasspath.extendsFrom(runtimeClasspath)
     commonJava {
         canBeResolved = true
     }
@@ -29,6 +31,13 @@ dependencies {
     commonResources project(path: ':common', configuration: 'commonResources')
     compileOnly files(project(':common').file('src/main/resources'))
     annotationProcessor files(project(':common').file('src/main/resources'))
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 tasks.named('compileJava', JavaCompile) {
@@ -48,13 +57,4 @@ tasks.named('javadoc', Javadoc).configure {
     source(configurations.commonJava)
     dependsOn(configurations.commonClientJava)
     source(configurations.commonClientJava)
-}
-
-tasks.named('sourcesJar', Jar) {
-    dependsOn(configurations.commonJava)
-    from(configurations.commonJava)
-    dependsOn(configurations.commonClientJava)
-    from(configurations.commonClientJava)
-    dependsOn(configurations.commonResources)
-    from(configurations.commonResources)
 }

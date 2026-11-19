@@ -64,7 +64,18 @@ public class YetAnotherThirstNeoForge {
     }
 
     private static void onConfigLoading(ModConfigEvent.Loading event) { onConfigEvent(event); }
-    private static void onConfigReloading(ModConfigEvent.Reloading event) { onConfigEvent(event); }
+    /**
+     * File-watcher reloads (hand edits, and every save from the config screen) arrive on the watcher thread;
+     * runtime state is updated on the server thread when a server is running.
+     */
+    private static void onConfigReloading(ModConfigEvent.Reloading event) {
+        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server != null && !server.isSameThread()) {
+            server.execute(() -> onConfigEvent(event));
+        } else {
+            onConfigEvent(event);
+        }
+    }
 
     private static void onConfigEvent(ModConfigEvent event) {
         Constants.LOG.info("onConfigEvent: {}", event.getConfig().getFileName());

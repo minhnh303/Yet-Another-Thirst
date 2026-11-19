@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
+import dev.minhnh.yetanotherthirst.platform.services.IConfigBackend;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -30,17 +31,11 @@ import java.util.Set;
 public final class FabricConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path NEW_DIR = FabricLoader.getInstance().getConfigDir().resolve(Constants.CONFIG_DIR);
-    private static final Path OLD_DIR_PATH = FabricLoader.getInstance().getConfigDir().resolve(Constants.MOD_ID);
-    private static final Path COMMON_PATH = NEW_DIR.resolve("common.json");
-    private static final Path ITEMS_PATH = NEW_DIR.resolve("items.json");
-    private static final Path COMPAT_PATH = NEW_DIR.resolve("compat.json");
-    private static final Path CLIENT_PATH = NEW_DIR.resolve("client.json");
 
-    private static JsonObject commonJson = new JsonObject();
-    private static JsonObject itemsJson = new JsonObject();
-    private static JsonObject compatJson = new JsonObject();
-    private static JsonObject clientJson = new JsonObject();
+    private static JsonObject commonJson = buildDefaultCommon();
+    private static JsonObject itemsJson = buildDefaultItems();
+    private static JsonObject compatJson = buildDefaultCompat();
+    private static JsonObject clientJson = buildDefaultClient();
 
     // Keys belonging to each split file
     private static final Set<String> ITEMS_KEYS = Set.of(
@@ -64,24 +59,38 @@ public final class FabricConfig {
 
     private FabricConfig() {}
 
-    public static void load() {
+    /*
+     * The JSON objects are written on the render thread by the config screen and read on the server thread
+     * by sync(); load/sync/write and FabricConfigBackend lock on FabricConfig.class.
+     */
+    public static synchronized void load() {
+        Path newDir = getConfigDir();
         try {
-            Files.createDirectories(NEW_DIR);
+            Files.createDirectories(newDir);
         } catch (IOException e) {
             Constants.LOG.error("Failed to create config directory", e);
         }
 
         migrate();
 
-        commonJson = loadOrCreate(COMMON_PATH, buildDefaultCommon());
-        itemsJson = loadOrCreate(ITEMS_PATH, buildDefaultItems());
-        compatJson = loadOrCreate(COMPAT_PATH, buildDefaultCompat());
-        clientJson = loadOrCreate(CLIENT_PATH, buildDefaultClient());
+        commonJson = loadOrCreate(pathOf(IConfigBackend.ConfigFile.COMMON), buildDefaultCommon());
+        itemsJson = loadOrCreate(pathOf(IConfigBackend.ConfigFile.ITEMS), buildDefaultItems());
+        compatJson = loadOrCreate(pathOf(IConfigBackend.ConfigFile.COMPAT), buildDefaultCompat());
+        clientJson = loadOrCreate(pathOf(IConfigBackend.ConfigFile.CLIENT), buildDefaultClient());
+        sync();
+    }
+
+    static void resetInMemoryDefaults() {
+        commonJson = buildDefaultCommon();
+        itemsJson = buildDefaultItems();
+        compatJson = buildDefaultCompat();
+        clientJson = buildDefaultClient();
         sync();
     }
 
     private static void migrate() {
-        Path oldCommon = OLD_DIR_PATH.resolve("common.json");
+        Path oldDirPath = FabricLoader.getInstance().getConfigDir().resolve(Constants.MOD_ID);
+        Path oldCommon = oldDirPath.resolve("common.json");
         if (!Files.exists(oldCommon)) return;
 
         Constants.LOG.info("[YAT] Migrating Fabric config from '{}' to '{}' with split", Constants.MOD_ID, Constants.CONFIG_DIR);
@@ -104,19 +113,23 @@ public final class FabricConfig {
                 }
             }
 
-            if (!Files.exists(COMMON_PATH)) writeJson(COMMON_PATH, newCommon);
-            if (!Files.exists(ITEMS_PATH)) writeJson(ITEMS_PATH, newItems);
-            if (!Files.exists(COMPAT_PATH)) writeJson(COMPAT_PATH, newCompat);
+            Path commonPath = pathOf(IConfigBackend.ConfigFile.COMMON);
+            Path itemsPath = pathOf(IConfigBackend.ConfigFile.ITEMS);
+            Path compatPath = pathOf(IConfigBackend.ConfigFile.COMPAT);
+            Path clientPath = pathOf(IConfigBackend.ConfigFile.CLIENT);
+            if (!Files.exists(commonPath)) writeJson(commonPath, newCommon);
+            if (!Files.exists(itemsPath)) writeJson(itemsPath, newItems);
+            if (!Files.exists(compatPath)) writeJson(compatPath, newCompat);
 
-            Path oldClient = OLD_DIR_PATH.resolve("client.json");
-            if (Files.exists(oldClient) && !Files.exists(CLIENT_PATH)) {
-                Files.copy(oldClient, CLIENT_PATH);
+            Path oldClient = oldDirPath.resolve("client.json");
+            if (Files.exists(oldClient) && !Files.exists(clientPath)) {
+                Files.copy(oldClient, clientPath);
             }
 
             Files.delete(oldCommon);
             if (Files.exists(oldClient)) Files.delete(oldClient);
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(OLD_DIR_PATH)) {
-                if (!stream.iterator().hasNext()) Files.delete(OLD_DIR_PATH);
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(oldDirPath)) {
+                if (!stream.iterator().hasNext()) Files.delete(oldDirPath);
             }
             Constants.LOG.info("[YAT] Fabric config migration complete.");
         } catch (Exception e) {
@@ -132,7 +145,7 @@ public final class FabricConfig {
         }
     }
 
-    static void sync() {
+    static synchronized void sync() {
         ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED = getBool(commonJson, "extraHydrationConvertsToQuenched", true);
         ThirstConfig.THIRST_DEPLETES_IN_PEACEFUL = getBool(commonJson, "thirstDepletesInPeaceful", false);
         ThirstConfig.DRINK_RAIN_WATER = getBool(commonJson, "drinkRainWater", true);
@@ -203,6 +216,10 @@ public final class FabricConfig {
         ThirstConfig.WATER_BOILER_CAPACITY = getInt(itemsJson, "waterBoilerCapacity", 2000);
         ThirstConfig.WATER_BOILER_BOIL_TIME = getInt(itemsJson, "waterBoilerBoilTime", 200);
         ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION = getInt(itemsJson, "waterBoilerEnergyConsumption", 32);
+        ThirstConfig.CONFIGURED_DRINKS = ThirstConfig.parseRawItemMap(getStringListList(itemsJson, "drinks", DefaultItemValues.defaultDrinkValues()));
+        ThirstConfig.CONFIGURED_FOODS = ThirstConfig.parseRawItemMap(getStringListList(itemsJson, "foods", DefaultItemValues.defaultFoodValues()));
+        ThirstConfig.CONFIGURED_BLACKLIST = new java.util.LinkedHashSet<>(getStringList(itemsJson, "itemsBlacklist",
+                List.of("yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2")));
 
         // compat
         ThirstConfig.APPLESKIN_THIRST_TOOLTIP = getBool(compatJson, "appleSkinThirstTooltip", true);
@@ -222,7 +239,7 @@ public final class FabricConfig {
                 getTemperatureTiers(compatJson, "environmentzTemperatureTiers", defaultEnvironmentzTemperatureTiers()));
         ThirstConfig.ENVIRONMENTZ_SHOW_TEMPERATURE_TEXT = getBool(compatJson, "environmentzShowTemperatureText", true);
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_TYPE = getString(compatJson, "environmentzTemperatureTextType", "PLAYER");
-        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT = getString(compatJson, "environmentzTemperatureTextUnit", "°C");
+        ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_UNIT = getString(compatJson, "environmentzTemperatureTextUnit", "");
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_X_OFFSET = getInt(compatJson, "environmentzTemperatureTextXOffset", 0);
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_Y_OFFSET = getInt(compatJson, "environmentzTemperatureTextYOffset", 0);
         ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TEXT_COLOR = getInt(compatJson, "environmentzTemperatureTextColor", 0xFFFFFF);
@@ -232,25 +249,99 @@ public final class FabricConfig {
         ThirstConfig.HUD_Y_OFFSET = getInt(clientJson, "hudYOffset", 0);
     }
 
+    public static Path getConfigDir() {
+        return FabricLoader.getInstance().getConfigDir().resolve(Constants.CONFIG_DIR);
+    }
+
+    private static Path pathOf(IConfigBackend.ConfigFile file) {
+        String name = switch (file) {
+            case COMMON -> "common.json";
+            case ITEMS -> "items.json";
+            case COMPAT -> "compat.json";
+            case CLIENT -> "client.json";
+        };
+        return getConfigDir().resolve(name);
+    }
+
+    private static com.google.gson.JsonArray stringListToJson(java.util.Collection<String> list) {
+        var arr = new com.google.gson.JsonArray();
+        for (String s : list) {
+            arr.add(s);
+        }
+        return arr;
+    }
+
     public static void reloadThirstValues() {
-        Map<Item, ThirstValue> drinks = parseItemValues(getStringListList(itemsJson, "drinks", DefaultItemValues.defaultDrinkValues()));
-        Map<Item, ThirstValue> foods = parseItemValues(getStringListList(itemsJson, "foods", DefaultItemValues.defaultFoodValues()));
-        Set<Item> blacklist = parseItems(getStringList(itemsJson, "itemsBlacklist",
-                List.of("yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2")));
+        Map<Item, ThirstValue> drinks = parseItemValues(ThirstConfig.toRawItemList(ThirstConfig.CONFIGURED_DRINKS));
+        Map<Item, ThirstValue> foods = parseItemValues(ThirstConfig.toRawItemList(ThirstConfig.CONFIGURED_FOODS));
+        Set<Item> blacklist = parseItems(new ArrayList<>(ThirstConfig.CONFIGURED_BLACKLIST));
 
         if (dev.minhnh.yetanotherthirst.core.item.ModItems.TERRACOTTA_WATER_BOWL != null) {
             Item t = dev.minhnh.yetanotherthirst.core.item.ModItems.TERRACOTTA_WATER_BOWL.get();
-            if (t != null && t != Items.AIR) drinks.putIfAbsent(t, new ThirstValue(5, 7));
+            if (t != null && t != Items.AIR && !ThirstConfig.CONFIGURED_DRINKS.containsKey(Constants.MOD_ID + ":terracotta_water_bowl")) {
+                drinks.putIfAbsent(t, new ThirstValue(5, 7));
+            }
         }
         if (dev.minhnh.yetanotherthirst.core.item.ModItems.WOODEN_WATER_BOWL != null) {
             Item w = dev.minhnh.yetanotherthirst.core.item.ModItems.WOODEN_WATER_BOWL.get();
-            if (w != null && w != Items.AIR) drinks.putIfAbsent(w, new ThirstValue(5, 7));
+            if (w != null && w != Items.AIR && !ThirstConfig.CONFIGURED_DRINKS.containsKey(Constants.MOD_ID + ":wooden_water_bowl")) {
+                drinks.putIfAbsent(w, new ThirstValue(5, 7));
+            }
         }
 
         ThirstValues.replaceConfiguredValues(drinks, foods, blacklist);
     }
 
+    static JsonObject json(IConfigBackend.ConfigFile file) {
+        return switch (file) {
+            case COMMON -> commonJson;
+            case ITEMS -> itemsJson;
+            case COMPAT -> compatJson;
+            case CLIENT -> clientJson;
+        };
+    }
+
+    static JsonObject defaults(IConfigBackend.ConfigFile file) {
+        return switch (file) {
+            case COMMON -> buildDefaultCommon();
+            case ITEMS -> buildDefaultItems();
+            case COMPAT -> buildDefaultCompat();
+            case CLIENT -> buildDefaultClient();
+        };
+    }
+
+    /** Writes one file atomically (temp file + move); throws so the config GUI can keep unsaved edits. */
+    static synchronized void write(IConfigBackend.ConfigFile file) {
+        Path path = pathOf(file);
+        try {
+            Files.createDirectories(path.getParent());
+            Path temp = path.resolveSibling(path.getFileName() + ".tmp");
+            try (Writer w = Files.newBufferedWriter(temp)) {
+                GSON.toJson(json(file), w);
+            }
+            try {
+                Files.move(temp, path, java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException e) {
+                Files.move(temp, path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            throw new java.io.UncheckedIOException("Failed to write config " + path, e);
+        }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /** Keeps an unreadable config next to the original so hand edits are not lost when defaults are written. */
+    private static void backupBroken(Path path) {
+        Path backup = path.resolveSibling(path.getFileName() + ".broken");
+        try {
+            Files.copy(path, backup, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            Constants.LOG.warn("Saved the unreadable config as {}", backup);
+        } catch (IOException e) {
+            Constants.LOG.error("Failed to back up unreadable config {}", path, e);
+        }
+    }
 
     private static JsonObject loadOrCreate(Path path, JsonObject defaults) {
         if (Files.exists(path)) {
@@ -264,7 +355,8 @@ public final class FabricConfig {
                 }
                 return loaded;
             } catch (Exception e) {
-                Constants.LOG.error("Failed to read config {}", path, e);
+                Constants.LOG.error("Failed to read config {}; replacing it with defaults", path, e);
+                backupBroken(path);
             }
         }
         writeJson(path, defaults);
@@ -378,6 +470,9 @@ public final class FabricConfig {
         obj.addProperty("sprintPrevention", true);
         obj.addProperty("sprintThreshold", 6);
         obj.addProperty("dehydrationHaltsHealthRegen", true);
+        obj.add("suspendThirstEffects", stringListToJson(ThirstConfig.defaultSuspendThirstEffects()));
+        obj.add("pauseDepletionEffects", stringListToJson(ThirstConfig.defaultPauseDepletionEffects()));
+        obj.add("regenThirstEffects", stringListToJson(ThirstConfig.defaultRegenThirstEffects()));
         obj.addProperty("regenThirstInterval", 40);
         obj.addProperty("regenThirstAmount", 1);
         obj.addProperty("hydrationEffectThirstPerTick", 1);
@@ -432,6 +527,7 @@ public final class FabricConfig {
         obj.addProperty("waterBottleStackSize", 64);
         obj.add("drinks", listOfListsToJson(DefaultItemValues.defaultDrinkValues()));
         obj.add("foods", listOfListsToJson(DefaultItemValues.defaultFoodValues()));
+        obj.add("itemsBlacklist", stringListToJson(ThirstConfig.defaultBlacklistSet()));
         obj.addProperty("filterBaseSpeed", 1);
         obj.addProperty("dirtyWaterDecayMultiplier", 4.0);
         obj.addProperty("slightlyDirtyWaterDecayMultiplier", 2.0);
@@ -442,7 +538,7 @@ public final class FabricConfig {
         obj.addProperty("sandFilterMaxPurity", 2);
         obj.addProperty("carbonFilterDurability", 250000);
         obj.addProperty("carbonFilterMaxPurity", 3);
-        obj.addProperty("waterBoilerCapacity", 16000);
+        obj.addProperty("waterBoilerCapacity", 2000);
         obj.addProperty("waterBoilerBoilTime", 200);
         obj.addProperty("waterBoilerEnergyConsumption", 32);
         return obj;

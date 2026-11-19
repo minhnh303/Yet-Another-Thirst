@@ -55,4 +55,20 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public boolean tryHandDrink() {
         return net.minecraftforge.fml.DistExecutor.unsafeCallWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> dev.minhnh.yetanotherthirst.ForgeHandDrinkClient::tryDrink);
     }
+
+    @Override
+    public String getModDisplayName(String modId) {
+        if ("minecraft".equals(modId)) {
+            return "Minecraft";
+        }
+        return ModList.get().getModContainerById(modId)
+                .map(c -> c.getModInfo().getDisplayName())
+                .orElse(modId);
+    }
+
+    @Override
+    public java.nio.file.Path getConfigDirectory() {
+        return net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get().resolve(Constants.CONFIG_DIR);
+    }
+
 }

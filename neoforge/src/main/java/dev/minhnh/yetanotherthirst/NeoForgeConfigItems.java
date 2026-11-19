@@ -129,22 +129,25 @@ public final class NeoForgeConfigItems {
         ThirstConfig.WATER_BOILER_CAPACITY = WATER_BOILER_CAPACITY.get();
         ThirstConfig.WATER_BOILER_BOIL_TIME = WATER_BOILER_BOIL_TIME.get();
         ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION = WATER_BOILER_ENERGY_CONSUMPTION.get();
+        ThirstConfig.CONFIGURED_DRINKS = ThirstConfig.parseRawItemMap(DRINK_VALUES.get());
+        ThirstConfig.CONFIGURED_FOODS = ThirstConfig.parseRawItemMap(FOOD_VALUES.get());
+        ThirstConfig.CONFIGURED_BLACKLIST = new java.util.LinkedHashSet<>(ITEMS_BLACKLIST.get());
     }
 
-    static void reloadThirstValues() {
-        Map<Item, ThirstValue> drinks = parseItemValues(DRINK_VALUES.get());
-        Map<Item, ThirstValue> foods = parseItemValues(FOOD_VALUES.get());
-        Set<Item> blacklist = parseItems(ITEMS_BLACKLIST.get());
+    public static void reloadThirstValues() {
+        Map<Item, ThirstValue> drinks = parseItemValues(ThirstConfig.toRawItemList(ThirstConfig.CONFIGURED_DRINKS));
+        Map<Item, ThirstValue> foods = parseItemValues(ThirstConfig.toRawItemList(ThirstConfig.CONFIGURED_FOODS));
+        Set<Item> blacklist = parseItems(new java.util.ArrayList<>(ThirstConfig.CONFIGURED_BLACKLIST));
 
         if (dev.minhnh.yetanotherthirst.core.item.ModItems.TERRACOTTA_WATER_BOWL != null) {
             Item terracotta = dev.minhnh.yetanotherthirst.core.item.ModItems.TERRACOTTA_WATER_BOWL.get();
-            if (terracotta != null && terracotta != Items.AIR) {
+            if (terracotta != null && terracotta != Items.AIR && !ThirstConfig.CONFIGURED_DRINKS.containsKey(Constants.MOD_ID + ":terracotta_water_bowl")) {
                 drinks.putIfAbsent(terracotta, new ThirstValue(5, 7));
             }
         }
         if (dev.minhnh.yetanotherthirst.core.item.ModItems.WOODEN_WATER_BOWL != null) {
             Item wooden = dev.minhnh.yetanotherthirst.core.item.ModItems.WOODEN_WATER_BOWL.get();
-            if (wooden != null && wooden != Items.AIR) {
+            if (wooden != null && wooden != Items.AIR && !ThirstConfig.CONFIGURED_DRINKS.containsKey(Constants.MOD_ID + ":wooden_water_bowl")) {
                 drinks.putIfAbsent(wooden, new ThirstValue(5, 7));
             }
         }

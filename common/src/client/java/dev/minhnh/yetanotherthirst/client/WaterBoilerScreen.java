@@ -20,6 +20,12 @@ public class WaterBoilerScreen extends AbstractContainerScreen<AbstractWaterBoil
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(Constants.MOD_ID, "textures/gui/water_boiler.png");
 
+    /** Energy gauge frame, placed between the input tank and the input/fuel slots. */
+    private static final int ENERGY_X = 36;
+    private static final int ENERGY_Y = 18;
+    private static final int ENERGY_W = 8;
+    private static final int ENERGY_H = 51;
+
     public WaterBoilerScreen(AbstractWaterBoilerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageWidth = 176;
@@ -90,6 +96,23 @@ public class WaterBoilerScreen extends AbstractContainerScreen<AbstractWaterBoil
         }
         guiGraphics.blit(TEXTURE, x + 145, y + 18, 177, 31, 20, 51);
 
+        renderEnergyGauge(guiGraphics, x + ENERGY_X, y + ENERGY_Y);
+    }
+
+    /** Inset vanilla-style frame filled bottom-up by received FE/t relative to the required FE/t. */
+    private void renderEnergyGauge(GuiGraphics guiGraphics, int gx, int gy) {
+        guiGraphics.fill(gx, gy, gx + ENERGY_W, gy + ENERGY_H, 0xFFFFFFFF);
+        guiGraphics.fill(gx, gy, gx + ENERGY_W - 1, gy + ENERGY_H - 1, 0xFF373737);
+        guiGraphics.fill(gx + 1, gy + 1, gx + ENERGY_W - 1, gy + ENERGY_H - 1, 0xFF1E1E1E);
+
+        int required = menu.getEnergyRequired();
+        int rate = menu.getEnergyRate();
+        if (required <= 0 || rate <= 0) return;
+        int inner = ENERGY_H - 2;
+        int filled = Math.max(1, (int) ((long) Math.min(rate, required) * inner / required));
+        int top = gy + 1 + inner - filled;
+        guiGraphics.fill(gx + 1, top, gx + ENERGY_W - 1, gy + ENERGY_H - 1, 0xFFB51500);
+        guiGraphics.fill(gx + 1, top, gx + 3, gy + ENERGY_H - 1, 0xFFE8401C);
     }
 
     @Override
@@ -117,6 +140,15 @@ public class WaterBoilerScreen extends AbstractContainerScreen<AbstractWaterBoil
             if (amount > 0) {
                 tooltip.add(WaterPurity.purityComponent(purity));
             }
+            guiGraphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
+        }
+
+        if (mouseX >= x + ENERGY_X && mouseX < x + ENERGY_X + ENERGY_W
+                && mouseY >= y + ENERGY_Y && mouseY < y + ENERGY_Y + ENERGY_H) {
+            List<Component> tooltip = new ArrayList<>();
+            tooltip.add(Lang.Gui.energy());
+            tooltip.add(Lang.Gui.energyRate(menu.getEnergyRate(), menu.getEnergyRequired())
+                    .withStyle(s -> s.withColor(0xAAAAAA)));
             guiGraphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
         }
 
