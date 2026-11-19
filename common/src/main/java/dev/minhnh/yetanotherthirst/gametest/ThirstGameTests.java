@@ -146,4 +146,35 @@ public class ThirstGameTests {
 
         helper.succeed();
     }
+
+    @GameTest(template = EMPTY_TEMPLATE, batch = BATCH)
+    public static void testConfigSnapshotAndLiveBalanceChanges(GameTestHelper helper) {
+        boolean originalConvertsToQuenched = ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
+        ThirstConfig.Snapshot snapshot = ThirstConfig.takeSnapshot();
+        try {
+            Player player = helper.makeMockPlayer();
+            ThirstState state = ThirstStorage.get(player);
+
+            // Disable extra hydration converting to quenched via live config
+            ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED = false;
+            state.reset();
+            state.setThirst(18);
+            state.setQuenched(0);
+            state.drink(6, 0);
+
+            if (state.getThirst() != 20 || state.getQuenched() != 0) {
+                helper.fail("Expected thirst=20, quenched=0 when extra hydration conversion is off, got thirst="
+                        + state.getThirst() + ", quenched=" + state.getQuenched());
+            }
+        } finally {
+            ThirstConfig.restoreSnapshot(snapshot);
+        }
+
+        if (ThirstConfig.EXTRA_HYDRATION_CONVERTS_TO_QUENCHED != originalConvertsToQuenched) {
+            helper.fail("Expected ThirstConfig.restoreSnapshot to restore EXTRA_HYDRATION_CONVERTS_TO_QUENCHED to "
+                    + originalConvertsToQuenched);
+        }
+
+        helper.succeed();
+    }
 }

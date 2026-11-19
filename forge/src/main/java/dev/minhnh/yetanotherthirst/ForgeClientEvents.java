@@ -31,6 +31,12 @@ public final class ForgeClientEvents {
 
     @SubscribeEvent
     public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
+        net.minecraftforge.fml.ModLoadingContext.get().registerExtensionPoint(
+                net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory(
+                        (minecraft, parent) -> new dev.minhnh.yetanotherthirst.client.config.YatConfigScreen(parent)
+                )
+        );
         event.enqueueWork(() -> {
             if (dev.minhnh.yetanotherthirst.screen.ModMenuTypes.WATER_BOILER != null) {
                 net.minecraft.client.gui.screens.MenuScreens.register(

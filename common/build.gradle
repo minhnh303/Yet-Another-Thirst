@@ -37,6 +37,10 @@ sourceSets {
         compileClasspath += sourceSets.main.output + configurations.compileClasspath
         runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
     }
+    test {
+        compileClasspath += sourceSets.client.output
+        runtimeClasspath += sourceSets.client.output
+    }
 }
 
 configurations {
@@ -66,11 +70,6 @@ artifacts {
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from sourceSets.client.output
-}
-
-sourcesJar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from sourceSets.client.allSource
 }
 
 tasks.named('check').configure {

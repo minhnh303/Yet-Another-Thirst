@@ -78,4 +78,16 @@ public interface IPlatformHelper {
     default boolean tryHandDrink() {
         return false;
     }
+
+    default String getModDisplayName(String modId) {
+        if ("minecraft".equals(modId)) {
+            return "Minecraft";
+        }
+        return modId;
+    }
+
+    default java.nio.file.Path getConfigDirectory() {
+        return java.nio.file.Path.of("config", dev.minhnh.yetanotherthirst.Constants.CONFIG_DIR);
+    }
+
 }

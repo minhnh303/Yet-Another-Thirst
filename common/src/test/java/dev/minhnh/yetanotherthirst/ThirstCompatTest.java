@@ -27,6 +27,7 @@ class ThirstCompatTest {
         assertFalse(ThirstCompat.showsAppleSkinHudPreview());
 
         ThirstConfig.COMPAT_APPLESKIN = false;
+        ThirstConfig.APPLESKIN_THIRST_HUD_PREVIEW = true;
         assertFalse(ThirstCompat.showsAppleSkinThirstTooltip());
         assertFalse(ThirstCompat.showsAppleSkinHudPreview());
     }

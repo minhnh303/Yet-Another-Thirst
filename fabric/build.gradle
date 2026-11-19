@@ -70,9 +70,17 @@ dependencies {
     compileOnly 'maven.modrinth:jade:11.13.2+forge'
     compileOnly 'squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api'
     modCompileOnly 'maven.modrinth:create-fabric:6.0.8.1+build.1744-mc1.20.1'
+    modCompileOnly 'maven.modrinth:modmenu:7.2.2'
 
     // javax.annotation (@Nonnull etc.) — provided transitively by Forge, must be explicit for Loom
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 tasks.named('compileJava', JavaCompile) {
@@ -83,15 +91,6 @@ tasks.named('compileJava', JavaCompile) {
 }
 
 processResources {
-    dependsOn(configurations.commonResources)
-    from(configurations.commonResources)
-}
-
-tasks.named('sourcesJar', Jar) {
-    dependsOn(configurations.commonJava)
-    from(configurations.commonJava)
-    dependsOn(configurations.commonClientJava)
-    from(configurations.commonClientJava)
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }

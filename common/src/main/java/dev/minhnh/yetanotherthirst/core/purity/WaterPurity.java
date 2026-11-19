@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst.core.purity;
 
+import dev.minhnh.yetanotherthirst.Lang;
 import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.effect.ModEffects;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
@@ -428,12 +429,7 @@ public final class WaterPurity {
     }
 
     public static Component purityComponent(int purity) {
-        String key = "yet_another_thirst.purity." + switch (purity) {
-            case 0 -> "dirty";
-            case 1 -> "slightly_dirty";
-            case 2 -> "acceptable";
-            default -> "purified";
-        };
+        String key = Lang.purityKey(purity);
         int color = switch (purity) {
             case 0 -> 0xa84825;  // dirty   — dark brown
             case 1 -> 0x796c71;  // slightly dirty — gray-brown

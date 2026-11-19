@@ -160,14 +160,8 @@ public final class EnvironmentzCompat {
     }
 
     private static float resolveTemperatureTierModifier(int playerTemperature) {
-        float modifier = 1.0F;
-        for (ThirstConfig.TemperatureTier tier : ThirstConfig.ENVIRONMENTZ_TEMPERATURE_TIERS) {
-            if (playerTemperature < tier.threshold) {
-                break;
-            }
-            modifier = tier.modifier;
-        }
-        return modifier;
+        ThirstConfig.TemperatureTier active = ThirstConfig.findActiveTemperatureTier(playerTemperature);
+        return active == null ? 1.0F : active.modifier;
     }
 
     private static ChatFormatting modifierColor(float modifier) {
@@ -186,13 +180,7 @@ public final class EnvironmentzCompat {
             return Component.literal("none configured").withStyle(ChatFormatting.DARK_GRAY);
         }
 
-        ThirstConfig.TemperatureTier active = null;
-        for (ThirstConfig.TemperatureTier tier : tiers) {
-            if (playerTemperature < tier.threshold) {
-                break;
-            }
-            active = tier;
-        }
+        ThirstConfig.TemperatureTier active = ThirstConfig.findActiveTemperatureTier(playerTemperature);
 
         MutableComponent result = Component.empty();
         for (int i = 0; i < tiers.size(); i++) {
