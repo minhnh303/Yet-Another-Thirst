@@ -603,6 +603,13 @@ final class ListEditorScreen extends Screen {
             out.add(remove);
             return out;
         }
+
+        /** Re-clicking the focused field must not blur it, which would revert invalid text still being typed. */
+        @Override
+        public void setFocused(GuiEventListener listener) {
+            if (listener != null && listener == getFocused()) return;
+            super.setFocused(listener);
+        }
     }
 
     private static Optional<Holder.Reference<MobEffect>> effectIcon(String rule) {

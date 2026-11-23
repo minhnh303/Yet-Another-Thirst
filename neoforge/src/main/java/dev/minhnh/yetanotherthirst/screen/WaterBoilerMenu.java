@@ -22,7 +22,7 @@ public class WaterBoilerMenu extends AbstractWaterBoilerMenu {
     public WaterBoilerMenu(int containerId, Inventory playerInventory, FriendlyByteBuf extraData) {
         this(containerId, playerInventory,
                 (WaterBoilerBlockEntity) playerInventory.player.level().getBlockEntity(extraData.readBlockPos()),
-                new SimpleContainerData(6));
+                new SimpleContainerData(AbstractWaterBoilerMenu.DATA_COUNT));
     }
 
     /** Server-side constructor. */

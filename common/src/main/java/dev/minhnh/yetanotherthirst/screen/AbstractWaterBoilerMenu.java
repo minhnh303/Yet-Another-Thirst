@@ -13,11 +13,17 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractWaterBoilerMenu extends AbstractContainerMenu {
 
+    /**
+     * Data slots: 0 lit time, 1 lit duration, 2 cook time, 3 cook total, 4-5 energy rate, 6-7 energy required.
+     * Menu data syncs as 16-bit shorts, so energy values (up to 100000 FE/t) are sent as low/high halves.
+     */
+    public static final int DATA_COUNT = 8;
+
     protected final ContainerData data;
 
     protected AbstractWaterBoilerMenu(@Nullable MenuType<?> menuType, int containerId, ContainerData data) {
         super(menuType, containerId);
-        checkContainerDataCount(data, 6);
+        checkContainerDataCount(data, DATA_COUNT);
         this.data = data;
         addDataSlots(data);
     }
@@ -53,12 +59,27 @@ public abstract class AbstractWaterBoilerMenu extends AbstractContainerMenu {
 
     /** FE received in the latest powered tick. */
     public int getEnergyRate() {
-        return data.get(4);
+        return combine(data.get(4), data.get(5));
     }
 
     /** FE per tick needed to keep the boiler running. */
     public int getEnergyRequired() {
-        return data.get(5);
+        return combine(data.get(6), data.get(7));
+    }
+
+    /** Low 16 bits of a value split across two data slots. */
+    public static int low(int value) {
+        return value & 0xFFFF;
+    }
+
+    /** High 16 bits of a value split across two data slots. */
+    public static int high(int value) {
+        return (value >>> 16) & 0xFFFF;
+    }
+
+    /** Rebuilds a value from its halves; masking undoes the sign extension of the synced shorts. */
+    static int combine(int low, int high) {
+        return (low & 0xFFFF) | ((high & 0xFFFF) << 16);
     }
 
     public abstract int getInputAmount();

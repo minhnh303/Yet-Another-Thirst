@@ -17,6 +17,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import dev.minhnh.yetanotherthirst.screen.AbstractWaterBoilerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -175,8 +176,10 @@ public class WaterBoilerBlockEntity extends BlockEntity implements MenuProvider,
                 case 1 -> litDuration;
                 case 2 -> cookTime;
                 case 3 -> cookTimeTotal;
-                case 4 -> energyRate;
-                case 5 -> ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION;
+                case 4 -> AbstractWaterBoilerMenu.low(energyRate);
+                case 5 -> AbstractWaterBoilerMenu.high(energyRate);
+                case 6 -> AbstractWaterBoilerMenu.low(ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION);
+                case 7 -> AbstractWaterBoilerMenu.high(ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION);
                 default -> 0;
             };
         }
@@ -188,12 +191,11 @@ public class WaterBoilerBlockEntity extends BlockEntity implements MenuProvider,
                 case 1 -> litDuration = value;
                 case 2 -> cookTime = value;
                 case 3 -> cookTimeTotal = value;
-                case 4 -> energyRate = value;
             }
         }
 
         @Override
-        public int getCount() { return 6; }
+        public int getCount() { return AbstractWaterBoilerMenu.DATA_COUNT; }
     };
 
     public WaterBoilerBlockEntity(BlockPos pos, BlockState state) {

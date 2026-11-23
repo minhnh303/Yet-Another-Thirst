@@ -175,6 +175,16 @@ final class OptionList extends ContainerObjectSelectionList<OptionList.Row> {
         public List<? extends NarratableEntry> narratables() {
             return List.of();
         }
+
+        /**
+         * Vanilla blurs and refocuses the focused widget when it is clicked again; skipping that keeps a focused
+         * edit box from treating the click as a blur and reverting invalid text that is still being typed.
+         */
+        @Override
+        public void setFocused(GuiEventListener listener) {
+            if (listener != null && listener == getFocused()) return;
+            super.setFocused(listener);
+        }
     }
 
     /** Page title and one-line description. */
