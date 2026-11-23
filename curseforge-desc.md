@@ -4,7 +4,7 @@
 
 **Yet Another Thirst** is a highly polished survival mod that introduces a realistic hydration and water purification system to Minecraft. Built with modpack balance, visual excellence, and modern design in mind, it adds an immersive layer of survival without being tedious.
 
-Whether you're exploring scorching deserts, dodging dehydration in the Nether, or brewing specialized teas for late-game hydration, this mod integrates seamlessly into your gameplay. The project utilizes a modern multi-loader structure to support both **Forge** and **NeoForge**.
+Whether you're exploring scorching deserts, dodging dehydration in the Nether, or brewing specialized teas for late-game hydration, this mod integrates seamlessly into your gameplay. The project utilizes a modern multi-loader structure to support **Forge**, **NeoForge**, and **Fabric** across **Minecraft 1.20.1, 1.21/1.21.1, and 26.2**.
 
 _Note: This project is rebuilt based on the classic [Thirst Was Taken](https://www.curseforge.com/minecraft/mc-mods/thirst-was-taken) mod (originally created by **ghen-git**). Special thanks to them for the inspiration and codebase reference!_
 
@@ -52,7 +52,7 @@ The purity of harvested water is determined by where you collect it. Mountain sp
 
 ### How to Purify Water
 
-Use heat to sanitize your water containers. You can boil water bottles or terracotta water bowls:
+Use heat to sanitize your water containers. You can boil water bottles, terracotta water bowls, or water buckets:
 
 *   **Campfire:** Increases the purity level by **1 step** (e.g., Dirty -> Slightly Dirty).
 *   **Furnace:** Purifies water by **2 steps** (e.g., Dirty -> Acceptable).
@@ -91,8 +91,27 @@ To help you survive your first night, the mod introduces new crafting options:
 
 ## ⚙️ Cauldron & Dispenser Automation
 
-*   **Cauldron Purity Blending:** Cauldrons dynamically track and average out the purity of the water inside. If you mix purified water with dirty water, the cauldron's water purity shifts dynamically!
+*   **Cauldron Purity Tracking:** Cauldrons track water purity using worst-case (minimum) purity when mixing fluids, and can also be used to wash clogged Fabric Filter Cores.
 *   **Dispenser Support:** Dispensers can automate your water processing by filling bottles and buckets, respecting the source block's purity level automatically.
+
+***
+
+## 🏭 Modular Filtration & Industrial Purification
+
+For mid- to late-game automation, Yet Another Thirst provides dedicated filtration and boiling machinery:
+
+### Filter Frame & Filter Cores _(Forge & NeoForge with Create)_
+
+*   **Modular Filtration:** Install a filter core inside a **Filter Frame** (`1,000 mB` internal tank, Wrench & Engineer's Goggles support) to automatically purify water piped through Create fluid networks:
+    *   **Fabric Filter Core:** Purifies up to **Tier 1 (Slightly Dirty)**; wash clogged cores in a cauldron, with a water bucket, or via Create Splashing.
+    *   **Sand Filter Core:** Purifies up to **Tier 2 (Acceptable)**; clean clogged cores via Create Splashing.
+    *   **Carbon Filter Core:** Purifies up to **Tier 3 (Purified)**; regenerate clogged cores in a furnace or on a campfire.
+
+### Water Boiler _(Forge & NeoForge)_
+
+*   **Industrial Boiling:** Heats and purifies water in bulk (`2,000 mB` tank, `200` ticks boil time, `32 FE/t`) with dynamic in-world fluid rendering and a custom GUI featuring an energy gauge (`FE/t` hover tooltip), temperature, and fluid indicators.
+*   **Configurable Ports:** Use a hammer or wrench to configure inlet, outlet, and energy ports per face with localized action-bar feedback.
+*   **Immersive Engineering Support:** Supports heating via IE External Heaters and preserves world water purity with IE Fluid Pumps.
 
 ***
 
@@ -115,13 +134,15 @@ To help you survive your first night, the mod introduces new crafting options:
 
 Yet Another Thirst is designed to be the ultimate modpack-friendly hydration mod. It features built-in compatibility with:
 
-*   <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/appleskin) · [Modrinth](https://modrinth.com/mod/appleskin)): Visually previews how much thirst and hydration saturation a drink will restore directly on your HUD when holding it.
-*   <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/jade) · [Modrinth](https://modrinth.com/mod/jade)): Adds an in-world tooltip when looking at water blocks or cauldrons, showing their current purity level before you harvest.
-*   <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> **Cold Sweat** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/cold-sweat) · [Modrinth](https://modrinth.com/mod/cold-sweat)): Seamlessly links with core body and ambient temperature. Your thirst rate adapts dynamically based on how hot or cold your body is.
-*   <img alt="EnvironmentZ icon" src="https://cdn.modrinth.com/data/TggYmc6t/4bab25a93f9e7f06aa22ff3cf44b8b1c829927d4.png" width="20" height="20" align="absmiddle"> **EnvironmentZ (Fabric)** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/environmentz) · [Modrinth](https://modrinth.com/mod/environmentz)): Links with EnvironmentZ's hot/cold environmental exposure state. Being overheated speeds up dehydration, while being chilled slows it down.
+*   <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/appleskin) · [Modrinth](https://modrinth.com/mod/appleskin)): Visually previews how much thirst and hydration saturation a drink will restore directly on your HUD and item tooltips when holding it.
+*   <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/jade) · [Modrinth](https://modrinth.com/mod/jade)): Adds an in-world tooltip when looking at water blocks, cauldrons, fluid tanks, item frames, Filter Frames, and Water Boilers, showing their current purity level before you harvest.
+*   <img alt="Create icon" src="https://cdn.modrinth.com/data/LNytGWDc/61d716699bcf1ec42ed4926a9e1c7311be6087e2_96.webp" width="20" height="20" align="absmiddle"> **Create** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/create) · [Modrinth](https://modrinth.com/mod/create)): Filter Frame block, Engineer's Goggles purity/durability overlays, Open-Ended Pipe & Hose Pulley purity retention, Spout container filling, Splashing filter cleaning, and Builder's Tea hydration.
+*   <img alt="Immersive Engineering icon" src="https://cdn.modrinth.com/data/tIm2nV03/icon.png" width="20" height="20" align="absmiddle"> **Immersive Engineering** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/immersive-engineering) · [Modrinth](https://modrinth.com/mod/immersiveengineering)): External Heater integration for the Water Boiler and position-based water purity preservation with IE Fluid Pumps.
+*   <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> **Cold Sweat** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/cold-sweat) · [Modrinth](https://modrinth.com/mod/cold-sweat)): Seamlessly links with core body and ambient temperature, scaling thirst depletion dynamically and supporting filled waterskins.
+*   <img alt="EnvironmentZ icon" src="https://cdn.modrinth.com/data/TggYmc6t/4bab25a93f9e7f06aa22ff3cf44b8b1c829927d4.png" width="20" height="20" align="absmiddle"> **EnvironmentZ (Fabric)** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/environmentz) · [Modrinth](https://modrinth.com/mod/environmentz)): Scales dehydration via configurable temperature tiers, displays HUD temperature text aligned with the thermometer icon, and extends `/thirst query`.
 *   <img alt="Farmer's Delight icon" src="https://cdn.modrinth.com/data/R2OftAxM/8e7aa38ab94d94bb0a2894a218b69beb49002b34.png" width="20" height="20" align="absmiddle"> **Farmer's Delight & Beverage Mods:**
     *   Water bottles stack up to **64** to fit better in food-focused packs.
-    *   Consuming stews, meals, teas, or alcoholic beverages from mods like [Farmer's Delight](https://www.curseforge.com/minecraft/mc-mods/farmers-delight), [Farmer's Respite](https://www.curseforge.com/minecraft/mc-mods/farmers-respite), and [Brewin' & Chewin'](https://www.curseforge.com/minecraft/mc-mods/brewin-and-chewin) provides long-lasting hydration.
+    *   Consuming stews, meals, teas, or alcoholic beverages from mods like [Farmer's Delight](https://www.curseforge.com/minecraft/mc-mods/farmers-delight), [Farmer's Respite](https://www.curseforge.com/minecraft/mc-mods/farmers-respite), [Brewin' & Chewin'](https://www.curseforge.com/minecraft/mc-mods/brewin-and-chewin), [Collector's Reap](https://www.curseforge.com/minecraft/mc-mods/collectors-reap), [Vanilla Delight](https://www.curseforge.com/minecraft/mc-mods/vanilla-delight), [Fruits Delight](https://www.curseforge.com/minecraft/mc-mods/fruits-delight), [Delightful](https://www.curseforge.com/minecraft/mc-mods/delightful), [Hearth & Harvest](https://www.curseforge.com/minecraft/mc-mods/hearth-and-harvest), and [Crock Pot](https://www.curseforge.com/minecraft/mc-mods/crock-pot) provides long-lasting hydration.
     *   Active food buffs (like Nourishment) pause thirst depletion and slowly regenerate hydration.
 *   <img alt="Let's Do Farm & Charm icon" src="https://cdn.modrinth.com/data/HJetCzWo/7c6c372629b3efa41409621631d60df12963f005_96.webp" width="20" height="20" align="absmiddle"> **Let's Do Mods** ([Bakery](https://www.curseforge.com/minecraft/mc-mods/lets-do-bakery-farm-charm-compat), [Brewery](https://www.curseforge.com/minecraft/mc-mods/lets-do-brewery-farm-charm-compat), [Farm & Charm](https://www.curseforge.com/minecraft/mc-mods/lets-do-farm-charm), [Beachparty](https://www.curseforge.com/minecraft/mc-mods/lets-do-beachparty), [HerbalBrews](https://www.curseforge.com/minecraft/mc-mods/lets-do-herbalbrews)): Native support for specialized teas, meals, and drinks. Food buffs (like Stuffed, Saturated, Satiation, Sustenance, or Feast) automatically pause thirst drain or restore hydration.
 *   <img alt="Vampirism icon" src="https://cdn.modrinth.com/data/jVZ0F1wn/icon.png" width="20" height="20" align="absmiddle"> **Vampirism** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/vampirism) · [Modrinth](https://modrinth.com/mod/vampirism)) & <img alt="Supernatural icon" src="https://cdn.modrinth.com/data/UXzKPebS/63ba2cf3a91eba83d797904ba8bfa81df089f854.png" width="20" height="20" align="absmiddle"> **Supernatural** ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/supernatural) · [Modrinth](https://modrinth.com/mod/supernatural)): Vampire players do not need water! The thirst mechanic is paused and the HUD is completely hidden if you become a vampire.
@@ -148,32 +169,34 @@ Manage player thirst easily with commands (requires operator permission):
 
 ***
 
-## ⚙️ Fully Configurable
+## ⚙️ Fully Configurable & In-Game Config GUI
 
-Almost every aspect of Yet Another Thirst can be customized in the `config/yetanotherthirst/common.toml` config file:
+Edit every setting directly inside Minecraft using the built-in **In-Game Config Screen** — open it from the **Config** button in the Mods list on **Forge/NeoForge**, or via **Mod Menu** on **Fabric**:
 
-*   Adjust exhaustion rates, damage intervals, and sprint thresholds.
-*   Change purity levels of world-harvested water.
-*   Customize which foods/drinks restore thirst and by how much.
-*   Add or remove status effects that pause or regenerate thirst.
-*   Reposition the HUD overlay to fit your custom UI layout.
+*   **Sidebar & Search:** Categorized pages with item icons, instant cross-page search, detailed tooltips (description, default, range), and one-click resets.
+*   **Interactive List Editors:** Configure drinks, foods, blacklists, status effect rules (supporting `!=` amplifier comparisons), and EnvironmentZ tiers with item/effect icons, registry Tab-completion, and live validation.
+*   **Live HUD Preview:** Reposition the thirst bar with a live preview of HUD offsets.
+*   **Multiplayer Safe:** Server-side settings are read-only while connected to a remote server; singleplayer changes apply immediately.
+
+Prefer editing files directly? Configs are split cleanly in `config/yetanotherthirst/{common,items,compat,client}.toml` (Forge/NeoForge) or `.json` (Fabric).
 
 ### Out-of-the-Box Mod Integration
 
 The default configuration ships **pre-tuned** for all supported companion mods so you get a smooth experience without any manual setup:
 
-| Mod                                      |Default Behavior                                                                    |
-| ---------------------------------------- |----------------------------------------------------------------------------------- |
-| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> <strong>AppleSkin</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/appleskin) · [Modrinth](https://modrinth.com/mod/appleskin)) |Thirst &amp; quenched preview enabled immediately after installation.               |
-| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> <strong>Jade</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/jade) · [Modrinth](https://modrinth.com/mod/jade)) |Water purity tooltips active on all water blocks and cauldrons out of the box.      |
-| <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> <strong>Cold Sweat</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/cold-sweat) · [Modrinth](https://modrinth.com/mod/cold-sweat)) |Body-temperature-based thirst scaling enabled with sensible thresholds.             |
-| <img alt="EnvironmentZ icon" src="https://cdn.modrinth.com/data/TggYmc6t/4bab25a93f9e7f06aa22ff3cf44b8b1c829927d4.png" width="20" height="20" align="absmiddle"> <strong>EnvironmentZ</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/environmentz) · [Modrinth](https://modrinth.com/mod/environmentz)) |Hot/cold environmental exposure scales thirst depletion out of the box (Fabric only). |
-| <img alt="Farmer's Delight icon" src="https://cdn.modrinth.com/data/R2OftAxM/8e7aa38ab94d94bb0a2894a218b69beb49002b34.png" width="20" height="20" align="absmiddle"> <strong>Farmer's Delight</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/farmers-delight) · [Modrinth](https://modrinth.com/mod/farmers-delight)) |Water bottles stack to 64; stews/meals grant hydration by default.                  |
-| <img alt="Farmer's Respite icon" src="https://cdn.modrinth.com/data/fasdaXH5/edba350f7617b0b0d724d6fcd7b432acd8f48de3_96.webp" width="20" height="20" align="absmiddle"> <strong>Respite</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/farmers-respite) · [Modrinth](https://modrinth.com/mod/farmers-respite)) / <img alt="Brewin' &amp; Chewin' icon" src="https://cdn.modrinth.com/data/hIu9KJTT/f7c591a80046859d3d45c04ecbbc54d264483d5e.png" width="20" height="20" align="absmiddle"> <strong>Brewin' &amp; Chewin'</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/brewin-and-chewin) · [Modrinth](https://modrinth.com/mod/brewin-and-chewin)) |Teas and brews restore thirst without any extra configuration.                      |
-| <img alt="Let's Do Farm &amp; Charm icon" src="https://cdn.modrinth.com/data/HJetCzWo/7c6c372629b3efa41409621631d60df12963f005_96.webp" width="20" height="20" align="absmiddle"> <strong>Let's Do</strong> ([Bakery](https://www.curseforge.com/minecraft/mc-mods/lets-do-bakery-farm-charm-compat), [Brewery](https://www.curseforge.com/minecraft/mc-mods/lets-do-brewery-farm-charm-compat), [Farm &amp; Charm](https://www.curseforge.com/minecraft/mc-mods/lets-do-farm-charm), [Beachparty](https://www.curseforge.com/minecraft/mc-mods/lets-do-beachparty), [HerbalBrews](https://www.curseforge.com/minecraft/mc-mods/lets-do-herbalbrews)) |Stuffed / Saturated / Satiation / Sustenance / Feast buffs auto-pause thirst drain. |
-| <img alt="Vampirism icon" src="https://cdn.modrinth.com/data/jVZ0F1wn/icon.png" width="20" height="20" align="absmiddle"> <strong>Vampirism</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/vampirism) · [Modrinth](https://modrinth.com/mod/vampirism)) |Thirst mechanic and HUD automatically hidden for vampire players.                   |
-| <img alt="Corail Tombstone icon" src="https://cdn.modrinth.com/data/YT5K34AB/b279e8756761d8160f678ad20fb632d0a09b89b4_96.webp" width="20" height="20" align="absmiddle"> <strong>Corail Tombstone</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/corail-tombstone) · [Modrinth](https://modrinth.com/mod/corail-tombstone)) |<em>Ghostly Shape</em> effect pre-mapped to suspend thirst depletion.               |
-| <img alt="Tough As Nails icon" src="https://cdn.modrinth.com/data/ge1sOdFH/fa385c1d5ed5638282faf31e8fc94884bd60d86e.png" width="20" height="20" align="absmiddle"> <strong>Tough As Nails</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/tough-as-nails) · [Modrinth](https://modrinth.com/mod/tough-as-nails)) |Coexistence mode pre-configured; YAT auto-disables if TAN is detected.              |
+| Mod | Default Behavior |
+| :--- | :--- |
+| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> <strong>AppleSkin</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/appleskin) · [Modrinth](https://modrinth.com/mod/appleskin)) | Thirst &amp; quenched preview enabled immediately after installation. |
+| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> <strong>Jade</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/jade) · [Modrinth](https://modrinth.com/mod/jade)) | Water purity tooltips active on water blocks, cauldrons, tanks, Filter Frames, and Water Boilers out of the box. |
+| <img alt="Create icon" src="https://cdn.modrinth.com/data/LNytGWDc/61d716699bcf1ec42ed4926a9e1c7311be6087e2_96.webp" width="20" height="20" align="absmiddle"> <strong>Create</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/create) · [Modrinth](https://modrinth.com/mod/create)) | Filter Frame, Goggles overlays, pipe/pulley purity retention, Spout filling, and Splashing enabled automatically. |
+| <img alt="Immersive Engineering icon" src="https://cdn.modrinth.com/data/tIm2nV03/icon.png" width="20" height="20" align="absmiddle"> <strong>Immersive Engineering</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/immersive-engineering) · [Modrinth](https://modrinth.com/mod/immersiveengineering)) | External Heater support for the Water Boiler and Fluid Pump purity preservation active automatically. |
+| <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> <strong>Cold Sweat</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/cold-sweat) · [Modrinth](https://modrinth.com/mod/cold-sweat)) | Body-temperature-based thirst scaling enabled with sensible thresholds. |
+| <img alt="EnvironmentZ icon" src="https://cdn.modrinth.com/data/TggYmc6t/4bab25a93f9e7f06aa22ff3cf44b8b1c829927d4.png" width="20" height="20" align="absmiddle"> <strong>EnvironmentZ</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/environmentz) · [Modrinth](https://modrinth.com/mod/environmentz)) | Temperature tiers scale thirst depletion and render HUD temperature text out of the box (Fabric only). |
+| <img alt="Farmer's Delight icon" src="https://cdn.modrinth.com/data/R2OftAxM/8e7aa38ab94d94bb0a2894a218b69beb49002b34.png" width="20" height="20" align="absmiddle"> <strong>Farmer's Delight &amp; Addons</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/farmers-delight) · [Modrinth](https://modrinth.com/mod/farmers-delight)) | Water bottles stack to 64; stews, teas, juices, and meals from Farmer's Delight, Respite, Brewin' &amp; Chewin', Collector's Reap, Vanilla/Fruits Delight, Delightful, Hearth &amp; Harvest, and Crock Pot grant hydration by default. |
+| <img alt="Let's Do Farm &amp; Charm icon" src="https://cdn.modrinth.com/data/HJetCzWo/7c6c372629b3efa41409621631d60df12963f005_96.webp" width="20" height="20" align="absmiddle"> <strong>Let's Do</strong> ([Bakery](https://www.curseforge.com/minecraft/mc-mods/lets-do-bakery-farm-charm-compat), [Brewery](https://www.curseforge.com/minecraft/mc-mods/lets-do-brewery-farm-charm-compat), [Farm &amp; Charm](https://www.curseforge.com/minecraft/mc-mods/lets-do-farm-charm), [Beachparty](https://www.curseforge.com/minecraft/mc-mods/lets-do-beachparty), [HerbalBrews](https://www.curseforge.com/minecraft/mc-mods/lets-do-herbalbrews)) | Pre-configured drink/food hydration values; Stuffed / Saturated / Satiation / Sustenance / Feast buffs auto-pause thirst drain. |
+| <img alt="Vampirism icon" src="https://cdn.modrinth.com/data/jVZ0F1wn/icon.png" width="20" height="20" align="absmiddle"> <strong>Vampirism</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/vampirism) · [Modrinth](https://modrinth.com/mod/vampirism)) / <img alt="Supernatural icon" src="https://cdn.modrinth.com/data/UXzKPebS/63ba2cf3a91eba83d797904ba8bfa81df089f854.png" width="20" height="20" align="absmiddle"> <strong>Supernatural</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/supernatural) · [Modrinth](https://modrinth.com/mod/supernatural)) | Thirst mechanic and HUD automatically hidden for vampire players. |
+| <img alt="Corail Tombstone icon" src="https://cdn.modrinth.com/data/YT5K34AB/b279e8756761d8160f678ad20fb632d0a09b89b4_96.webp" width="20" height="20" align="absmiddle"> <strong>Corail Tombstone</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/corail-tombstone) · [Modrinth](https://modrinth.com/mod/corail-tombstone)) | <em>Ghostly Shape</em> effect pre-mapped to suspend thirst depletion. |
+| <img alt="Tough As Nails icon" src="https://cdn.modrinth.com/data/ge1sOdFH/fa385c1d5ed5638282faf31e8fc94884bd60d86e.png" width="20" height="20" align="absmiddle"> <strong>Tough As Nails</strong> ([CurseForge](https://www.curseforge.com/minecraft/mc-mods/tough-as-nails) · [Modrinth](https://modrinth.com/mod/tough-as-nails)) | Coexistence mode pre-configured; YAT auto-disables if TAN is detected. |
 
 > Simply drop the relevant mods into your `mods/` folder — no extra config editing required.
 
@@ -185,7 +208,6 @@ Detailed compatibility and integration breakdown across mod loaders and Minecraf
 
 #### 📌 Legend
 * **✅ Supported:** Fully supported and integrated out of the box.
-* **🔨 In Progress:** Currently under active development / testing (unreleased).
 * **⏳ Pending Port:** Awaiting upstream companion mod update/port to this version.
 * **❌ N/A:** Not available or unsupported on this mod loader / version.
 
@@ -193,15 +215,15 @@ Detailed compatibility and integration breakdown across mod loaders and Minecraf
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | 🔨 | — |
-| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | 🔨 | — |
+| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | ✅ | — |
+| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | ✅ | — |
 | <img alt="Create icon" src="https://cdn.modrinth.com/data/LNytGWDc/61d716699bcf1ec42ed4926a9e1c7311be6087e2_96.webp" width="20" height="20" align="absmiddle"> **Create** | ✅ | ✅ | ⏳ | 26.2: Pending Create port to Minecraft 26.2 |
 | <img alt="Immersive Engineering icon" src="https://cdn.modrinth.com/data/tIm2nV03/icon.png" width="20" height="20" align="absmiddle"> **Immersive Engineering** | ✅ | ✅ | ⏳ | 26.2: Pending Immersive Engineering port to Minecraft 26.2 |
-| <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> **Cold Sweat** | ✅ | ✅ | ⏳ | 26.2: Pending Cold Sweat port to Minecraft 26.2 |
+| <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> **Cold Sweat** | ✅ | ✅ | ✅ | — |
 | <img alt="Tough As Nails icon" src="https://cdn.modrinth.com/data/ge1sOdFH/fa385c1d5ed5638282faf31e8fc94884bd60d86e.png" width="20" height="20" align="absmiddle"> **Tough As Nails** | ✅ | ✅ | ⏳ | 26.2: Pending Tough As Nails port to Minecraft 26.2 |
 | <img alt="Vampirism icon" src="https://cdn.modrinth.com/data/jVZ0F1wn/icon.png" width="20" height="20" align="absmiddle"> **Vampirism** | ✅ | ✅ | ⏳ | 26.2: Pending Vampirism port to Minecraft 26.2 |
 | <img alt="Supernatural icon" src="https://cdn.modrinth.com/data/UXzKPebS/63ba2cf3a91eba83d797904ba8bfa81df089f854.png" width="20" height="20" align="absmiddle"> **Supernatural** | ✅ | ✅ | ⏳ | 26.2: Pending Supernatural port to Minecraft 26.2 |
-| <img alt="Corail Tombstone icon" src="https://cdn.modrinth.com/data/YT5K34AB/b279e8756761d8160f678ad20fb632d0a09b89b4_96.webp" width="20" height="20" align="absmiddle"> **Corail Tombstone** | ✅ | ✅ | ⏳ | 26.2: Pending Corail Tombstone port to Minecraft 26.2 |
+| <img alt="Corail Tombstone icon" src="https://cdn.modrinth.com/data/YT5K34AB/b279e8756761d8160f678ad20fb632d0a09b89b4_96.webp" width="20" height="20" align="absmiddle"> **Corail Tombstone** | ✅ | ✅ | ✅ | — |
 | <img alt="Farmer's Delight icon" src="https://cdn.modrinth.com/data/R2OftAxM/8e7aa38ab94d94bb0a2894a218b69beb49002b34.png" width="20" height="20" align="absmiddle"> **Farmer's Delight** | ✅ | ✅ | ⏳ | 26.2: Pending Farmer's Delight port to Minecraft 26.2 |
 | <img alt="Farmer's Respite icon" src="https://cdn.modrinth.com/data/fasdaXH5/edba350f7617b0b0d724d6fcd7b432acd8f48de3_96.webp" width="20" height="20" align="absmiddle"> **Farmer's Respite** | ✅ | ✅ | ⏳ | 26.2: Pending Farmer's Respite port to Minecraft 26.2 |
 | <img alt="Brewin' & Chewin' icon" src="https://cdn.modrinth.com/data/hIu9KJTT/f7c591a80046859d3d45c04ecbbc54d264483d5e.png" width="20" height="20" align="absmiddle"> **Brewin' & Chewin'** | ✅ | ✅ | ⏳ | 26.2: Pending Brewin' & Chewin' port to Minecraft 26.2 |
@@ -241,8 +263,8 @@ Detailed compatibility and integration breakdown across mod loaders and Minecraf
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | 🔨 | — |
-| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | 🔨 | — |
+| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | ✅ | — |
+| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | ✅ | — |
 | <img alt="EnvironmentZ icon" src="https://cdn.modrinth.com/data/TggYmc6t/4bab25a93f9e7f06aa22ff3cf44b8b1c829927d4.png" width="20" height="20" align="absmiddle"> **EnvironmentZ** | ✅ | ✅ | ⏳ | 26.2: Pending EnvironmentZ port to Minecraft 26.2 |
 | <img alt="Create Fabric icon" src="https://cdn.modrinth.com/data/Xbc0uyRg/bb29eb217b1fd159579409b06ec7b976afd30b14_96.webp" width="20" height="20" align="absmiddle"> **Create** *(Create: Fabric — [CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-fabric) · [Modrinth](https://modrinth.com/mod/create-fabric))* | ✅ | ❌ | ❌ | 1.21+ & 26.2: Create: Fabric is only maintained up to 1.20.1 |
 | <img alt="Immersive Engineering icon" src="https://cdn.modrinth.com/data/tIm2nV03/icon.png" width="20" height="20" align="absmiddle"> **Immersive Engineering** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
@@ -311,8 +333,6 @@ Yet Another Thirst introduces custom status effects to manage hydration:
 
 ## 🚀 Near-Future Plans
 
-*   **Create Mod Integration:** Add blocks and items to support automated water filtration using kinetic machinery.
-*   **Immersive Engineering Integration:** Add blocks and items to support large-scale water cooking, purification, and storage compatible with industrial themes.
 *   **Water Storage Expansion:** Add new items and containers specifically designed for storing and transporting clean water.
 *   **Sophisticated Storage & Backpacks Integration:** Support dynamic fluid storage upgrades inside backpacks and chests, allowing direct drinking and automatic refilling.
 
@@ -333,7 +353,7 @@ Yes! By default, thirst does not deplete in Peaceful mode. If your thirst is low
 
 ### How is this different from Thirst Was Taken?
 
-Yet Another Thirst is a complete, modern rewrite targeting Minecraft 1.20.1 and 1.21/1.21.1. It provides multi-loader support for both **Forge** and **NeoForge**, improved stability, more reliable mod integrations (via a dynamic status effect configuration), and fixes common issues with modern rendering pipelines.
+Yet Another Thirst is a complete, modern rewrite targeting **Minecraft 1.20.1, 1.21/1.21.1, and 26.2**. It provides multi-loader support for **Forge**, **NeoForge**, and **Fabric**, a built-in in-game config GUI, modular filtration and industrial water boiling machinery, 11 progression advancements, and expanded mod integrations.
 
 ### Is it compatible with other thirst mods?
 
@@ -343,8 +363,8 @@ Yes! If you have **Tough As Nails** installed, Yet Another Thirst includes a con
 
 ## ⚙️ Installation & Requirements
 
-1.  Make sure you are using **Minecraft 1.20.1 or 1.21/1.21.1**.
-2.  Install the latest version of either **Forge** or **NeoForge**.
+1.  Make sure you are using **Minecraft 1.20.1, 1.21/1.21.1, or 26.2**.
+2.  Install the latest version of **Forge**, **NeoForge**, or **Fabric** _(Fabric also requires **Fabric API**, plus **Mod Menu** if you want the in-game config button)_.
 3.  Download the matching **Yet Another Thirst** jar file.
 4.  Place the jar in your Minecraft instance's `mods` folder.
 5.  (Optional) Install **AppleSkin** and **Jade** for the best visual experience.

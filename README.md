@@ -21,17 +21,23 @@
 
 | Worktree / Branch | Minecraft Version | Mod Version | Java | Supported Loaders | Config Directory & Format |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `1.20.1` | `1.20.1` | `1.5.3` | Java 17 | Forge (`47.2.30+`), NeoForge (`47.1.99+`), Fabric (`0.15.11+`) | `config/yetanotherthirst/{common,items,compat,client}.toml` (Forge/NeoForge)<br>`config/yetanotherthirst/{common,items,compat,client}.json` (Fabric) |
-| `1.21` | `1.21` - `1.21.1` | `1.21-1.5.2` | Java 21 | Forge (`51.0.33+`), NeoForge (`21.0.167+`), Fabric (`0.16.9+`) | `config/yetanotherthirst/{common,items,compat,client}.toml` (Forge/NeoForge)<br>`config/yetanotherthirst/{common,items,compat,client}.json` (Fabric) |
-| `26.2` | `26.2` | `1.5.3` *(In Progress)* | Java 25 | Forge (`65.1.6+`), NeoForge (`26.2.0.93+`), Fabric (`0.20.1+`) | `config/yetanotherthirst/{common,items,compat,client}.toml` (Forge/NeoForge)<br>`config/yetanotherthirst/{common,items,compat,client}.json` (Fabric) |
+| `1.20.1` | `1.20.1` | `1.6.0` | Java 17 | Forge (`47.2.30+`), NeoForge (`47.1.99+`), Fabric (`0.15.11+`) | `config/yetanotherthirst/{common,items,compat,client}.toml` (Forge/NeoForge)<br>`config/yetanotherthirst/{common,items,compat,client}.json` (Fabric) |
+| `1.21` | `1.21` - `1.21.1` | `1.6.0` | Java 21 | Forge (`51.0.33+`), NeoForge (`21.0.167+`), Fabric (`0.16.9+`) | `config/yetanotherthirst/{common,items,compat,client}.toml` (Forge/NeoForge)<br>`config/yetanotherthirst/{common,items,compat,client}.json` (Fabric) |
+| `26.2` | `26.2` | `1.6.0` | Java 25 | Forge (`65.1.5+`), NeoForge (`26.2.0.93+`), Fabric (`0.20.1+`) | `config/yetanotherthirst/{common,items,compat,client}.toml` (Forge/NeoForge)<br>`config/yetanotherthirst/{common,items,compat,client}.json` (Fabric) |
 
-## Configuration Files
+## Configuration & In-Game Config GUI
 
-All configuration files are stored in `config/yetanotherthirst/` (`.toml` on Forge/NeoForge, `.json` on Fabric). Legacy configs in `config/yet_another_thirst/` are automatically migrated and split into the 4 files below on startup:
+All settings can be edited directly via the built-in **In-Game Config Screen** (open from the Mods list **Config** button on Forge/NeoForge, or via **Mod Menu** on Fabric):
+- Categorized sidebar with item icons, cross-page search, per-setting tooltips (description, default, range), and reset controls.
+- Interactive list editors (drinks, foods, blacklist, effect rules, EnvironmentZ tiers) with item/effect icons, registry Tab-completion, and live validation.
+- Live thirst-bar preview for HUD offsets, unsaved-change indicators, Apply/Cancel, and discard confirmation.
+- Server-side settings are read-only while connected to a remote server; singleplayer changes apply immediately.
+
+Configuration files are stored in `config/yetanotherthirst/` (`.toml` on Forge/NeoForge; atomic `.json` writes with `.broken` backup on Fabric). Legacy configs in `config/yet_another_thirst/` are automatically migrated and split into the 4 files below on startup:
 
 | File | Scope | Configured Settings |
 | :--- | :--- | :--- |
-| `common.toml` / `common.json` | Server / Common | General thirst rules, status effect lists (`suspendThirstEffects`, `pauseDepletionEffects`, `regenThirstEffects`), `Hydration`/`Thirsty` tick rates, dehydration damage, biome/Nether depletion modifiers, water purity chances, world altitude thresholds (`mountainsY`, `cavesY`), and hand drinking |
+| `common.toml` / `common.json` | Server / Common | General thirst rules, status effect lists (`suspendThirstEffects`, `pauseDepletionEffects`, `regenThirstEffects`, supporting `!=` amplifier comparisons), `Hydration`/`Thirsty` tick rates, dehydration damage, biome/Nether depletion modifiers, water purity chances, world altitude thresholds (`mountainsY`, `cavesY`), and hand drinking |
 | `items.toml` / `items.json` | Server / Common | `waterBottleStackSize`, `drinks` & `foods` hydration lists (supports item IDs and `#tags`), `itemsBlacklist`, Filter Frame parameters (speed, durability, max purity, decay multipliers), and Water Boiler parameters (capacity, boil time, FE/t consumption) |
 | `compat.toml` / `compat.json` | Server / Common | AppleSkin tooltip/HUD toggles, `toughAsNailsMode`, Cold Sweat temperature thresholds & modifiers, Vampirism/Supernatural toggles, and EnvironmentZ temperature tiers & HUD thermometer text settings |
 | `client.toml` / `client.json` | Client | Thirst HUD position offsets (`hudXOffset`, `hudYOffset`) |
@@ -61,8 +67,8 @@ All configuration files are stored in `config/yetanotherthirst/` (`.toml` on For
 
 ### Early-Game Containers & Thermal Purification
 - **Containers**: `clay_bowl` (craftable from clay balls, found in dungeon/mineshaft/shipwreck/nether bridge/bastion loot), fired into `terracotta_bowl`. Supports `terracotta_water_bowl`, `wooden_water_bowl`, and vanilla `potion` (water bottles stack up to `64`).
-- **Campfire Cooking**: Purifies water containers by `+1` tier.
-- **Furnace Smelting**: Purifies water containers by `+2` tiers.
+- **Campfire Cooking**: Purifies water bottles, terracotta water bowls, and water buckets by `+1` tier.
+- **Furnace Smelting**: Purifies water bottles, terracotta water bowls, and water buckets by `+2` tiers.
 - **Cauldrons & Dispensers**: Cauldrons track purity using worst-case (minimum) purity when mixing fluids; dispensers preserve source block purity when filling bottles or buckets.
 
 ### Modular Filtration (`yet_another_thirst:filter_frame`)
@@ -76,8 +82,8 @@ Available on Forge and NeoForge when **Create** is installed (`1,000 mB` interna
 
 ### Industrial Purification (`yet_another_thirst:water_boiler`)
 Available on Forge and NeoForge:
-- **Capacity & Consumption**: `2,000 mB` tank capacity, `200` ticks boil time, `32 FE/t` energy consumption.
-- **Port Configuration**: Configurable inlet, outlet, and electrical connector ports per block face/half.
+- **Capacity & Consumption**: `2,000 mB` tank capacity, `200` ticks boil time, `32 FE/t` energy consumption, with dynamic in-world fluid rendering and a GUI energy gauge (`FE/t` received vs. required hover tooltip).
+- **Port Configuration**: Configurable inlet, outlet, and electrical connector ports per block face/half using a hammer or wrench, with localized action-bar feedback.
 - **Immersive Engineering Integration**: Supports heating via IE External Heaters and preserves world water purity with IE Fluid Pumps.
 
 ## Status Effects
@@ -129,7 +135,6 @@ Available on Forge and NeoForge:
 
 #### 📌 Legend
 * **✅ Supported:** Fully supported and integrated out of the box.
-* **🔨 In Progress:** Currently under active development / testing (unreleased).
 * **⏳ Pending Port:** Awaiting upstream companion mod update/port to this version.
 * **❌ N/A:** Not available or unsupported on this mod loader / version.
 
@@ -137,15 +142,15 @@ Available on Forge and NeoForge:
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | 🔨 | — |
-| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | 🔨 | — |
+| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | ✅ | — |
+| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | ✅ | — |
 | <img alt="Create icon" src="https://cdn.modrinth.com/data/LNytGWDc/61d716699bcf1ec42ed4926a9e1c7311be6087e2_96.webp" width="20" height="20" align="absmiddle"> **Create** | ✅ | ✅ | ⏳ | 26.2: Pending Create port to Minecraft 26.2 |
 | <img alt="Immersive Engineering icon" src="https://cdn.modrinth.com/data/tIm2nV03/icon.png" width="20" height="20" align="absmiddle"> **Immersive Engineering** | ✅ | ✅ | ⏳ | 26.2: Pending Immersive Engineering port to Minecraft 26.2 |
-| <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> **Cold Sweat** | ✅ | ✅ | ⏳ | 26.2: Pending Cold Sweat port to Minecraft 26.2 |
+| <img alt="Cold Sweat icon" src="https://cdn.modrinth.com/data/uXhSmPjd/bf55420556c30d44d2f5cf7b8915705b9214b4ef.png" width="20" height="20" align="absmiddle"> **Cold Sweat** | ✅ | ✅ | ✅ | — |
 | <img alt="Tough As Nails icon" src="https://cdn.modrinth.com/data/ge1sOdFH/fa385c1d5ed5638282faf31e8fc94884bd60d86e.png" width="20" height="20" align="absmiddle"> **Tough As Nails** | ✅ | ✅ | ⏳ | 26.2: Pending Tough As Nails port to Minecraft 26.2 |
 | <img alt="Vampirism icon" src="https://cdn.modrinth.com/data/jVZ0F1wn/icon.png" width="20" height="20" align="absmiddle"> **Vampirism** | ✅ | ✅ | ⏳ | 26.2: Pending Vampirism port to Minecraft 26.2 |
 | <img alt="Supernatural icon" src="https://cdn.modrinth.com/data/UXzKPebS/63ba2cf3a91eba83d797904ba8bfa81df089f854.png" width="20" height="20" align="absmiddle"> **Supernatural** | ✅ | ✅ | ⏳ | 26.2: Pending Supernatural port to Minecraft 26.2 |
-| <img alt="Corail Tombstone icon" src="https://cdn.modrinth.com/data/YT5K34AB/b279e8756761d8160f678ad20fb632d0a09b89b4_96.webp" width="20" height="20" align="absmiddle"> **Corail Tombstone** | ✅ | ✅ | ⏳ | 26.2: Pending Corail Tombstone port to Minecraft 26.2 |
+| <img alt="Corail Tombstone icon" src="https://cdn.modrinth.com/data/YT5K34AB/b279e8756761d8160f678ad20fb632d0a09b89b4_96.webp" width="20" height="20" align="absmiddle"> **Corail Tombstone** | ✅ | ✅ | ✅ | — |
 | <img alt="Farmer's Delight icon" src="https://cdn.modrinth.com/data/R2OftAxM/8e7aa38ab94d94bb0a2894a218b69beb49002b34.png" width="20" height="20" align="absmiddle"> **Farmer's Delight** | ✅ | ✅ | ⏳ | 26.2: Pending Farmer's Delight port to Minecraft 26.2 |
 | <img alt="Farmer's Respite icon" src="https://cdn.modrinth.com/data/fasdaXH5/edba350f7617b0b0d724d6fcd7b432acd8f48de3_96.webp" width="20" height="20" align="absmiddle"> **Farmer's Respite** | ✅ | ✅ | ⏳ | 26.2: Pending Farmer's Respite port to Minecraft 26.2 |
 | <img alt="Brewin' & Chewin' icon" src="https://cdn.modrinth.com/data/hIu9KJTT/f7c591a80046859d3d45c04ecbbc54d264483d5e.png" width="20" height="20" align="absmiddle"> **Brewin' & Chewin'** | ✅ | ✅ | ⏳ | 26.2: Pending Brewin' & Chewin' port to Minecraft 26.2 |
@@ -185,8 +190,8 @@ Available on Forge and NeoForge:
 
 | Third-Party Mod | 1.20.1 | 1.21 / 1.21.1 | 26.2 | Unsupported Reason |
 | :--- | :---: | :---: | :---: | :--- |
-| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | 🔨 | — |
-| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | 🔨 | — |
+| <img alt="AppleSkin icon" src="https://cdn.modrinth.com/data/EsAfCjCV/icon.png" width="20" height="20" align="absmiddle"> **AppleSkin** | ✅ | ✅ | ✅ | — |
+| <img alt="Jade icon" src="https://cdn.modrinth.com/data/nvQzSEkH/b04217bc2b7dc524c4d12f81ff42cc1cefb9b0fc_96.webp" width="20" height="20" align="absmiddle"> **Jade** | ✅ | ✅ | ✅ | — |
 | <img alt="EnvironmentZ icon" src="https://cdn.modrinth.com/data/TggYmc6t/4bab25a93f9e7f06aa22ff3cf44b8b1c829927d4.png" width="20" height="20" align="absmiddle"> **EnvironmentZ** | ✅ | ✅ | ⏳ | 26.2: Pending EnvironmentZ port to Minecraft 26.2 |
 | <img alt="Create Fabric icon" src="https://cdn.modrinth.com/data/Xbc0uyRg/bb29eb217b1fd159579409b06ec7b976afd30b14_96.webp" width="20" height="20" align="absmiddle"> **Create** *(Create: Fabric — [Modrinth](https://modrinth.com/mod/create-fabric) · [CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-fabric))* | ✅ | ❌ | ❌ | 1.21+ & 26.2: Create: Fabric is only maintained up to 1.20.1 |
 | <img alt="Immersive Engineering icon" src="https://cdn.modrinth.com/data/tIm2nV03/icon.png" width="20" height="20" align="absmiddle"> **Immersive Engineering** | ❌ | ❌ | ❌ | Not supported on Fabric (Forge/NeoForge exclusive) |
