@@ -12,7 +12,11 @@ base {
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
     withSourcesJar()
-    withJavadocJar()
+}
+
+// Keep line numbers and source file names for crash stack traces; drop local variable tables to shrink class files.
+tasks.withType(JavaCompile).configureEach {
+    options.debugOptions.debugLevel = 'lines,source'
 }
 
 repositories {
@@ -60,7 +64,7 @@ repositories {
 
 // Declare capabilities on the outgoing configurations.
 // Read more about capabilities here: https://docs.gradle.org/current/userguide/component_capabilities.html#sec:declaring-additional-capabilities-for-a-local-component
-['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+['apiElements', 'runtimeElements', 'sourcesElements'].each { variant ->
     configurations."$variant".outgoing {
         capability("$group:${project.name}:$version")
         capability("$group:${base.archivesName.get()}:$version")
@@ -122,7 +126,7 @@ processResources {
     ]
 
     var jsonExpandProps = expandProps.collectEntries {
-        key, value -> [(key): value instanceof String ? value.replace("\n", "\\\\n") : value]
+        key, value -> [(key): value instanceof String ? value.replace("\n", "\\n") : value]
     }
 
     filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
@@ -154,6 +158,21 @@ tasks.withType(Javadoc).configureEach {
     options.addStringOption('Xdoclint:none', '-quiet')
     options.encoding = 'UTF-8'
     options.charSet = 'UTF-8'
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+configurations {
+    testCompileClasspath.extendsFrom(compileClasspath)
+    testRuntimeClasspath.extendsFrom(runtimeClasspath)
+}
+
+test {
+    useJUnitPlatform()
 }
 
 // ── Architectural Seam Checks ──────────────────────────────────────────────
@@ -303,5 +322,107 @@ if (project.name == 'common') {
 
     tasks.named('compileJava').configure {
         dependsOn checkSeams
+    }
+}
+
+// ── Clean Old Jars & Copy Built Jar to Game Mods Directory ─────────────────
+if (project.name in ['forge', 'neoforge', 'fabric']) {
+    def resolveModsDir = {
+        def loaderKey = "${project.name}ModsDir"
+        def propValue = project.findProperty(loaderKey)?.toString()?.trim()
+        if (propValue) {
+            return propValue
+        }
+        def genericProp = project.findProperty('modsDir')?.toString()?.trim()
+        if (genericProp) {
+            return genericProp
+        }
+        def localPropsFile = rootProject.file('local.properties')
+        if (localPropsFile.exists()) {
+            def props = new Properties()
+            localPropsFile.withInputStream { props.load(it) }
+            def localLoaderVal = props.getProperty(loaderKey)?.trim()
+            if (localLoaderVal) {
+                return localLoaderVal
+            }
+            def localGenericVal = props.getProperty('modsDir')?.trim()
+            if (localGenericVal) {
+                return localGenericVal
+            }
+        }
+        return null
+    }
+
+    def cleanOldJars = tasks.register('cleanOldJars') {
+        description = 'Deletes old jar files from build/libs before building new jars.'
+        group = 'build'
+        doLast {
+            delete fileTree(dir: layout.buildDirectory.dir('libs'), include: '*.jar')
+        }
+    }
+
+    tasks.withType(Jar).configureEach {
+        dependsOn cleanOldJars
+    }
+
+    def copyModToGame = tasks.register('copyModToGame') {
+        description = 'Removes old mod jars from the target game mods directory and copies the newly built jar.'
+        group = 'build'
+
+        onlyIf {
+            resolveModsDir() != null
+        }
+
+        doLast {
+            def rawDir = resolveModsDir()
+            if (rawDir == null) {
+                return
+            }
+            if (rawDir.startsWith('~/') || rawDir == '~') {
+                rawDir = System.getProperty('user.home') + rawDir.substring(1)
+            }
+            def targetDir = file(rawDir)
+            if (!targetDir.exists() || !targetDir.isDirectory()) {
+                throw new GradleException("Target mods directory does not exist: ${targetDir.absolutePath}")
+            }
+
+            delete fileTree(dir: targetDir, include: 'YetAnotherThirst-*.jar')
+
+            def jarTask = (project.name == 'fabric' && tasks.names.contains('remapJar'))
+                    ? tasks.named('remapJar').get()
+                    : tasks.named('jar').get()
+            def jarFile = jarTask.archiveFile.get().asFile
+
+            copy {
+                from jarFile
+                into targetDir
+            }
+            logger.lifecycle("Copied ${jarFile.name} -> ${targetDir.absolutePath}")
+        }
+    }
+
+    if (project.name == 'fabric') {
+        afterEvaluate {
+            if (tasks.names.contains('remapJar')) {
+                tasks.named('remapJar').configure {
+                    dependsOn cleanOldJars
+                }
+                copyModToGame.configure {
+                    dependsOn tasks.named('remapJar')
+                }
+            } else {
+                copyModToGame.configure {
+                    dependsOn tasks.named('jar')
+                }
+            }
+        }
+    } else {
+        copyModToGame.configure {
+            dependsOn tasks.named('jar')
+        }
+    }
+
+    tasks.named('build').configure {
+        dependsOn copyModToGame
     }
 }

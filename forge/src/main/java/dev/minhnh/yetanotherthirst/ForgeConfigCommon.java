@@ -8,7 +8,6 @@ public final class ForgeConfigCommon {
 
     static final ForgeConfigSpec SPEC;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_VERSION;
     // [general]
     private static final ForgeConfigSpec.BooleanValue EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
     private static final ForgeConfigSpec.BooleanValue THIRST_DEPLETES_IN_PEACEFUL;
@@ -22,6 +21,7 @@ public final class ForgeConfigCommon {
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> REGEN_THIRST_EFFECTS;
     private static final ForgeConfigSpec.IntValue REGEN_THIRST_INTERVAL;
     private static final ForgeConfigSpec.IntValue REGEN_THIRST_AMOUNT;
+    private static final ForgeConfigSpec.BooleanValue DEBUG_LOGGING;
     // [effects]
     private static final ForgeConfigSpec.IntValue HYDRATION_EFFECT_THIRST_PER_TICK;
     private static final ForgeConfigSpec.IntValue HYDRATION_EFFECT_QUENCHED_PER_TICK;
@@ -62,10 +62,6 @@ public final class ForgeConfigCommon {
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-
-        CONFIG_VERSION = builder
-                .comment("Config file version — do not modify")
-                .defineInRange("configVersion", 1, 1, Integer.MAX_VALUE);
 
         builder.push("general");
         EXTRA_HYDRATION_CONVERTS_TO_QUENCHED = builder
@@ -121,6 +117,9 @@ public final class ForgeConfigCommon {
         REGEN_THIRST_AMOUNT = builder
                 .comment("Amount of thirst restored per regeneration tick")
                 .defineInRange("regenThirstAmount", 1, 1, 20);
+        DEBUG_LOGGING = builder
+                .comment("Enable debug logging (advancements, hand drinking, purity, etc.)")
+                .define("debugLogging", false);
         builder.pop();
 
         builder.push("effects");
@@ -281,6 +280,7 @@ public final class ForgeConfigCommon {
         ThirstConfig.HAND_DRINKING_THIRST = HAND_DRINKING_THIRST.get();
         ThirstConfig.HAND_DRINKING_QUENCHED = HAND_DRINKING_QUENCHED.get();
         ThirstConfig.DRINK_BOTH_HANDS_NEEDED = DRINK_BOTH_HANDS_NEEDED.get();
+        ThirstConfig.DEBUG_LOGGING = DEBUG_LOGGING.get();
     }
 
     private ForgeConfigCommon() {}

@@ -61,7 +61,7 @@ public final class ThirstConfig {
     public static int CARBON_FILTER_MAX_PURITY = 3;
 
     // Water Boiler Config
-    public static int WATER_BOILER_CAPACITY = 16000;
+    public static int WATER_BOILER_CAPACITY = 2000;
     public static int WATER_BOILER_BOIL_TIME = 200;
     public static int WATER_BOILER_ENERGY_CONSUMPTION = 32;
 
@@ -73,6 +73,9 @@ public final class ThirstConfig {
 
     // Items
     public static int WATER_BOTTLE_STACKSIZE = 64;
+
+    // Debug
+    public static boolean DEBUG_LOGGING = false;
 
     // Client-side only — set by the loader's client config
     public static int HUD_X_OFFSET = 0;

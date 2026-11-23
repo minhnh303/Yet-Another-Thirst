@@ -21,8 +21,6 @@ public final class ForgeConfigItems {
 
     static final ForgeConfigSpec SPEC;
 
-    @SuppressWarnings("unused")
-    private static final ForgeConfigSpec.IntValue CONFIG_VERSION;
     // [items]
     private static final ForgeConfigSpec.IntValue WATER_BOTTLE_STACKSIZE;
     private static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> DRINK_VALUES;
@@ -47,10 +45,6 @@ public final class ForgeConfigItems {
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
-        CONFIG_VERSION = builder
-                .comment("Config file version — do not modify")
-                .defineInRange("configVersion", 1, 1, Integer.MAX_VALUE);
-
         builder.push("items");
         WATER_BOTTLE_STACKSIZE = builder
                 .comment("Maximum stack size for water bottles (1-64)")
@@ -68,8 +62,8 @@ public final class ForgeConfigItems {
 
         builder.push("filter");
         FILTER_BASE_SPEED = builder
-                .comment("Base throughput speed of the Sand Filter Frame block in mB/tick (default: 5)")
-                .defineInRange("filterBaseSpeed", 5, 1, 1000);
+                .comment("Base throughput speed of the Filter Frame block in mB/tick (default: 1)")
+                .defineInRange("filterBaseSpeed", 1, 1, 1000);
         DIRTY_WATER_DECAY_MULTIPLIER = builder
                 .comment("Durability consumption multiplier for dirty water (default: 4.0)")
                 .defineInRange("dirtyWaterDecayMultiplier", 4.0, 0.0, 100.0);

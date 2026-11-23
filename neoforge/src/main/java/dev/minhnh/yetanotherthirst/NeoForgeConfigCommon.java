@@ -8,8 +8,6 @@ public final class NeoForgeConfigCommon {
 
     static final ModConfigSpec SPEC;
 
-    @SuppressWarnings("unused")
-    private static final ModConfigSpec.IntValue CONFIG_VERSION;
     // [general]
     private static final ModConfigSpec.BooleanValue EXTRA_HYDRATION_CONVERTS_TO_QUENCHED;
     private static final ModConfigSpec.BooleanValue THIRST_DEPLETES_IN_PEACEFUL;
@@ -23,6 +21,7 @@ public final class NeoForgeConfigCommon {
     private static final ModConfigSpec.ConfigValue<List<? extends String>> REGEN_THIRST_EFFECTS;
     private static final ModConfigSpec.IntValue REGEN_THIRST_INTERVAL;
     private static final ModConfigSpec.IntValue REGEN_THIRST_AMOUNT;
+    private static final ModConfigSpec.BooleanValue DEBUG_LOGGING;
     // [effects]
     private static final ModConfigSpec.IntValue HYDRATION_EFFECT_THIRST_PER_TICK;
     private static final ModConfigSpec.IntValue HYDRATION_EFFECT_QUENCHED_PER_TICK;
@@ -63,10 +62,6 @@ public final class NeoForgeConfigCommon {
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-
-        CONFIG_VERSION = builder
-                .comment("Config file version — do not modify")
-                .defineInRange("configVersion", 1, 1, Integer.MAX_VALUE);
 
         builder.push("general");
         EXTRA_HYDRATION_CONVERTS_TO_QUENCHED = builder
@@ -122,6 +117,9 @@ public final class NeoForgeConfigCommon {
         REGEN_THIRST_AMOUNT = builder
                 .comment("Amount of thirst restored per regeneration tick")
                 .defineInRange("regenThirstAmount", 1, 1, 20);
+        DEBUG_LOGGING = builder
+                .comment("Emit verbose thirst debug logs to the console")
+                .define("debugLogging", false);
         builder.pop();
 
         builder.push("effects");
@@ -251,6 +249,7 @@ public final class NeoForgeConfigCommon {
         ThirstConfig.setRegenThirstEffects(REGEN_THIRST_EFFECTS.get());
         ThirstConfig.REGEN_THIRST_INTERVAL = REGEN_THIRST_INTERVAL.get();
         ThirstConfig.REGEN_THIRST_AMOUNT = REGEN_THIRST_AMOUNT.get();
+        ThirstConfig.DEBUG_LOGGING = DEBUG_LOGGING.get();
         ThirstConfig.HYDRATION_EFFECT_THIRST_PER_TICK = HYDRATION_EFFECT_THIRST_PER_TICK.get();
         ThirstConfig.HYDRATION_EFFECT_QUENCHED_PER_TICK = HYDRATION_EFFECT_QUENCHED_PER_TICK.get();
         ThirstConfig.THIRSTY_EFFECT_EXHAUSTION_PER_TICK = THIRSTY_EFFECT_EXHAUSTION_PER_TICK.get().floatValue();

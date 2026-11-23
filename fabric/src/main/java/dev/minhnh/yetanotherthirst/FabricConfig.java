@@ -2,10 +2,12 @@ package dev.minhnh.yetanotherthirst;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValue;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstValues;
+import dev.minhnh.yetanotherthirst.platform.services.IConfigBackend;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -15,10 +17,13 @@ import net.minecraft.world.item.Items;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -30,27 +35,22 @@ import java.util.Set;
 public final class FabricConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path NEW_DIR = FabricLoader.getInstance().getConfigDir().resolve(Constants.CONFIG_DIR);
-    private static final Path OLD_DIR_PATH = FabricLoader.getInstance().getConfigDir().resolve(Constants.MOD_ID);
-    private static final Path COMMON_PATH = NEW_DIR.resolve("common.json");
-    private static final Path ITEMS_PATH = NEW_DIR.resolve("items.json");
-    private static final Path COMPAT_PATH = NEW_DIR.resolve("compat.json");
-    private static final Path CLIENT_PATH = NEW_DIR.resolve("client.json");
+    private static final String CONFIG_DIR_NAME = Constants.CONFIG_DIR;
 
-    private static JsonObject commonJson = new JsonObject();
-    private static JsonObject itemsJson = new JsonObject();
-    private static JsonObject compatJson = new JsonObject();
-    private static JsonObject clientJson = new JsonObject();
+    private static JsonObject commonJson = buildDefaultCommon();
+    private static JsonObject itemsJson = buildDefaultItems();
+    private static JsonObject compatJson = buildDefaultCompat();
+    private static JsonObject clientJson = buildDefaultClient();
 
     // Keys belonging to each split file
-    private static final Set<String> ITEMS_KEYS = Set.of(
+    static final Set<String> ITEMS_KEYS = Set.of(
             "waterBottleStackSize", "drinks", "foods", "itemsBlacklist",
             "filterBaseSpeed", "dirtyWaterDecayMultiplier", "slightlyDirtyWaterDecayMultiplier",
             "acceptableWaterDecayMultiplier", "fabricFilterDurability", "fabricFilterMaxPurity",
             "sandFilterDurability", "sandFilterMaxPurity", "carbonFilterDurability", "carbonFilterMaxPurity",
             "waterBoilerCapacity", "waterBoilerBoilTime", "waterBoilerEnergyConsumption"
     );
-    private static final Set<String> COMPAT_KEYS = Set.of(
+    static final Set<String> COMPAT_KEYS = Set.of(
             "appleSkinThirstTooltip", "appleSkinThirstHudPreview", "toughAsNailsMode",
             "coldSweatDehydrationModifier", "coldSweatReplacesEnvironmentModifiers",
             "coldSweatHotBodyTemperature", "coldSweatBurningBodyTemperature",
@@ -64,27 +64,46 @@ public final class FabricConfig {
 
     private FabricConfig() {}
 
+    private static Path newDir() {
+        return FabricLoader.getInstance().getConfigDir().resolve(CONFIG_DIR_NAME);
+    }
+
+    private static Path oldDir() {
+        return FabricLoader.getInstance().getConfigDir().resolve(Constants.MOD_ID);
+    }
+
+    private static Path path(IConfigBackend.ConfigFile file) {
+        Path dir = newDir();
+        return switch (file) {
+            case COMMON -> dir.resolve("common.json");
+            case ITEMS -> dir.resolve("items.json");
+            case COMPAT -> dir.resolve("compat.json");
+            case CLIENT -> dir.resolve("client.json");
+        };
+    }
+
     public static void load() {
         try {
-            Files.createDirectories(NEW_DIR);
+            Files.createDirectories(newDir());
         } catch (IOException e) {
             Constants.LOG.error("Failed to create config directory", e);
         }
 
         migrate();
 
-        commonJson = loadOrCreate(COMMON_PATH, buildDefaultCommon());
-        itemsJson = loadOrCreate(ITEMS_PATH, buildDefaultItems());
-        compatJson = loadOrCreate(COMPAT_PATH, buildDefaultCompat());
-        clientJson = loadOrCreate(CLIENT_PATH, buildDefaultClient());
+        commonJson = loadOrCreate(path(IConfigBackend.ConfigFile.COMMON), buildDefaultCommon());
+        itemsJson = loadOrCreate(path(IConfigBackend.ConfigFile.ITEMS), buildDefaultItems());
+        compatJson = loadOrCreate(path(IConfigBackend.ConfigFile.COMPAT), buildDefaultCompat());
+        clientJson = loadOrCreate(path(IConfigBackend.ConfigFile.CLIENT), buildDefaultClient());
         sync();
     }
 
     private static void migrate() {
-        Path oldCommon = OLD_DIR_PATH.resolve("common.json");
+        Path oldDirPath = oldDir();
+        Path oldCommon = oldDirPath.resolve("common.json");
         if (!Files.exists(oldCommon)) return;
 
-        Constants.LOG.info("[YAT] Migrating Fabric config from '{}' to '{}' with split", Constants.MOD_ID, Constants.CONFIG_DIR);
+        Constants.LOG.info("[YAT] Migrating Fabric config from '{}' to '{}'", Constants.MOD_ID, CONFIG_DIR_NAME);
 
         try (Reader r = Files.newBufferedReader(oldCommon)) {
             JsonObject old = GSON.fromJson(r, JsonObject.class);
@@ -104,19 +123,24 @@ public final class FabricConfig {
                 }
             }
 
-            if (!Files.exists(COMMON_PATH)) writeJson(COMMON_PATH, newCommon);
-            if (!Files.exists(ITEMS_PATH)) writeJson(ITEMS_PATH, newItems);
-            if (!Files.exists(COMPAT_PATH)) writeJson(COMPAT_PATH, newCompat);
+            Path commonPath = path(IConfigBackend.ConfigFile.COMMON);
+            Path itemsPath = path(IConfigBackend.ConfigFile.ITEMS);
+            Path compatPath = path(IConfigBackend.ConfigFile.COMPAT);
+            Path clientPath = path(IConfigBackend.ConfigFile.CLIENT);
 
-            Path oldClient = OLD_DIR_PATH.resolve("client.json");
-            if (Files.exists(oldClient) && !Files.exists(CLIENT_PATH)) {
-                Files.copy(oldClient, CLIENT_PATH);
+            if (!Files.exists(commonPath)) writeJson(commonPath, newCommon);
+            if (!Files.exists(itemsPath)) writeJson(itemsPath, newItems);
+            if (!Files.exists(compatPath)) writeJson(compatPath, newCompat);
+
+            Path oldClient = oldDirPath.resolve("client.json");
+            if (Files.exists(oldClient) && !Files.exists(clientPath)) {
+                Files.copy(oldClient, clientPath);
             }
 
             Files.delete(oldCommon);
             if (Files.exists(oldClient)) Files.delete(oldClient);
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(OLD_DIR_PATH)) {
-                if (!stream.iterator().hasNext()) Files.delete(OLD_DIR_PATH);
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(oldDirPath)) {
+                if (!stream.iterator().hasNext()) Files.delete(oldDirPath);
             }
             Constants.LOG.info("[YAT] Fabric config migration complete.");
         } catch (Exception e) {
@@ -124,11 +148,25 @@ public final class FabricConfig {
         }
     }
 
+    /** Best-effort write for load and migration, where a failure only means defaults are not persisted yet. */
     private static void writeJson(Path path, JsonObject obj) {
-        try (Writer w = Files.newBufferedWriter(path)) {
-            GSON.toJson(obj, w);
+        try {
+            writeAtomically(path, obj);
         } catch (IOException e) {
             Constants.LOG.error("Failed to write config {}", path, e);
+        }
+    }
+
+    /** Writes to a sibling temp file, then moves it over {@code path}, so a failed write never truncates the config. */
+    private static void writeAtomically(Path path, JsonObject obj) throws IOException {
+        Path temp = path.resolveSibling(path.getFileName() + ".tmp");
+        try (Writer w = Files.newBufferedWriter(temp)) {
+            GSON.toJson(obj, w);
+        }
+        try {
+            Files.move(temp, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(temp, path, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
@@ -187,6 +225,7 @@ public final class FabricConfig {
         ThirstConfig.HAND_DRINKING_THIRST = getInt(commonJson, "handDrinkingThirst", 3);
         ThirstConfig.HAND_DRINKING_QUENCHED = getInt(commonJson, "handDrinkingQuenched", 2);
         ThirstConfig.DRINK_BOTH_HANDS_NEEDED = getBool(commonJson, "drinkBothHandsNeeded", false);
+        ThirstConfig.DEBUG_LOGGING = getBool(commonJson, "debugLogging", false);
 
         // items
         ThirstConfig.WATER_BOTTLE_STACKSIZE = getInt(itemsJson, "waterBottleStackSize", 64);
@@ -200,7 +239,7 @@ public final class FabricConfig {
         ThirstConfig.SAND_FILTER_MAX_PURITY = getInt(itemsJson, "sandFilterMaxPurity", 2);
         ThirstConfig.CARBON_FILTER_DURABILITY = getInt(itemsJson, "carbonFilterDurability", 250000);
         ThirstConfig.CARBON_FILTER_MAX_PURITY = getInt(itemsJson, "carbonFilterMaxPurity", 3);
-        ThirstConfig.WATER_BOILER_CAPACITY = getInt(itemsJson, "waterBoilerCapacity", 16000);
+        ThirstConfig.WATER_BOILER_CAPACITY = getInt(itemsJson, "waterBoilerCapacity", 2000);
         ThirstConfig.WATER_BOILER_BOIL_TIME = getInt(itemsJson, "waterBoilerBoilTime", 200);
         ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION = getInt(itemsJson, "waterBoilerEnergyConsumption", 32);
 
@@ -250,6 +289,44 @@ public final class FabricConfig {
         ThirstValues.replaceConfiguredValues(drinks, foods, blacklist);
     }
 
+    // ── In-game config screen access ──────────────────────────────────────────
+
+    static JsonObject json(IConfigBackend.ConfigFile file) {
+        return switch (file) {
+            case COMMON -> commonJson;
+            case ITEMS -> itemsJson;
+            case COMPAT -> compatJson;
+            case CLIENT -> clientJson;
+        };
+    }
+
+    static JsonObject defaults(IConfigBackend.ConfigFile file) {
+        return switch (file) {
+            case COMMON -> buildDefaultCommon();
+            case ITEMS -> buildDefaultItems();
+            case COMPAT -> buildDefaultCompat();
+            case CLIENT -> buildDefaultClient();
+        };
+    }
+
+    static void resetToDefaults() {
+        commonJson = buildDefaultCommon();
+        itemsJson = buildDefaultItems();
+        compatJson = buildDefaultCompat();
+        clientJson = buildDefaultClient();
+        sync();
+    }
+
+    /** Writes one file for the config screen; throws so the screen keeps the edits pending when it fails. */
+    static void write(IConfigBackend.ConfigFile file) {
+        Path path = path(file);
+        try {
+            writeAtomically(path, json(file));
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to write config " + path, e);
+        }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static JsonObject loadOrCreate(Path path, JsonObject defaults) {
@@ -265,10 +342,22 @@ public final class FabricConfig {
                 return loaded;
             } catch (Exception e) {
                 Constants.LOG.error("Failed to read config {}", path, e);
+                backUpUnreadable(path);
             }
         }
         writeJson(path, defaults);
         return defaults;
+    }
+
+    /** Keeps an unreadable config (e.g. a JSON syntax error) beside the defaults written in its place, so edits can be recovered. */
+    private static void backUpUnreadable(Path path) {
+        Path backup = path.resolveSibling(path.getFileName() + ".broken-" + System.currentTimeMillis());
+        try {
+            Files.copy(path, backup, StandardCopyOption.REPLACE_EXISTING);
+            Constants.LOG.warn("Unreadable config {} was copied to {} and replaced with defaults", path, backup);
+        } catch (IOException e) {
+            Constants.LOG.error("Could not back up unreadable config {}", path, e);
+        }
     }
 
     /**
@@ -379,6 +468,11 @@ public final class FabricConfig {
         obj.addProperty("sprintPrevention", true);
         obj.addProperty("sprintThreshold", 6);
         obj.addProperty("dehydrationHaltsHealthRegen", true);
+        obj.add("suspendThirstEffects", stringListToJson(List.of("tombstone:ghostly_shape")));
+        obj.add("pauseDepletionEffects", stringListToJson(List.of(
+                "farmersdelight:nourishment", "bakery:stuffed",
+                "farm_and_charm:satiation", "farm_and_charm:sustenance", "farm_and_charm:feast")));
+        obj.add("regenThirstEffects", stringListToJson(List.of("farmersdelight:nourishment", "farm_and_charm:sustenance")));
         obj.addProperty("regenThirstInterval", 40);
         obj.addProperty("regenThirstAmount", 1);
         obj.addProperty("hydrationEffectThirstPerTick", 1);
@@ -412,13 +506,14 @@ public final class FabricConfig {
         obj.addProperty("handDrinkingThirst", 3);
         obj.addProperty("handDrinkingQuenched", 2);
         obj.addProperty("drinkBothHandsNeeded", false);
+        obj.addProperty("debugLogging", false);
         return obj;
     }
 
-    private static com.google.gson.JsonArray listOfListsToJson(List<List<Object>> entries) {
-        var arr = new com.google.gson.JsonArray();
+    private static JsonArray listOfListsToJson(List<List<Object>> entries) {
+        var arr = new JsonArray();
         for (var entry : entries) {
-            var row = new com.google.gson.JsonArray();
+            var row = new JsonArray();
             row.add((String) entry.get(0));
             row.add(((Number) entry.get(1)).intValue());
             row.add(((Number) entry.get(2)).intValue());
@@ -433,6 +528,8 @@ public final class FabricConfig {
         obj.addProperty("waterBottleStackSize", 64);
         obj.add("drinks", listOfListsToJson(DefaultItemValues.defaultDrinkValues()));
         obj.add("foods", listOfListsToJson(DefaultItemValues.defaultFoodValues()));
+        obj.add("itemsBlacklist", stringListToJson(List.of(
+                "yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2")));
         obj.addProperty("filterBaseSpeed", 1);
         obj.addProperty("dirtyWaterDecayMultiplier", 4.0);
         obj.addProperty("slightlyDirtyWaterDecayMultiplier", 2.0);
@@ -443,7 +540,7 @@ public final class FabricConfig {
         obj.addProperty("sandFilterMaxPurity", 2);
         obj.addProperty("carbonFilterDurability", 250000);
         obj.addProperty("carbonFilterMaxPurity", 3);
-        obj.addProperty("waterBoilerCapacity", 16000);
+        obj.addProperty("waterBoilerCapacity", 2000);
         obj.addProperty("waterBoilerBoilTime", 200);
         obj.addProperty("waterBoilerEnergyConsumption", 32);
         return obj;
@@ -474,12 +571,6 @@ public final class FabricConfig {
         return obj;
     }
 
-    /**
-     * Starting point for {@code environmentzTemperatureTiers}, matching the example threshold from
-     * the feature request ("playerTemperature >= 20 -> 1.0x"). EnvironmentZ's own tier boundaries
-     * are datapack-configurable per server, so these are just a reasonable starting shape — use
-     * {@code /thirst query} to read the live body temperature and retune to taste.
-     */
     private static List<ThirstConfig.TemperatureTier> defaultEnvironmentzTemperatureTiers() {
         return new ArrayList<>(List.of(
                 new ThirstConfig.TemperatureTier(-1000, 0.5F),
@@ -501,12 +592,12 @@ public final class FabricConfig {
         return result;
     }
 
-    private static com.google.gson.JsonArray temperatureTiersToJson(List<ThirstConfig.TemperatureTier> tiers) {
-        var arr = new com.google.gson.JsonArray();
+    private static JsonArray temperatureTiersToJson(List<ThirstConfig.TemperatureTier> tiers) {
+        var arr = new JsonArray();
         for (var tier : tiers) {
-            var row = new com.google.gson.JsonArray();
+            var row = new JsonArray();
             row.add(tier.threshold);
-            row.add(tier.modifier);
+            row.add(Math.round(tier.modifier * 1000.0) / 1000.0);
             arr.add(row);
         }
         return arr;
@@ -519,4 +610,9 @@ public final class FabricConfig {
         return obj;
     }
 
+    private static JsonArray stringListToJson(List<String> list) {
+        JsonArray arr = new JsonArray();
+        list.forEach(arr::add);
+        return arr;
+    }
 }

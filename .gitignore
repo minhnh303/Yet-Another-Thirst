@@ -37,6 +37,8 @@ run/
 **/run/
 runs/
 **/runs/
+run-*/
+**/run-*/
 **/run-gametest/
 logs/
 **/logs/

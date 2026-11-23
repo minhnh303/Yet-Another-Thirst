@@ -98,36 +98,16 @@ public final class NeoForgeGameEvents {
 
         // 1. Water bucket filling with purity tracking
         if (held.is(Items.BUCKET)) {
-            var eyePos = player.getEyePosition();
-            BlockHitResult hit = level.clip(new ClipContext(
-                    eyePos,
-                    eyePos.add(player.getLookAngle().scale(player.isCreative() ? 5.0 : 4.5)),
-                    ClipContext.Block.OUTLINE,
-                    ClipContext.Fluid.ANY,
-                    player));
-            BlockPos pos = hit.getBlockPos();
-
-            if (level.getFluidState(pos).is(FluidTags.WATER) && level.getFluidState(pos).isSource()) {
-                BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof BucketPickup pickup) {
-                    int purity = WaterPurity.getBlockPurity(level, pos);
-                    ItemStack taken = pickup.pickupBlock(player, level, pos, state);
-                    if (!taken.isEmpty()) {
-                        if (!level.isClientSide()) {
-                            ItemStack filledBucket = new ItemStack(Items.WATER_BUCKET);
-                            WaterPurity.addPurity(filledBucket, purity);
-                            player.awardStat(Stats.ITEM_USED.get(Items.BUCKET));
-                            pickup.getPickupSound().ifPresent(sound -> level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F));
-                            level.gameEvent(player, GameEvent.FLUID_PICKUP, pos);
-
-                            ItemStack result = ItemUtils.createFilledResult(held, player, filledBucket);
-                            player.setItemInHand(hand, result);
-                        }
-                        event.setCancellationResult(InteractionResult.SUCCESS);
-                        event.setCanceled(true);
-                        return;
-                    }
+            InteractionResult bucketResult = WaterPurity.useEmptyBucketOnWater(player, level, hand);
+            if (bucketResult != null) {
+                // Cancelled results skip vanilla's held-item replacement, so apply the filled bucket here.
+                if (bucketResult instanceof InteractionResult.Success success
+                        && success.heldItemTransformedTo() != null) {
+                    player.setItemInHand(hand, success.heldItemTransformedTo());
                 }
+                event.setCancellationResult(bucketResult);
+                event.setCanceled(true);
+                return;
             }
         }
 
@@ -137,7 +117,7 @@ public final class NeoForgeGameEvents {
         var eyePos = player.getEyePosition();
         BlockHitResult hit = level.clip(new ClipContext(
                 eyePos,
-                eyePos.add(player.getLookAngle().scale(player.isCreative() ? 5.0 : 4.5)),
+                eyePos.add(player.getLookAngle().scale(player.blockInteractionRange())),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.ANY,
                 player));

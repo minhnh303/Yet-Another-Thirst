@@ -43,6 +43,14 @@ sourceSets {
         compileClasspath += sourceSets.main.output + configurations.compileClasspath
         runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
     }
+    test {
+        compileClasspath += sourceSets.client.output
+        runtimeClasspath += sourceSets.client.output
+    }
+}
+
+tasks.named('test').configure {
+    dependsOn tasks.named('compileClientJava')
 }
 
 configurations {

@@ -7,8 +7,6 @@ public final class NeoForgeConfigCompat {
 
     static final ModConfigSpec SPEC;
 
-    @SuppressWarnings("unused")
-    private static final ModConfigSpec.IntValue CONFIG_VERSION;
     private static final ModConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
     private static final ModConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
     private static final ModConfigSpec.EnumValue<ThirstConfig.ToughAsNailsMode> TOUGH_AS_NAILS_MODE;
@@ -22,10 +20,6 @@ public final class NeoForgeConfigCompat {
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-
-        CONFIG_VERSION = builder
-                .comment("Config file version — do not modify")
-                .defineInRange("configVersion", 1, 1, Integer.MAX_VALUE);
 
         builder.push("compatibility");
         APPLESKIN_THIRST_TOOLTIP = builder

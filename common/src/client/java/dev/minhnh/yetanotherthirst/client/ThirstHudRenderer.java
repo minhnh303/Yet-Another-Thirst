@@ -208,7 +208,8 @@ public final class ThirstHudRenderer {
         if (previewThirst > currentThirst) {
             for (int i = 0; i < 10; ++i) {
                 int index = i * 2 + 1;
-                if (index <= currentThirst) {
+                // Skip only fully filled slots; a current half droplet is completed by the preview.
+                if (index < currentThirst) {
                     continue;
                 }
                 int x = left - i * 8 - 9;

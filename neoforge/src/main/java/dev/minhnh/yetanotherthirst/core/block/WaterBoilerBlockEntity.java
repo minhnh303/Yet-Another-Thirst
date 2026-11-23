@@ -1,5 +1,6 @@
 package dev.minhnh.yetanotherthirst.core.block;
 
+import dev.minhnh.yetanotherthirst.Lang;
 import dev.minhnh.yetanotherthirst.compat.FluidPurityHelper;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.purity.WaterPurity;
@@ -135,6 +136,7 @@ public class WaterBoilerBlockEntity extends BlockEntity implements MenuProvider,
 
     private long lastEnergyTick = -1;
     private int energyReceivedThisTick = 0;
+    private int energyRate = 0;
 
     private final net.minecraftforge.energy.IEnergyStorage energyHandlerImpl = new net.minecraftforge.energy.IEnergyStorage() {
         @Override
@@ -202,28 +204,33 @@ public class WaterBoilerBlockEntity extends BlockEntity implements MenuProvider,
     protected final ContainerData dataAccess = new ContainerData() {
         @Override
         public int get(int index) {
-            switch (index) {
-                case 0: return litTime;
-                case 1: return litDuration;
-                case 2: return cookTime;
-                case 3: return cookTimeTotal;
-                default: return 0;
-            }
+            return switch (index) {
+                case 0 -> litTime;
+                case 1 -> litDuration;
+                case 2 -> cookTime;
+                case 3 -> cookTimeTotal;
+                // Data slots sync as 16-bit shorts, so 32-bit energy values are split into low and high halves.
+                case 4 -> energyRate & 0xFFFF;
+                case 5 -> energyRate >>> 16;
+                case 6 -> ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION & 0xFFFF;
+                case 7 -> ThirstConfig.WATER_BOILER_ENERGY_CONSUMPTION >>> 16;
+                default -> 0;
+            };
         }
 
         @Override
         public void set(int index, int value) {
             switch (index) {
-                case 0: litTime = value; break;
-                case 1: litDuration = value; break;
-                case 2: cookTime = value; break;
-                case 3: cookTimeTotal = value; break;
+                case 0 -> litTime = value;
+                case 1 -> litDuration = value;
+                case 2 -> cookTime = value;
+                case 3 -> cookTimeTotal = value;
             }
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return 8;
         }
     };
 
@@ -235,6 +242,8 @@ public class WaterBoilerBlockEntity extends BlockEntity implements MenuProvider,
         if (level.isClientSide()) return;
 
         entity.cookTimeTotal = ThirstConfig.WATER_BOILER_BOIL_TIME;
+        // Energy may arrive before or after this tick runs, so accept input from the current or previous tick.
+        entity.energyRate = entity.lastEnergyTick >= level.getGameTime() - 1 ? entity.energyReceivedThisTick : 0;
 
         boolean wasLit = state.getValue(WaterBoilerBlock.LIT);
         boolean changed = false;
@@ -578,7 +587,8 @@ public class WaterBoilerBlockEntity extends BlockEntity implements MenuProvider,
             BlockState newSelfState = state;
             BlockState newOtherState = otherState.is(state.getBlock()) ? otherState : null;
             WaterBoilerBlock.PortSide clickedPortSide = WaterBoilerBlock.PortSide.fromDirection(side);
-            String halfStr = isUpper() ? "upper" : "lower";
+            boolean upper = isUpper();
+            Component message;
 
             if (state.getValue(WaterBoilerBlock.INLET) == clickedPortSide) {
                  newSelfState = newSelfState.setValue(WaterBoilerBlock.INLET, WaterBoilerBlock.PortSide.NONE);
@@ -586,25 +596,30 @@ public class WaterBoilerBlockEntity extends BlockEntity implements MenuProvider,
                      newOtherState = newOtherState.setValue(WaterBoilerBlock.OUTLET, WaterBoilerBlock.PortSide.NONE);
                  }
                  newSelfState = newSelfState.setValue(WaterBoilerBlock.OUTLET, clickedPortSide);
+                 message = Lang.WaterBoiler.outletSet(side, upper);
             } else if (state.getValue(WaterBoilerBlock.OUTLET) == clickedPortSide) {
                  newSelfState = newSelfState.setValue(WaterBoilerBlock.OUTLET, WaterBoilerBlock.PortSide.NONE);
                  if (newOtherState != null && newOtherState.getValue(WaterBoilerBlock.PORT) != WaterBoilerBlock.PortSide.NONE) {
                      newOtherState = newOtherState.setValue(WaterBoilerBlock.PORT, WaterBoilerBlock.PortSide.NONE);
                  }
                  newSelfState = newSelfState.setValue(WaterBoilerBlock.PORT, clickedPortSide);
+                 message = Lang.WaterBoiler.portSet(side, upper);
             } else if (state.getValue(WaterBoilerBlock.PORT) == clickedPortSide) {
                  newSelfState = newSelfState.setValue(WaterBoilerBlock.PORT, WaterBoilerBlock.PortSide.NONE);
+                 message = Lang.WaterBoiler.portRemoved(side, upper);
             } else {
                  if (newOtherState != null && newOtherState.getValue(WaterBoilerBlock.INLET) != WaterBoilerBlock.PortSide.NONE) {
                      newOtherState = newOtherState.setValue(WaterBoilerBlock.INLET, WaterBoilerBlock.PortSide.NONE);
                  }
                  newSelfState = newSelfState.setValue(WaterBoilerBlock.INLET, clickedPortSide);
+                 message = Lang.WaterBoiler.inletSet(side, upper);
             }
 
             this.level.setBlock(pos, newSelfState, 3);
             if (newOtherState != null) {
                 this.level.setBlock(otherPos, newOtherState, 3);
             }
+            player.displayClientMessage(message, true);
             this.level.playSound(null, pos, net.minecraft.sounds.SoundEvents.ANVIL_PLACE, net.minecraft.sounds.SoundSource.BLOCKS, 0.5F, 1.5F);
             return true;
         }

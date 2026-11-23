@@ -7,8 +7,6 @@ public final class ForgeConfigCompat {
 
     static final ForgeConfigSpec SPEC;
 
-    @SuppressWarnings("unused")
-    private static final ForgeConfigSpec.IntValue CONFIG_VERSION;
     private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_TOOLTIP;
     private static final ForgeConfigSpec.BooleanValue APPLESKIN_THIRST_HUD_PREVIEW;
     private static final ForgeConfigSpec.EnumValue<ThirstConfig.ToughAsNailsMode> TOUGH_AS_NAILS_MODE;
@@ -22,10 +20,6 @@ public final class ForgeConfigCompat {
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-
-        CONFIG_VERSION = builder
-                .comment("Config file version — do not modify")
-                .defineInRange("configVersion", 1, 1, Integer.MAX_VALUE);
 
         builder.push("compatibility");
         APPLESKIN_THIRST_TOOLTIP = builder

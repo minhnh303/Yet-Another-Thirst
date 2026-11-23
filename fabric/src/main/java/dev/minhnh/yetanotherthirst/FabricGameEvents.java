@@ -56,33 +56,19 @@ public final class FabricGameEvents {
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack held = player.getItemInHand(hand);
             if (held.is(net.minecraft.world.item.Items.BUCKET)) {
-                var eyePos = player.getEyePosition();
-                var pos = world.clip(new net.minecraft.world.level.ClipContext(
-                        eyePos,
-                        eyePos.add(player.getLookAngle().scale(player.isCreative() ? 5.0 : 4.5)),
-                        net.minecraft.world.level.ClipContext.Block.OUTLINE,
-                        net.minecraft.world.level.ClipContext.Fluid.ANY,
-                        player)).getBlockPos();
-                if (world.getFluidState(pos).is(FluidTags.WATER) && world.getFluidState(pos).isSource()) {
-                    net.minecraft.world.level.block.state.BlockState state = world.getBlockState(pos);
-                    if (state.getBlock() instanceof net.minecraft.world.level.block.BucketPickup pickup) {
-                        int purity = WaterPurity.getBlockPurity(world, pos);
-                        ItemStack taken = pickup.pickupBlock(player, world, pos, state);
-                        if (!taken.isEmpty()) {
-                            if (!world.isClientSide()) {
-                                ItemStack filledBucket = new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET);
-                                WaterPurity.addPurity(filledBucket, purity);
-                                player.awardStat(net.minecraft.stats.Stats.ITEM_USED.get(net.minecraft.world.item.Items.BUCKET));
-                                pickup.getPickupSound().ifPresent(sound -> world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F));
-                                world.gameEvent(player, GameEvent.FLUID_PICKUP, pos);
-                                
-                                ItemStack result = ItemUtils.createFilledResult(held, player, filledBucket);
-                                player.setItemInHand(hand, result);
-                            }
-                            return InteractionResult.SUCCESS;
-                        }
-                    }
+                InteractionResult bucketResult = WaterPurity.useEmptyBucketOnWater(player, world, hand);
+                if (bucketResult == null) {
+                    return InteractionResult.PASS;
                 }
+                if (bucketResult instanceof InteractionResult.Success success) {
+                    if (success.heldItemTransformedTo() != null
+                            && success.heldItemTransformedTo() != player.getItemInHand(hand)) {
+                        player.setItemInHand(hand, success.heldItemTransformedTo());
+                    }
+                    // Fabric only sends the use-item packet to the server for the SUCCESS constant itself.
+                    return InteractionResult.SUCCESS;
+                }
+                return bucketResult;
             }
             if (!WaterPurity.canHarvestRunningWater(held)) {
                 return InteractionResult.PASS;
@@ -90,7 +76,7 @@ public final class FabricGameEvents {
             var eyePos = player.getEyePosition();
             var pos = world.clip(new net.minecraft.world.level.ClipContext(
                     eyePos,
-                    eyePos.add(player.getLookAngle().scale(player.isCreative() ? 5.0 : 4.5)),
+                    eyePos.add(player.getLookAngle().scale(player.blockInteractionRange())),
                     net.minecraft.world.level.ClipContext.Block.OUTLINE,
                     net.minecraft.world.level.ClipContext.Fluid.ANY,
                     player)).getBlockPos();

@@ -1,11 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
 license = "${license}"
+issueTrackerURL = "https://github.com/minhnh303/Yet-Another-Thirst/issues"
 
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/yet-another-thirst"
 iconFile = "${mod_id}.png"
 credits = "${credits}"
 authors = "${mod_author}"

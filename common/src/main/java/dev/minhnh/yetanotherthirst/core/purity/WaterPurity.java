@@ -1,10 +1,13 @@
 package dev.minhnh.yetanotherthirst.core.purity;
 
+import dev.minhnh.yetanotherthirst.Lang;
 import dev.minhnh.yetanotherthirst.core.advancement.ModAdvancements;
 import dev.minhnh.yetanotherthirst.core.effect.ModEffects;
 import dev.minhnh.yetanotherthirst.core.item.ModItems;
 import dev.minhnh.yetanotherthirst.core.thirst.ThirstConfig;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.core.component.DataComponents;
@@ -30,13 +33,19 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractCauldronBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -275,6 +284,54 @@ public final class WaterPurity {
         return false;
     }
 
+    /**
+     * Mirrors vanilla {@code BucketItem.use} for an empty bucket aimed at a water source,
+     * attaching the source's purity to the filled bucket. The water is removed through
+     * {@link BucketPickup#pickupBlock}, which also clears waterlogged states.
+     *
+     * @return the use result, or {@code null} when the bucket is not aimed at a water source
+     *         and vanilla handling should proceed
+     */
+    public static InteractionResult useEmptyBucketOnWater(Player player, Level level, InteractionHand hand) {
+        ItemStack held = player.getItemInHand(hand);
+        if (!held.is(Items.BUCKET)) return null;
+
+        Vec3 eye = player.getEyePosition();
+        BlockHitResult hit = level.clip(new ClipContext(
+                eye,
+                eye.add(player.getLookAngle().scale(player.blockInteractionRange())),
+                ClipContext.Block.OUTLINE,
+                ClipContext.Fluid.SOURCE_ONLY,
+                player));
+        if (hit.getType() != HitResult.Type.BLOCK) return null;
+
+        BlockPos pos = hit.getBlockPos();
+        FluidState fluid = level.getFluidState(pos);
+        if (!fluid.is(FluidTags.WATER) || !fluid.isSource()) return null;
+
+        Direction direction = hit.getDirection();
+        if (!level.mayInteract(player, pos) || !player.mayUseItemAt(pos.relative(direction), direction, held)) {
+            return InteractionResult.FAIL;
+        }
+
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof BucketPickup pickup)) return null;
+
+        int purity = getBlockPurity(level, pos);
+        ItemStack filled = pickup.pickupBlock(player, level, pos, state);
+        if (filled.isEmpty()) return InteractionResult.FAIL;
+
+        addPurity(filled, purity);
+        player.awardStat(Stats.ITEM_USED.get(held.getItem()));
+        pickup.getPickupSound().ifPresent(sound -> player.playSound(sound, 1.0F, 1.0F));
+        level.gameEvent(player, GameEvent.FLUID_PICKUP, pos);
+        ItemStack result = ItemUtils.createFilledResult(held, player, filled);
+        if (player instanceof ServerPlayer serverPlayer) {
+            CriteriaTriggers.FILLED_BUCKET.trigger(serverPlayer, filled);
+        }
+        return InteractionResult.SUCCESS.heldItemTransformedTo(result);
+    }
+
     public static ContainerWithPurity getContainerForEmpty(ItemStack stack) {
         for (ContainerWithPurity c : CONTAINERS)
             if (c.equalsEmpty(stack)) return c;
@@ -463,12 +520,7 @@ public final class WaterPurity {
     }
 
     public static Component purityComponent(int purity) {
-        String key = "yet_another_thirst.purity." + switch (purity) {
-            case 0 -> "dirty";
-            case 1 -> "slightly_dirty";
-            case 2 -> "acceptable";
-            default -> "purified";
-        };
+        String key = Lang.purityKey(purity);
         int color = switch (purity) {
             case 0 -> 0xa84825;  // dirty   — dark brown
             case 1 -> 0x796c71;  // slightly dirty — gray-brown

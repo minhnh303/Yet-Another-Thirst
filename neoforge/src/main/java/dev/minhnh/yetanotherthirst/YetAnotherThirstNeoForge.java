@@ -16,6 +16,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 @Mod(Constants.MOD_ID)
 public class YetAnotherThirstNeoForge {
@@ -35,6 +37,9 @@ public class YetAnotherThirstNeoForge {
         modBus.addListener(YetAnotherThirstNeoForge::onCommonSetup);
         modBus.addListener(YetAnotherThirstNeoForge::onRegister);
         modBus.addListener(YetAnotherThirstNeoForge::onRegisterGameTests);
+        if (FMLEnvironment.getDist().isClient()) {
+            NeoForgeConfigScreen.register(modContainer);
+        }
 
         // Bind NeoForge DeferredItems/DeferredHolders into loader-agnostic ModItems/ModEffects
         NeoForgeItems.bindToCommon();
@@ -79,20 +84,42 @@ public class YetAnotherThirstNeoForge {
     }
 
     private static void onConfigLoading(ModConfigEvent.Loading event) { onConfigEvent(event); }
-    private static void onConfigReloading(ModConfigEvent.Reloading event) { onConfigEvent(event); }
+
+    /**
+     * Fired on the config file-watcher thread, also after the in-game config screen saves a file. While a server
+     * runs, the values are pushed on its thread so ticking never sees them change mid-tick.
+     */
+    private static void onConfigReloading(ModConfigEvent.Reloading event) {
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            server.execute(() -> onConfigEvent(event));
+        } else {
+            onConfigEvent(event);
+        }
+    }
 
     private static void onConfigEvent(ModConfigEvent event) {
-        Constants.LOG.info("onConfigEvent: {}", event.getConfig().getFileName());
         var spec = event.getConfig().getSpec();
         if (spec == NeoForgeConfigCommon.SPEC) {
             NeoForgeConfigCommon.sync();
         } else if (spec == NeoForgeConfigItems.SPEC) {
             NeoForgeConfigItems.sync();
-            NeoForgeConfigItems.reloadThirstValues();
+            reloadItemValuesOnServer();
         } else if (spec == NeoForgeConfigCompat.SPEC) {
             NeoForgeConfigCompat.sync();
         } else if (spec == NeoForgeClientConfig.SPEC) {
             NeoForgeClientConfig.sync();
+        }
+    }
+
+    /**
+     * Config events fire on the loading, render or file-watcher thread; item values are resolved on the
+     * running server thread, where tags are bound. Without a server nothing runs; server start resolves them.
+     */
+    private static void reloadItemValuesOnServer() {
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            server.execute(NeoForgeConfigItems::reloadThirstValues);
         }
     }
 }

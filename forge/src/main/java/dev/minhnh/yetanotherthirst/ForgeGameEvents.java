@@ -90,6 +90,18 @@ public final class ForgeGameEvents {
     @SubscribeEvent
     public static boolean onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         ItemStack held = event.getItemStack();
+        if (held.is(Items.BUCKET)) {
+            var bucketResult = WaterPurity.useEmptyBucketOnWater(event.getEntity(), event.getLevel(), event.getHand());
+            if (bucketResult != null) {
+                if (bucketResult instanceof InteractionResult.Success success
+                        && success.heldItemTransformedTo() != null) {
+                    event.getEntity().setItemInHand(event.getHand(), success.heldItemTransformedTo());
+                }
+                event.setCancellationResult(bucketResult);
+                return true;
+            }
+            return false;
+        }
         if (!WaterPurity.canHarvestRunningWater(held)) return false;
 
         var player = event.getEntity();
@@ -97,7 +109,7 @@ public final class ForgeGameEvents {
         var eyePos = player.getEyePosition();
         var pos = level.clip(new ClipContext(
                 eyePos,
-                eyePos.add(player.getLookAngle().scale(player.isCreative() ? 5.0 : 4.5)),
+                eyePos.add(player.getLookAngle().scale(player.blockInteractionRange())),
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.ANY,
                 player)).getBlockPos();
@@ -130,29 +142,5 @@ public final class ForgeGameEvents {
     @SubscribeEvent
     public static void onTagsUpdated(TagsUpdatedEvent event) {
         ForgeConfigItems.reloadThirstValues();
-    }
-
-    @SubscribeEvent
-    public static void onFillBucket(FillBucketEvent event) {
-        if (event.getLevel().isClientSide()) return;
-        if (!event.getEmptyBucket().is(Items.BUCKET)) return;
-        if (!(event.getTarget() instanceof BlockHitResult blockHit)) return;
-
-        BlockPos pos = blockHit.getBlockPos();
-        Level level = event.getLevel();
-        if (!level.getFluidState(pos).is(FluidTags.WATER) || !level.getFluidState(pos).isSource()) return;
-
-        BlockState state = level.getBlockState(pos);
-        if (!(state.getBlock() instanceof BucketPickup pickup)) return;
-
-        int purity = WaterPurity.getBlockPurity(level, pos);
-        ItemStack filled = pickup.pickupBlock(event.getEntity(), level, pos, state);
-        if (filled.isEmpty()) return;
-
-        WaterPurity.addPurity(filled, purity);
-        pickup.getPickupSound().ifPresent(sound -> event.getEntity().playSound(sound, 1.0F, 1.0F));
-        level.gameEvent(event.getEntity(), GameEvent.FLUID_PICKUP, pos);
-        event.setFilledBucket(filled);
-        event.setResult(Result.ALLOW);
     }
 }

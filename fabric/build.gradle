@@ -68,7 +68,11 @@ dependencies {
 }
 
 sourceSets {
+    modmenuApi {
+        compileClasspath += configurations.compileClasspath
+    }
     main {
+        compileClasspath += sourceSets.modmenuApi.output
         java {
             exclude 'dev/minhnh/yetanotherthirst/mixin/create/**'
             exclude 'dev/minhnh/yetanotherthirst/mixin/CompatMixinPlugin.java'
@@ -80,6 +84,7 @@ sourceSets {
 }
 
 tasks.named('compileJava', JavaCompile) {
+    dependsOn(tasks.named('compileModmenuApiJava'))
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
     dependsOn(configurations.commonClientJava)

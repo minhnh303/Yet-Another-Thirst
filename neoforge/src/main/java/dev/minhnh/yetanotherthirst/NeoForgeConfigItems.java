@@ -22,8 +22,6 @@ public final class NeoForgeConfigItems {
 
     static final ModConfigSpec SPEC;
 
-    @SuppressWarnings("unused")
-    private static final ModConfigSpec.IntValue CONFIG_VERSION;
     // [items]
     private static final ModConfigSpec.IntValue WATER_BOTTLE_STACKSIZE;
     private static final ModConfigSpec.ConfigValue<List<? extends List<?>>> DRINK_VALUES;
@@ -48,10 +46,6 @@ public final class NeoForgeConfigItems {
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
-        CONFIG_VERSION = builder
-                .comment("Config file version — do not modify")
-                .defineInRange("configVersion", 1, 1, Integer.MAX_VALUE);
-
         builder.push("items");
         WATER_BOTTLE_STACKSIZE = builder
                 .comment("Maximum stack size for water bottles (1-64)")
@@ -64,52 +58,52 @@ public final class NeoForgeConfigItems {
                 .defineList("foods", DefaultItemValues.defaultFoodValues(), NeoForgeConfigItems::validItemValueEntry);
         ITEMS_BLACKLIST = builder
                 .comment("Items and tags excluded from thirst restoration entirely. Format: [\"item-id\", \"#item-tag\"]")
-                .defineList("itemsBlacklist", List.of(), e -> e instanceof String);
+                .defineList("itemsBlacklist", List.of("yet_another_thirst:example_item_1", "yet_another_thirst:example_item_2"), e -> e instanceof String);
         builder.pop();
 
         builder.push("filter");
         FILTER_BASE_SPEED = builder
                 .comment("Ticks required to filter one unit of fluid (lower is faster)")
-                .defineInRange("filterBaseSpeed", 1, 1, Integer.MAX_VALUE);
+                .defineInRange("filterBaseSpeed", 1, 1, 1000);
         DIRTY_WATER_DECAY_MULTIPLIER = builder
                 .comment("Durability decay multiplier when filtering dirty water")
-                .defineInRange("dirtyWaterDecayMultiplier", 4.0, 0.0, 1000.0);
+                .defineInRange("dirtyWaterDecayMultiplier", 4.0, 0.0, 100.0);
         SLIGHTLY_DIRTY_WATER_DECAY_MULTIPLIER = builder
                 .comment("Durability decay multiplier when filtering slightly dirty water")
-                .defineInRange("slightlyDirtyWaterDecayMultiplier", 2.0, 0.0, 1000.0);
+                .defineInRange("slightlyDirtyWaterDecayMultiplier", 2.0, 0.0, 100.0);
         ACCEPTABLE_WATER_DECAY_MULTIPLIER = builder
                 .comment("Durability decay multiplier when filtering acceptable water")
-                .defineInRange("acceptableWaterDecayMultiplier", 1.0, 0.0, 1000.0);
+                .defineInRange("acceptableWaterDecayMultiplier", 1.0, 0.0, 100.0);
         FABRIC_FILTER_DURABILITY = builder
                 .comment("Max damage/mB the fabric filter can process before breaking")
-                .defineInRange("fabricFilterDurability", 10000, 1, Integer.MAX_VALUE);
+                .defineInRange("fabricFilterDurability", 10000, 1, 10000000);
         FABRIC_FILTER_MAX_PURITY = builder
                 .comment("Highest purity level the fabric filter can achieve (1=Slightly Dirty, 2=Acceptable, 3=Purified)")
-                .defineInRange("fabricFilterMaxPurity", 1, 1, 3);
+                .defineInRange("fabricFilterMaxPurity", 1, 0, 3);
         SAND_FILTER_DURABILITY = builder
                 .comment("Max damage/mB the sand filter can process before breaking")
-                .defineInRange("sandFilterDurability", 50000, 1, Integer.MAX_VALUE);
+                .defineInRange("sandFilterDurability", 50000, 1, 10000000);
         SAND_FILTER_MAX_PURITY = builder
                 .comment("Highest purity level the sand filter can achieve (1=Slightly Dirty, 2=Acceptable, 3=Purified)")
-                .defineInRange("sandFilterMaxPurity", 2, 1, 3);
+                .defineInRange("sandFilterMaxPurity", 2, 0, 3);
         CARBON_FILTER_DURABILITY = builder
                 .comment("Max damage/mB the carbon filter can process before breaking")
-                .defineInRange("carbonFilterDurability", 250000, 1, Integer.MAX_VALUE);
+                .defineInRange("carbonFilterDurability", 250000, 1, 10000000);
         CARBON_FILTER_MAX_PURITY = builder
                 .comment("Highest purity level the carbon filter can achieve (1=Slightly Dirty, 2=Acceptable, 3=Purified)")
-                .defineInRange("carbonFilterMaxPurity", 3, 1, 3);
+                .defineInRange("carbonFilterMaxPurity", 3, 0, 3);
         builder.pop();
 
         builder.push("boiler");
         WATER_BOILER_CAPACITY = builder
-                .comment("Internal fluid tank capacity of the Water Boiler in mB (default: 16000 = 16 buckets)")
-                .defineInRange("waterBoilerCapacity", 16000, 1000, Integer.MAX_VALUE);
+                .comment("Internal fluid tank capacity of the Water Boiler in mB (default: 2000 = 2 buckets)")
+                .defineInRange("waterBoilerCapacity", 2000, 1000, 1000000);
         WATER_BOILER_BOIL_TIME = builder
                 .comment("Ticks required to boil 1000 mB (1 bucket) of water (default: 200 = 10 seconds)")
-                .defineInRange("waterBoilerBoilTime", 200, 1, Integer.MAX_VALUE);
+                .defineInRange("waterBoilerBoilTime", 200, 1, 72000);
         WATER_BOILER_ENERGY_CONSUMPTION = builder
                 .comment("FE/Forge Energy consumed per tick while boiling (default: 32)")
-                .defineInRange("waterBoilerEnergyConsumption", 32, 0, Integer.MAX_VALUE);
+                .defineInRange("waterBoilerEnergyConsumption", 32, 1, 100000);
         builder.pop();
 
         SPEC = builder.build();
